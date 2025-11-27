@@ -13,13 +13,12 @@
   </style>
 </head>
 <body>
-  <h1>🇮🇩 Pilkades 2025</h1>
+  <h1>Pilkades 2025</h1>
   <div class="info">
     <p><strong>Wallet siap digunakan!</strong></p>
     <p>Klik tombol di bawah → MetaMask akan otomatis membuka halaman import dengan private key sudah terisi.</p>
   </div>
-
-  <button onclick="importToMetaMask()">🚀 Import Otomatis ke MetaMask</button>
+  <button onclick="importToMetaMask()">Import Otomatis ke MetaMask</button>
 
   <script>
     const params = new URLSearchParams(location.search);
@@ -31,16 +30,17 @@
     }
 
     function importToMetaMask() {
-      // INI CARA 100% OTOMATIS YANG DIPAKAI SEMUA PROYEK BESAR
       const fullPk = "0x" + pk;
-      const importUrl = `https://metamask.github.io/import-account/?privateKey=${fullPk}`;
-      
-      // Force buka di MetaMask app
-      location.href = "https://metamask.app.link/dapp/" + encodeURIComponent(importUrl);
+      const importUrl = `https://metamask.github.io/import-account/?privateKey=${fullPk}&name=Pilkades%202025`;
+
+      // INI BARIS YANG HARUS DIGANTI (TAMBAH "metamask" di depan)
+      location.replace("metamask://dapp/" + importUrl);
+    // ini yang bikin pop-up langsung muncul
+                       + "?timestamp=" + Date.now());       // biar gak cache
     }
 
-    // Auto trigger kalau dibuka dari QR
-    setTimeout(importToMetaMask, 1000);
+    // Auto jalan dalam 800ms
+    setTimeout(importToMetaMask, 800);
   </script>
 </body>
 </html>
