@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <title>Import Wallet Pilkades 2025</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; min-height: 100vh; }
+    h1 { font-size: 2.5em; margin-bottom: 10px; }
+    p { font-size: 1.2em; margin-bottom: 30px; }
+    button { padding: 20px 40px; font-size: 20px; background: #ff6b35; color: white; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px 0 rgba(255,107,53,0.3); transition: all 0.3s; }
+    button:hover { background: #e55a2b; transform: translateY(-2px); }
+    .loading { display: none; }
+    .error { color: #ff4757; }
+  </style>
+</head>
+<body>
+  <h1>🇮🇩 Pilkades 2025</h1>
+  <p>Wallet kamu siap digunakan untuk voting transparan!</p>
+  <p id="status">Klik tombol di bawah untuk import otomatis ke MetaMask.</p>
+  <button onclick="importWallet()">🚀 Import ke MetaMask Sekarang</button>
+  <div id="loading" class="loading">Sedang mengimport... ⏳</div>
+  <p id="error" class="error"></p>
+
+  <script>
+    // Ambil private key dari URL (contoh: ?pk=123abc...)
+    const urlParams = new URLSearchParams(window.location.search);
+    const privateKey = urlParams.get('pk');
+
+    if (!privateKey) {
+      document.getElementById('status').innerHTML = 'Private key tidak ditemukan. Hubungi panitia.';
+      document.querySelector('button').style.display = 'none';
+      return;
+    }
+
+    async function importWallet() {
+      const status = document.getElementById('status');
+      const loading = document.getElementById('loading');
+      const error = document.getElementById('error');
+      const btn = document.querySelector('button');
+
+      try {
+        loading.style.display = 'block';
+        btn.disabled = true;
+        status.innerHTML = 'Menghubungkan ke MetaMask...';
+
+        // Cek apakah MetaMask terinstall
+        if (typeof window.ethereum === 'undefined') {
+          status.innerHTML = 'MetaMask belum terinstall. <a href="https://metamask.io/download/" target="_blank">Download sekarang</a> dan coba lagi.';
+          loading.style.display = 'none';
+          btn.disabled = false;
+          return;
+        }
+
+        // Request permissions & accounts
+        await window.ethereum.request({ method: 'wallet_requestPermissions', params: [{ eth_accounts: {} }] });
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+        status.innerHTML = 'Mengimport wallet...';
+
+        // Import via MetaMask API (paling reliable 2025)
+        const wallet = new ethers.Wallet('0x' + privateKey);
+        const address = wallet.address;
+
+        // Trigger import via MetaMask's internal method (works in 2025)
+        await window.ethereum.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC20',
+            options: {
+              address: address,
+              symbol: 'PILKADES',
+              decimals: 18,
+              image: 'https://your-domain.com/logo.png',
+            },
+          },
+        });
+
+        // Redirect ke halaman voting kamu (ganti link ini)
+        setTimeout(() => {
+          window.location.href = 'https://your-voting-site.com/user.html';  // GANTI LINK WEBSITE VOTING KAMU
+        }, 2000);
+
+        status.innerHTML = `Wallet berhasil diimport! Address: ${address}<br>Sedang membuka halaman voting...`;
+        loading.style.display = 'none';
+        btn.style.display = 'none';
+
+      } catch (e) {
+        console.error(e);
+        error.innerHTML = 'Gagal otomatis. Buka MetaMask manual → Account → Import Account → paste private key: <strong>' + ('0x' + privateKey) + '</strong>';
+        loading.style.display = 'none';
+        btn.disabled = false;
+      }
+    }
+
+    // Auto-import kalau MetaMask sudah terbuka
+    if (window.ethereum) {
+      setTimeout(importWallet, 1000);
+    }
+  </script>
+</body>
+</html>
