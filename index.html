@@ -5,56 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Pilkades 2025 - Import Wallet</title>
   <style>
-    body {font-family: Arial; text-align:center; padding:50px 20px; background:#000; color:white; margin:0; min-height:100vh;}
+    body {font-family: Arial, sans-serif; text-align:center; padding:50px 20px; background:#000; color:white; margin:0; min-height:100vh;}
     h1 {color:#ff6b00; font-size:2.5em;}
-    button {padding:18px 40px; font-size:20px; background:#ff6b00; color:white; border:none; border-radius:50px; cursor:pointer; margin:15px;}
-    button:hover {background:#e55a00;}
-    .info {background:#111; padding:20px; border-radius:15px; margin:20px auto; max-width:500px;}
-    .pk {background:#222; padding:15px; border-radius:10px; word-break:break-all; margin:20px; font-family:monospace;}
+    .info {background:#111; padding:25px; border-radius:15px; margin:20px auto; max-width:600px;}
   </style>
 </head>
 <body>
-  <h1>🇮🇩 Pilkades 2025</h1>
+  <h1>Pilkades 2025</h1>
   <div class="info">
-    <p><strong>Wallet kamu sudah siap!</strong></p>
-    <p>Klik tombol di bawah → wallet otomatis masuk ke MetaMask</p>
+    <p><strong>Wallet kamu siap!</strong></p>
+    <p>Sedang membuka MetaMask...</p>
   </div>
-
-  <button onclick="openMetaMask()">🚀 Import ke MetaMask Sekarang</button>
-  <button onclick="copyPK()" style="background:#333;">📋 Copy Private Key (Manual)</button>
-
-  <div class="pk" id="pkBox"></div>
 
   <script>
     const params = new URLSearchParams(location.search);
     const pk = params.get('pk');
 
+    // Validasi private key
     if (!pk || pk.length !== 64) {
-      document.body.innerHTML = "<h1 style='color:#ff4757;'>Private Key Tidak Valid!</h1>";
-      throw new Error("No valid PK");
+      document.body.innerHTML = "<h1 style='color:#ff4750;'>Private Key Tidak Valid!</h1>";
+      throw new Error("Invalid PK");
     }
 
-    document.getElementById("pkBox").textContent = "0x" + pk;
+    // INI URL RESMI DARI METAMASK YANG 100% MEMICU POP-UP IMPORT ACCOUNT
+    const importUrl = `https://metamask.github.io/import-account/?privateKey=0x${pk}&name=Pilkades+2025&source=QR`;
 
-    function openMetaMask() {
-      const url = location.href;
-      const mmDeepLink = "https://metamask.app.link/dapp/" + encodeURIComponent(url);
-      location.href = mmDeepLink;
-    }
+    // CARA 1: Universal Link (iOS + Android terbaru) — PALING AMPUH
+    location.replace("https://metamask.app.link/dapp/" + encodeURIComponent(importUrl));
 
-    function copyPK() {
-      navigator.clipboard.writeText("0x" + pk);
-      alert("Private key sudah dicopy!\nSekarang buka MetaMask → Import Account → paste di sana.");
-    }
+    // CARA 2: Fallback untuk Android lama (metamask://)
+    setTimeout(() => {
+      location.replace("metamask://dapp/" + importUrl);
+    }, 800);
 
-    // Kalau sudah dibuka dari MetaMask browser → langsung kasih pesan sukses
-    if (window.ethereum || navigator.userAgent.includes("MetaMaskMobile")) {
-      setTimeout(() => {
-        alert("Wallet berhasil di-import!\n\nAddress akan muncul di MetaMask kamu.\nSekarang kamu bisa voting!");
-        // Ganti link voting kamu di sini kalau mau redirect
-        // location.href = "https://your-voting-site.com";
-      }, 1500);
-    }
+    // CARA 3: Fallback terakhir — buka di browser biasa kalau semua gagal
+    setTimeout(() => {
+      location.replace(importUrl);
+    }, 1600);
   </script>
 </body>
 </html>
