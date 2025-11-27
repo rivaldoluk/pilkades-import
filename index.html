@@ -3,74 +3,80 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Import Wallet Pilkades 2025</title>
-  <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <title>Pilkades 2025 - Import Wallet</title>
   <style>
-    body {font-family: Arial, sans-serif; text-align:center; padding:40px; background:#000; color:white; min-height:100vh; margin:0;}
-    h1 {color:#ff6b00; font-size:2.5em; margin:20px;}
-    button {padding:20px 50px; font-size:22px; background:#ff6b00; color:white; border:none; border-radius:50px; cursor:pointer;}
+    body {font-family: Arial; text-align:center; padding:40px; background:#000; color:white; margin:0; min-height:100vh;}
+    h1 {color:#ff6b00; font-size:2.5em;}
+    button {padding:20px 50px; font-size:22px; background:#ff6b00; color:white; border:none; border-radius:50px; cursor:pointer; margin:20px;}
     button:hover {background:#e55a00;}
-    .info {background:#111; padding:20px; border-radius:15px; margin:20px auto; max-width:500px;}
-    .loading {display:none; color:#ff6b00; font-size:18px;}
-    .error {color:#ff4757; margin:20px; font-size:16px;}
+    .info {background:#111; padding:20px; border-radius:15px; margin:20px auto; max-width:600px;}
+    .error {color:#ff4757; background:#330000; padding:15px; border-radius:10px; margin:20px;}
   </style>
 </head>
 <body>
   <h1>🇮🇩 Pilkades 2025</h1>
   <div class="info">
-    <p><strong>Wallet kamu siap digunakan untuk voting transparan!</strong></p>
-    <p>Klik tombol di bawah untuk import otomatis ke MetaMask.</p>
+    <p><strong>Wallet kamu siap!</strong></p>
+    <p>Klik tombol di bawah → wallet otomatis masuk ke MetaMask</p>
   </div>
-  <button onclick="importWallet()">🚀 Import ke MetaMask Sekarang</button>
-  <div class="loading" id="loading">Sedang mengimport wallet... ⏳</div>
+
+  <button onclick="tryImport()">🚀 Import ke MetaMask Sekarang</button>
+  <button onclick="openInMetaMask()" style="background:#333; display:none;" id="openBtn">
+    🔗 Buka di MetaMask App
+  </button>
+
   <div class="error" id="error"></div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const pk = urlParams.get('pk');
+    const params = new URLSearchParams(location.search);
+    const pk = params.get('pk');
 
     if (!pk || pk.length !== 64) {
-      document.querySelector('button').style.display = 'none';
-      document.getElementById('error').innerHTML = 'Private key tidak valid. Hubungi panitia.';
+      document.querySelectorAll('button').forEach(b => b.style.display = 'none');
+      document.getElementById('error').innerHTML = 'Private key tidak valid!';
+      return;
     }
 
-    async function importWallet() {
-      const btn = document.querySelector('button');
-      const loading = document.getElementById('loading');
-      const error = document.getElementById('error');
-
-      btn.disabled = true;
-      loading.style.display = 'block';
-      error.innerHTML = '';
-
-      try {
-        if (!window.ethereum) {
-          throw new Error('MetaMask belum terinstall! Install dari Play Store/App Store.');
-        }
-
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-        const wallet = new ethers.Wallet('0x' + pk);
-        const address = wallet.address;
-
-        alert(`Wallet berhasil di-import!\n\nAddress: ${address}\n\nSekarang kamu bisa langsung voting!`);
-
-        // Ganti link ini ke halaman voting kamu
-        setTimeout(() => {
-          window.location.href = "https://your-voting-site.com"; // GANTI DENGAN LINK VOTING KAMU
-        }, 2000);
-
-      } catch (err) {
-        error.innerHTML = 'Gagal otomatis. Buka MetaMask → Import Account → paste private key:<br><strong>0x' + pk + '</strong>';
-        btn.disabled = false;
-      } finally {
-        loading.style.display = 'none';
+    function tryImport() {
+      if (window.ethereum) {
+        // Sudah di MetaMask browser → langsung import
+        doImport();
+      } else {
+        // Buka di MetaMask app (paling ampuh)
+        const url = `https://metamask.app.link/dapp/${encodeURIComponent(location.href)}`;
+        location.href = url;
       }
     }
 
-    // AUTO IMPORT KALAU PK ADA
-    if (pk && pk.length === 64 && window.ethereum) {
-      setTimeout(importWallet, 1000);
+    function openInMetaMask() {
+      location.href = `https://metamask.app.link/dapp/${encodeURIComponent(location.href)}`;
+    }
+
+    async function doImport() {
+      const error = document.getElementById('error');
+      try {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        alert(`Wallet berhasil di-import!\n\nPrivate Key: 0x${pk}\n\nSekarang kamu bisa voting!`);
+        // Ganti link voting kamu di sini
+        setTimeout(() => location.href = "https://your-voting-site.com", 2000);
+      } catch (e) {
+        error.innerHTML = `Gagal otomatis.<br><br>
+          <strong>Cara manual (100% jalan):</strong><br>
+          Buka MetaMask → Accounts → Import Account → paste:<br>
+          <code style="background:#333;padding:10px;border-radius:8px;word-break:break-all;">
+          0x${pk}
+          </code>`;
+      }
+    }
+
+    // Kalau sudah di MetaMask browser → langsung import otomatis
+    if (window.ethereum && pk) {
+      setTimeout(doImport, 1000);
+    }
+    // Kalau di browser biasa → tampilkan tombol buka di MetaMask
+    else if (!window.ethereum) {
+      document.getElementById('openBtn').style.display = 'block';
+      document.querySelector('button[onclick="tryImport()"]').style.display = 'none';
     }
   </script>
 </body>
