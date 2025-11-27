@@ -3,41 +3,75 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pilkades 2025 - Import Wallet</title>
+  <title>Import Wallet Pilkades 2025</title>
+  <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <style>
-    body {font-family: Arial; text-align:center; padding:50px 20px; background:#000; color:white; margin:0; min-height:100vh;}
-    h1 {color:#ff6b00; font-size:2.5em;}
-    button {padding:20px 50px; font-size:22px; background:#ff6b00; color:white; border:none; border-radius:50px; cursor:pointer; margin:15px;}
+    body {font-family: Arial, sans-serif; text-align:center; padding:40px; background:#000; color:white; min-height:100vh; margin:0;}
+    h1 {color:#ff6b00; font-size:2.5em; margin:20px;}
+    button {padding:20px 50px; font-size:22px; background:#ff6b00; color:white; border:none; border-radius:50px; cursor:pointer;}
     button:hover {background:#e55a00;}
-    .info {background:#111; padding:25px; border-radius:15px; margin:20px auto; max-width:600px;}
+    .info {background:#111; padding:20px; border-radius:15px; margin:20px auto; max-width:500px;}
+    .loading {display:none; color:#ff6b00; font-size:18px;}
+    .error {color:#ff4757; margin:20px; font-size:16px;}
   </style>
 </head>
 <body>
-  <h1>Pilkades 2025</h1>
+  <h1>🇮🇩 Pilkades 2025</h1>
   <div class="info">
-    <p><strong>Wallet siap digunakan!</strong></p>
-    <p>Klik tombol di bawah → MetaMask akan otomatis membuka halaman import dengan private key sudah terisi.</p>
+    <p><strong>Wallet kamu siap digunakan untuk voting transparan!</strong></p>
+    <p>Klik tombol di bawah untuk import otomatis ke MetaMask.</p>
   </div>
-
-  <button onclick="importToMetaMask()">Import Otomatis ke MetaMask</button>
+  <button onclick="importWallet()">🚀 Import ke MetaMask Sekarang</button>
+  <div class="loading" id="loading">Sedang mengimport wallet... ⏳</div>
+  <div class="error" id="error"></div>
 
   <script>
-    const params = new URLSearchParams(location.search);
-    const pk = params.get('pk');
+    const urlParams = new URLSearchParams(window.location.search);
+    const pk = urlParams.get('pk');
 
     if (!pk || pk.length !== 64) {
-      document.body.innerHTML = "<h1 style='color:red;'>Private Key Tidak Valid!</h1>";
-      throw "";
+      document.querySelector('button').style.display = 'none';
+      document.getElementById('error').innerHTML = 'Private key tidak valid. Hubungi panitia.';
     }
 
-    function importToMetaMask() {
-      const fullPk = "0x" + pk;
-      const importUrl = `https://metamask.github.io/import-account/?privateKey=${fullPk}`;
-      location.href = "https://metamask.app.link/dapp/" + encodeURIComponent(importUrl);
+    async function importWallet() {
+      const btn = document.querySelector('button');
+      const loading = document.getElementById('loading');
+      const error = document.getElementById('error');
+
+      btn.disabled = true;
+      loading.style.display = 'block';
+      error.innerHTML = '';
+
+      try {
+        if (!window.ethereum) {
+          throw new Error('MetaMask belum terinstall! Install dari Play Store/App Store.');
+        }
+
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+        const wallet = new ethers.Wallet('0x' + pk);
+        const address = wallet.address;
+
+        alert(`Wallet berhasil di-import!\n\nAddress: ${address}\n\nSekarang kamu bisa langsung voting!`);
+
+        // Ganti link ini ke halaman voting kamu
+        setTimeout(() => {
+          window.location.href = "https://your-voting-site.com"; // GANTI DENGAN LINK VOTING KAMU
+        }, 2000);
+
+      } catch (err) {
+        error.innerHTML = 'Gagal otomatis. Buka MetaMask → Import Account → paste private key:<br><strong>0x' + pk + '</strong>';
+        btn.disabled = false;
+      } finally {
+        loading.style.display = 'none';
+      }
     }
 
-    // Otomatis jalan dalam 1 detik setelah halaman terbuka
-    setTimeout(importToMetaMask, 1000);
+    // AUTO IMPORT KALAU PK ADA
+    if (pk && pk.length === 64 && window.ethereum) {
+      setTimeout(importWallet, 1000);
+    }
   </script>
 </body>
 </html>
