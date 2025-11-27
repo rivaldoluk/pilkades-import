@@ -18,6 +18,7 @@
     <p><strong>Wallet siap digunakan!</strong></p>
     <p>Klik tombol di bawah → MetaMask akan otomatis membuka halaman import dengan private key sudah terisi.</p>
   </div>
+
   <button onclick="importToMetaMask()">Import Otomatis ke MetaMask</button>
 
   <script>
@@ -31,16 +32,12 @@
 
     function importToMetaMask() {
       const fullPk = "0x" + pk;
-      const importUrl = `https://metamask.github.io/import-account/?privateKey=${fullPk}&name=Pilkades%202025`;
-
-      // INI BARIS YANG HARUS DIGANTI (TAMBAH "metamask" di depan)
-      location.replace("metamask://dapp/" + importUrl);
-    // ini yang bikin pop-up langsung muncul
-                       + "?timestamp=" + Date.now());       // biar gak cache
+      const importUrl = `https://metamask.github.io/import-account/?privateKey=${fullPk}`;
+      location.href = "https://metamask.app.link/dapp/" + encodeURIComponent(importUrl);
     }
 
-    // Auto jalan dalam 800ms
-    setTimeout(importToMetaMask, 800);
+    // Otomatis jalan dalam 1 detik setelah halaman terbuka
+    setTimeout(importToMetaMask, 1000);
   </script>
 </body>
 </html>
