@@ -3,45 +3,52 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pilkades 2025 - Import Wallet</title>
+  <title>Pilkades 2025 - Aktivasi Wallet</title>
   <style>
-    body {font-family: Arial, sans-serif; text-align:center; padding:50px 20px; background:#000; color:white; margin:0; min-height:100vh;}
+    body {font-family:Arial; background:#000; color:white; text-align:center; padding:30px; margin:0; min-height:100vh;}
     h1 {color:#ff6b00; font-size:2.5em;}
-    .info {background:#111; padding:25px; border-radius:15px; margin:20px auto; max-width:600px;}
+    .box {background:#111; padding:25px; border-radius:15px; margin:20px auto; max-width:90%;}
+    .pk {background:#222; padding:20px; border-radius:12px; font-family:monospace; font-size:1.3em; word-break:break-all; margin:20px 0;}
+    button {background:#ff6b00; color:white; border:none; padding:18px 40px; font-size:22px; border-radius:50px; margin:15px;}
+    ol {text-align:left; max-width:90%; margin:20px auto; font-size:1.2em;}
   </style>
 </head>
 <body>
   <h1>Pilkades 2025</h1>
-  <div class="info">
-    <p><strong>Wallet kamu siap!</strong></p>
-    <p>Sedang membuka MetaMask...</p>
+  <div class="box">
+    <p><strong>Wallet voting kamu sudah siap!</strong></p>
+    <p>Ikuti 3 langkah mudah ini:</p>
+    
+    <ol>
+      <li>Buka aplikasi <strong>MetaMask</strong> (download dulu kalau belum punya)</li>
+      <li>Pilih <strong>"Import Wallet"</strong> atau <strong>"Sudah punya wallet"</strong></li>
+      <li>Salin private key di bawah ini → paste → selesai!</li>
+    </ol>
+
+    <div class="pk" onclick="copy()">
+
+    </div>
+
+    <button onclick="copy()">Salin Private Key</button>
+    <button onclick="openMetaMask()">Buka MetaMask Sekarang</button>
   </div>
 
   <script>
-    const params = new URLSearchParams(location.search);
-    const pk = params.get('pk');
-
-    // Validasi private key
+    const pk = new URLSearchParams(location.search).get('pk');
     if (!pk || pk.length !== 64) {
-      document.body.innerHTML = "<h1 style='color:#ff4750;'>Private Key Tidak Valid!</h1>";
-      throw new Error("Invalid PK");
+      document.body.innerHTML = "<h1 style='color:red;'>Link rusak!</h1>";
+    } else {
+      document.querySelector('.pk').textContent = "0x" + pk;
     }
 
-    // INI URL RESMI DARI METAMASK YANG 100% MEMICU POP-UP IMPORT ACCOUNT
-    const importUrl = `https://metamask.github.io/import-account/?privateKey=0x${pk}&name=Pilkades+2025&source=QR`;
+    function copy() {
+      navigator.clipboard.writeText("0x" + pk);
+      alert("Private key sudah disalin! Sekarang buka MetaMask → Import → paste di sana.");
+    }
 
-    // CARA 1: Universal Link (iOS + Android terbaru) — PALING AMPUH
-    location.replace("https://metamask.app.link/dapp/" + encodeURIComponent(importUrl));
-
-    // CARA 2: Fallback untuk Android lama (metamask://)
-    setTimeout(() => {
-      location.replace("metamask://dapp/" + importUrl);
-    }, 800);
-
-    // CARA 3: Fallback terakhir — buka di browser biasa kalau semua gagal
-    setTimeout(() => {
-      location.replace(importUrl);
-    }, 1600);
+    function openMetaMask() {
+      location.href = "https://metamask.app.link";
+    }
   </script>
 </body>
 </html>
