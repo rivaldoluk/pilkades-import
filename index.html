@@ -40,25 +40,32 @@
     .btn-copy.copied{background:#0c6e0c;}
     .footer{margin-top:40px;font-size:0.9em;color:#888;}
 
-    /* SCANNER CANTIK – TETAP DI TENGAH KARTU */
+    /* OVERLAY SCANNER CANTIK */
     #scannerOverlay{
-      position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);
-      border-radius:20px;display:none;align-items:center;justify-content:center;
-      z-index:99;flex-direction:column;padding:20px;box-sizing:border-box;
+      position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);
+      display:none;align-items:center;justify-content:center;z-index:9999;
+      flex-direction:column;padding:20px;box-sizing:border-box;
     }
     #scannerOverlay.active{display:flex;}
-    #reader{width:100%;max-width:340px;border-radius:16px;overflow:hidden;
-      box-shadow:0 0 30px rgba(255,107,0,0.4);border:4px solid #ff6b00;
+    #reader{
+      width:90%;max-width:380px;border-radius:16px;overflow:hidden;
+      box-shadow:0 0 40px rgba(255,107,0,0.6);border:5px solid #ff6b00;
     }
-    #reader video{border-radius:12px;}
     .closeScanner{
-      position:absolute;top:15px;right:15px;background:#ff4444;color:white;
-      width:44px;height:44px;border-radius:50%;font-size:24px;display:flex;
-      align-items:center;justify-content:center;cursor:pointer;z-index:100;
+      position:absolute;top:20px;right:20px;background:#ff2d2d;color:white;
+      width:56px;height:56px;border-radius:50%;font-size:32px;font-weight:bold;
+      display:flex;align-items:center;justify-content:center;cursor:pointer;
+      box-shadow:0 4px 15px rgba(255,0,0,0.5);z-index:1000;
+      transition:all 0.2s;
+    }
+    .closeScanner:hover{transform:scale(1.1);background:#ff0000;}
+    .scanner-title{
+      margin:0 0 20px 0;color:#ff6b00;font-size:1.6em;font-weight:bold;
     }
     @media(max-width:480px){
       h1{font-size:1.9em;}
       .btn{width:100%;margin:10px 0;}
+      .closeScanner{width:50px;height:50px;font-size:28px;top:15px;right:15px;}
     }
   </style>
 </head>
@@ -79,7 +86,7 @@
     </div>
 
     <button class="btn btn-scan" id="scanBtn">
-      <i class="fas fa-qrcode"></i> Scan QR Code Undangan
+      Scan QR Code Undangan
     </button>
 
     <button class="btn btn-copy" id="copyBtn">
@@ -87,24 +94,24 @@
     </button>
 
     <button class="btn" onclick="location.href='https://metamask.app.link'">
-      <i class="fas fa-external-link-alt"></i> Buka MetaMask Sekarang
+      Buka MetaMask Sekarang
     </button>
 
     <div class="footer">
       Panitia Desa • Sistem Voting Blockchain 2026<br>
       Hubungi panitia jika ada kendala
     </div>
-
-    <!-- OVERLAY SCANNER CANTIK -->
-    <div id="scannerOverlay">
-      <div class="closeScanner" id="closeScanner">×</div>
-      <h2 style="margin:0 0 20px;color:#ff6b00;">Arahkan ke QR Code</h2>
-      <div id="reader"></div>
-      <p style="margin-top:15px;font-size:0.9em;">Pastikan QR Code undangan terlihat jelas</p>
-    </div>
   </div>
 
-  <!-- Library QR Scanner -->
+  <!-- OVERLAY SCANNER DENGAN TOMBOL X BESAR -->
+  <div id="scannerOverlay">
+    <div class="closeScanner" id="closeScanner">×</div>
+    <h2 class="scanner-title">Arahkan Kamera ke QR Code</h2>
+    <div id="reader"></div>
+    <p style="margin-top:15px;color:#aaa;">Pastikan QR Code di undangan terlihat jelas</p>
+  </div>
+
+  <!-- QR Scanner Library -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
     const urlParams = new URLSearchParams(location.search);
@@ -135,10 +142,15 @@
       startScanner();
     };
 
-    // Tutup scanner
+    // Tutup scanner dengan tombol X
     closeBtn.onclick = () => {
       overlay.classList.remove('active');
-      if(scanner){ scanner.clear(); scanner=null; }
+      if(scanner){ scanner.clear(); scanner = null; }
+    };
+
+    // Tutup juga kalau klik di luar (opsional)
+    overlay.onclick = (e) => {
+      if(e.target === overlay) closeBtn.onclick();
     };
 
     function startScanner(){
@@ -158,14 +170,14 @@
             scanner.clear();
             alert('Berhasil! 12 kata rahasia sudah muncul.');
           }else{
-            alert('QR Code tidak valid.');
+            alert('QR Code tidak valid.\nGunakan undangan resmi Pilkades 2026.');
           }
         },
         () => {}
       );
     }
 
-    // Copy
+    // Copy function
     copyBtn.onclick = async () => {
       if(!realSeed) return;
       try{
