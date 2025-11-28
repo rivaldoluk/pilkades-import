@@ -542,21 +542,36 @@
       });
   };
 
-    // === TOMBOL BUKA META MASK (100% JALAN DI SEMUA HP) ===
+    // Ganti seluruh fungsi open MetaMask jadi ini (taruh paling bawah sebelum </script>)
 document.getElementById('openMetaMaskBtn').onclick = function() {
-    const currentUrl = encodeURIComponent(window.location.href);
-    const metamaskDeepLink = `https://metamask.app.link/dapp/${currentUrl}`;
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-    window.location.href = metamaskDeepLink;
+    if (isMobile) {
+        // KALAU HP → pakai deep link
+        const currentUrl = encodeURIComponent(location.href.split('?')[0]); // biar seed ga ikut
+        window.location.href = `https://metamask.app.link/dapp/${currentUrl}`;
 
-    // Kalau 2 detik kemudian masih di sini → MetaMask belum ada
-    setTimeout(() => {
-        if (document.hasFocus()) {
-            if (confirm('Kamu belum install MetaMask nih!\n\nMau download sekarang?')) {
-                window.location.href = 'https://metamask.io/download/';
+        // Kalau 2 detik masih di sini → belum install
+        setTimeout(() => {
+            if (document.hasFocus()) {
+                if (confirm('MetaMask belum terinstall di HP kamu.\n\nMau download sekarang?')) {
+                    window.location.href = 'https://metamask.io/download/';
+                }
+            }
+        }, 2000);
+    } 
+    else {
+        // KALAU PC & ADA EXTENSION METAMASK → langsung buka
+        if (typeof window.ethereum !== 'undefined' || typeof window.web3 !== 'undefined') {
+            alert('MetaMask terdeteksi! Silakan buka extension MetaMask di pojok kanan atas browser kamu.');
+            // Bisa juga otomatis fokus ke extension (tapi lebih aman kasih instruksi)
+        } else {
+            // Kalau belum install extension
+            if (confirm('MetaMask belum terinstall di browser kamu.\n\nBuka halaman download MetaMask sekarang?')) {
+                window.open('https://metamask.io/download/', '_blank');
             }
         }
-    }, 2000);
+    }
 };
 
   // === FUNGSI UTAMA ===
@@ -637,4 +652,5 @@ document.getElementById('openMetaMaskBtn').onclick = function() {
 </body>
 
 </html>
+
 
