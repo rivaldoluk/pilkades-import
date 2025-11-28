@@ -55,6 +55,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: text;
     }
     .btn {
       background: #ff6b00;
@@ -66,7 +67,7 @@
       cursor: pointer;
       margin: 12px 8px;
       display: inline-block;
-      min-width: 220px;
+      min-width: 240px;
       transition: all 0.3s;
     }
     .btn:hover {background:#e55a00;}
@@ -102,16 +103,14 @@
 
     <div class="seed" id="seedBox">Sedang memuat 12 kata…</div>
 
+    <!-- Tombol 1: Copy 12 Kata -->
     <button class="btn btn-copy" id="copyBtn">
       <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
     </button>
 
-    <button class="btn" id="importBtn">
-      <i class="fas fa-wallet"></i> Import Otomatis ke MetaMask
-    </button>
-
+    <!-- Tombol 2: Buka MetaMask (hanya redirect ke app) -->
     <button class="btn" onclick="location.href='https://metamask.app.link'">
-      <i class="fas fa-external-link-alt"></i> Buka MetaMask
+      <i class="fas fa-external-link-alt"></i> Buka MetaMask Sekarang
     </button>
 
     <div class="footer">
@@ -124,7 +123,7 @@
     const params = new URLSearchParams(location.search);
     const seed = params.get('seed')?.trim();
 
-    if (!seed || seed.split(/\s+/).filter(w => w).length !== 12) {
+    if (!seed || seed.split(/\s+/).filter(word => word.length > 0).length !== 12) {
       document.body.innerHTML = "<div style='color:red;padding:50px;font-size:2em;'>Link tidak valid atau sudah rusak!</div>";
     } else {
       // Tampilkan seed phrase
@@ -139,7 +138,7 @@
         try {
           await navigator.clipboard.writeText(seed);
           copyBtn.classList.add('copied');
-          copyText.textContent = 'Berhasil disalin!';
+          copyText.textContent = 'Berhasil Disalin!';
           copyIcon.className = 'fas fa-check';
           setTimeout(() => {
             copyBtn.classList.remove('copied');
@@ -147,22 +146,8 @@
             copyIcon.className = 'fas fa-copy';
           }, 3000);
         } catch (err) {
-          alert('Gagal copy, silakan seleksi manual lalu copy.');
+          alert('Gagal copy otomatis. Silakan blok teks di atas lalu copy manual.');
         }
-      });
-
-      // ---------- IMPORT OTOMATIS KE METAMASK (deep link terbaik 2025) ----------
-      document.getElementById('importBtn').addEventListener('click', () => {
-        // Cara paling efektif di 2025 (bekerja di Android & iOS)
-        const deepLink = `metamask://import-seed?seed=${encodeURIComponent(seed)}`;
-        location.href = deepLink;
-
-        // Fallback kalau tidak terbuka
-        setTimeout(() => {
-          if (confirm('MetaMask tidak terbuka otomatis?\nKlik OK untuk membuka MetaMask secara manual.')) {
-            location.href = 'https://metamask.app.link';
-          }
-        }, 1500);
       });
     }
   </script>
