@@ -6,56 +6,57 @@
   <title>Pilkades 2026 - Aktivasi Wallet Voting</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #000;
-      color: white;
-      text-align: center;
-      padding: 20px;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    body{
+      font-family:Arial,sans-serif;background:#000;color:white;text-align:center;padding:20px;margin:0;
+      min-height:100vh;display:flex;align-items:center;justify-content:center;
     }
-    .card {
-      background: #111;
-      padding: 35px 25px;
-      border-radius: 20px;
-      max-width: 420px;
-      width: 95%;
-      box-shadow: 0 10px 40px rgba(255,107,0,0.3);
+    .card{
+      background:#111;padding:35px 25px;border-radius:20px;max-width:420px;width:95%;
+      box-shadow:0 10px 40px rgba(255,107,0,0.3);position:relative;
     }
-    h1 {color:#ff6b00;margin:0 0 20px;font-size:2.2em;}
-    .steps {
+    h1{color:#ff6b00;margin:0 0 20px;font-size:2.2em;}
+    .steps{
       text-align:left;background:#1a1a1a;padding:18px;border-radius:12px;margin:20px 0;
       font-size:0.98em;line-height:1.75;
     }
-    .steps b {color:#ff8b3d;}
-    .seed {
-      background:#222;padding:20px;border-radius:12px;
-      font-family:'Courier New',monospace;font-size:1.18em;line-height:1.9;
-      word-spacing:10px;margin:25px 0;user-select:all;border:1px solid #333;
-      min-height:90px;display:flex;align-items:center;justify-content:center;cursor:text;
+    .steps b{color:#ff8b3d;}
+    .seed{
+      background:#222;padding:20px;border-radius:12px;font-family:'Courier New',monospace;
+      font-size:1.18em;line-height:1.9;word-spacing:10px;margin:25px 0;user-select:all;
+      border:1px solid #333;min-height:90px;display:flex;align-items:center;justify-content:center;
     }
-    .seed-locked {
-      background:#330000;border:2px dashed #ff4444;color:#ff8888;
-      user-select:none;cursor:default;
+    .seed-locked{
+      background:#330000;border:2px dashed #ff4444;color:#ff8888;user-select:none;
     }
-    .btn {
-      background:#ff6b00;color:white;border:none;padding:16px 32px;
-      font-size:18px;border-radius:50px;cursor:pointer;margin:12px 8px;
-      display:inline-block;min-width:260px;transition:all 0.3s;
+    .btn{
+      background:#ff6b00;color:white;border:none;padding:16px 32px;font-size:18px;
+      border-radius:50px;cursor:pointer;margin:12px 8px;display:inline-block;
+      min-width:260px;transition:all 0.3s;
     }
-    .btn:hover {background:#e55a00;}
-    .btn-scan {background:#0066ff;font-weight:bold;}
-    .btn-copy {background:#333;}
-    .btn-copy i {margin-right:8px;}
-    .btn-copy.copied {background:#0c6e0c;}
-    .btn-copy:disabled {opacity:0.5;cursor:not-allowed;}
-    .footer {margin-top:40px;font-size:0.9em;color:#888;}
-    #reader {width:100%;margin:20px 0;}
-    @media (max-width:480px){
+    .btn:hover{background:#e55a00;}
+    .btn-scan{background:#0066ff;font-weight:bold;font-size:19px;}
+    .btn-copy{background:#333;}
+    .btn-copy i{margin-right:8px;}
+    .btn-copy.copied{background:#0c6e0c;}
+    .footer{margin-top:40px;font-size:0.9em;color:#888;}
+
+    /* SCANNER CANTIK – TETAP DI TENGAH KARTU */
+    #scannerOverlay{
+      position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);
+      border-radius:20px;display:none;align-items:center;justify-content:center;
+      z-index:99;flex-direction:column;padding:20px;box-sizing:border-box;
+    }
+    #scannerOverlay.active{display:flex;}
+    #reader{width:100%;max-width:340px;border-radius:16px;overflow:hidden;
+      box-shadow:0 0 30px rgba(255,107,0,0.4);border:4px solid #ff6b00;
+    }
+    #reader video{border-radius:12px;}
+    .closeScanner{
+      position:absolute;top:15px;right:15px;background:#ff4444;color:white;
+      width:44px;height:44px;border-radius:50%;font-size:24px;display:flex;
+      align-items:center;justify-content:center;cursor:pointer;z-index:100;
+    }
+    @media(max-width:480px){
       h1{font-size:1.9em;}
       .btn{width:100%;margin:10px 0;}
     }
@@ -69,26 +70,22 @@
     <div class="steps">
       1. Kalau 12 kata sudah muncul → klik <b>Copy 12 Kata Rahasia</b><br>
       2. Klik <b>Buka MetaMask Sekarang</b> → tempel → selesai!<br><br>
-      <b>Kalau belum muncul → scan QR Code di undangan kertas Anda</b>
+      <b>Kalau belum muncul → klik tombol scan di bawah</b>
     </div>
 
-    <!-- Seed Box - Bisa terkunci atau terbuka -->
     <div class="seed seed-locked" id="seedBox">
       <i class="fas fa-lock fa-2x"></i><br><br>
       Scan QR Code undangan untuk melihat 12 kata rahasia
     </div>
 
-    <!-- Tombol Scan QR (hanya muncul kalau belum ada seed) -->
     <button class="btn btn-scan" id="scanBtn">
       <i class="fas fa-qrcode"></i> Scan QR Code Undangan
     </button>
 
-    <!-- Tombol Copy -->
     <button class="btn btn-copy" id="copyBtn">
       <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
     </button>
 
-    <!-- Tombol Buka MetaMask -->
     <button class="btn" onclick="location.href='https://metamask.app.link'">
       <i class="fas fa-external-link-alt"></i> Buka MetaMask Sekarang
     </button>
@@ -97,93 +94,94 @@
       Panitia Desa • Sistem Voting Blockchain 2026<br>
       Hubungi panitia jika ada kendala
     </div>
+
+    <!-- OVERLAY SCANNER CANTIK -->
+    <div id="scannerOverlay">
+      <div class="closeScanner" id="closeScanner">×</div>
+      <h2 style="margin:0 0 20px;color:#ff6b00;">Arahkan ke QR Code</h2>
+      <div id="reader"></div>
+      <p style="margin-top:15px;font-size:0.9em;">Pastikan QR Code undangan terlihat jelas</p>
+    </div>
   </div>
 
-  <!-- QR Scanner Library -->
+  <!-- Library QR Scanner -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-
   <script>
     const urlParams = new URLSearchParams(location.search);
     const seedFromUrl = urlParams.get('seed')?.trim();
-    const seedBox = document.getElementById('seedBox');
-    const copyBtn = document.getElementById('copyBtn');
-    const copyText = copyBtn.querySelector('span');
-    const copyIcon = copyBtn.querySelector('i');
-    const scanBtn = document.getElementById('scanBtn');
-    let realSeed = null;
-    let scanner = null;
 
-    // Kalau link benar → langsung tampilkan 12 kata (seperti biasa)
-    if (seedFromUrl && seedFromUrl.split(/\s+/).filter(w => w.length > 0).length === 12) {
+    const seedBox   = document.getElementById('seedBox');
+    const copyBtn   = document.getElementById('copyBtn');
+    const copyText  = copyBtn.querySelector('span');
+    const copyIcon  = copyBtn.querySelector('i');
+    const scanBtn   = document.getElementById('scanBtn');
+    const overlay   = document.getElementById('scannerOverlay');
+    const closeBtn  = document.getElementById('closeScanner');
+
+    let realSeed = null;
+    let scanner  = null;
+
+    // Kalau link sudah benar → langsung tampilkan 12 kata
+    if (seedFromUrl && seedFromUrl.split(/\s+/).filter(w=>w).length===12) {
       realSeed = seedFromUrl;
       seedBox.textContent = realSeed;
       seedBox.classList.remove('seed-locked');
-      scanBtn.style.display = 'none'; // sembunyikan tombol scan
-    }
-
-    // Fungsi buka seed setelah scan
-    function unlockSeed(seed) {
-      realSeed = seed;
-      seedBox.textContent = seed;
-      seedBox.classList.remove('seed-locked');
       scanBtn.style.display = 'none';
-      seedBox.scrollIntoView({behavior:'smooth'});
     }
 
-    // Tombol Scan QR
-    scanBtn.addEventListener('click', function() {
-      if (scanner) {
-        scanner.clear();
-        document.getElementById('reader')?.remove();
-        scanner = null;
-        this.innerHTML = '<i class="fas fa-qrcode"></i> Scan QR Code Undangan';
-        return;
-      }
+    // Buka scanner
+    scanBtn.onclick = () => {
+      overlay.classList.add('active');
+      startScanner();
+    };
 
-      const div = document.createElement('div');
-      div.id = 'reader';
-      div.style.margin = '20px 0';
-      document.getElementById('mainCard').appendChild(div);
+    // Tutup scanner
+    closeBtn.onclick = () => {
+      overlay.classList.remove('active');
+      if(scanner){ scanner.clear(); scanner=null; }
+    };
 
-      scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 }, false);
+    function startScanner(){
+      scanner = new Html5QrcodeScanner("reader", { fps:10, qrbox:{width:280,height:280} }, false);
       scanner.render(
         (text) => {
           let seed = text.trim();
-          if (text.includes('seed=')) {
+          if(text.includes('seed=')){
             seed = new URLSearchParams(text.split('?')[1]).get('seed') || seed;
           }
-          if (seed.split(/\s+/).filter(w => w).length === 12) {
-            unlockSeed(seed);
-            alert('Berhasil! 12 kata rahasia sudah muncul.');
+          if(seed.split(/\s+/).filter(w=>w).length===12){
+            realSeed = seed;
+            seedBox.textContent = seed;
+            seedBox.classList.remove('seed-locked');
+            scanBtn.style.display = 'none';
+            overlay.classList.remove('active');
             scanner.clear();
-            div.remove();
-            scanner = null;
-          } else {
+            alert('Berhasil! 12 kata rahasia sudah muncul.');
+          }else{
             alert('QR Code tidak valid.');
           }
         },
         () => {}
       );
-      this.innerHTML = '<i class="fas fa-times"></i> Tutup Scanner';
-    });
+    }
 
-    // Copy function
-    copyBtn.addEventListener('click', async () => {
-      if (!realSeed) return;
-      try {
+    // Copy
+    copyBtn.onclick = async () => {
+      if(!realSeed) return;
+      try{
         await navigator.clipboard.writeText(realSeed);
         copyBtn.classList.add('copied');
         copyText.textContent = 'Berhasil Disalin!';
         copyIcon.className = 'fas fa-check';
-        setTimeout(() => {
+        setTimeout(()=>{
           copyBtn.classList.remove('copied');
           copyText.textContent = 'Copy 12 Kata Rahasia';
           copyIcon.className = 'fas fa-copy';
-        }, 3000);
-      } catch(e) {
-        alert('Gagal copy otomatis. Silakan blok teks lalu copy manual.');
+        },3000);
+      }catch(e){
+        alert('Gagal copy otomatis. Blok teks lalu copy manual.');
       }
-    });
+    };
   </script>
 </body>
 </html>
