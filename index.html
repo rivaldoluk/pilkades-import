@@ -560,17 +560,17 @@ document.getElementById('openMetaMaskBtn').onclick = function() {
         }, 2000);
     } 
     else {
-        // KALAU PC & ADA EXTENSION METAMASK → langsung buka
-        if (typeof window.ethereum !== 'undefined' || typeof window.web3 !== 'undefined') {
-            alert('MetaMask terdeteksi! Silakan buka extension MetaMask di pojok kanan atas browser kamu.');
-            // Bisa juga otomatis fokus ke extension (tapi lebih aman kasih instruksi)
-        } else {
-            // Kalau belum install extension
-            if (confirm('MetaMask belum terinstall di browser kamu.\n\nBuka halaman download MetaMask sekarang?')) {
-                window.open('https://metamask.io/download/', '_blank');
-            }
+    // PC + ada MetaMask
+    if (window.ethereum) {
+        alert('MetaMask terdeteksi! Extension akan otomatis terbuka...');
+        // Trigger wallet connect (bikin extension blink/fokus)
+        window.ethereum.request({ method: 'eth_requestAccounts' }).catch(() => {});
+    } else {
+        if (confirm('MetaMask belum terinstall di browser.\n\nBuka halaman download sekarang?')) {
+            window.open('https://metamask.io/download/', '_blank');
         }
     }
+}
 };
 
   // === FUNGSI UTAMA ===
@@ -651,6 +651,7 @@ document.getElementById('openMetaMaskBtn').onclick = function() {
 </body>
 
 </html>
+
 
 
 
