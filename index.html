@@ -358,35 +358,71 @@
     };
 
     closeScanner.onclick = () => {
-      scannerOverlay.classList.remove('active');
-      if (scanner) scanner.stop();
-    };
+    scannerOverlay.classList.remove('active');
+    if (scanner) {
+        scanner.stop().catch(() => {});
+        scanner = null;
+    }
+    document.getElementById('reader').innerHTML = ''; // kosongin biar bersih
+};
 
     // Klik tombol galeri → buka file picker
 galleryBtn.onclick = () => qrInput.click();
 
 // Ketika user pilih foto
 qrInput.onchange = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+    const file = e.target.files[0];
+    if (!file) return;
 
-  // Loading feedback
-  galleryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-  galleryBtn.disabled = true;
+    // Matikan kamera dulu kalau masih nyala
+    if (scanner) {
+        scanner.stop().catch(() => {});
+        scanner = null;
+    }
 
-  const reader = new FileReader();
-  reader.onload = () => {
+    // Ganti isi #reader jadi loading
+    document.getElementById('reader').innerHTML = `
+        <div style="color:#ff6b00; text-align:center; padding:60px 20px; font-size:1.3em;">
+            <i class="fas fa-spinner fa-spin"></i><br><br>
+            Membaca QR Code dari gambar...
+        </div>
+    `;
+
+    galleryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+    galleryBtn.disabled = true;
+
     const html5QrCode = new Html5Qrcode("reader");
     html5QrCode.scanFile(file, true)
-      .then(decodedText => processQrResult(decodedText))
-      .catch(() => {
-        alert("Gagal membaca QR Code dari gambar.\nCoba pilih foto yang lebih jelas atau zoom QR-nya.");
-        resetGalleryButton();
-      });
-  };
-  reader.readAsDataURL(file);
+        .then(decodedText => processQrResult(decodedText))
+        .catch(err => {
+            showQrError();
+        });
 };
 
+function showQrError() {
+    document.getElementById('reader').innerHTML = `
+        <div style="padding:20px; text-align:center;">
+            <i class="fas fa-times-circle" style="font-size:80px; color:#ff4444; margin:20px 0;"></i>
+            <h2 style="color:#ff6b00; margin:15px 0;">QR Code Tidak Valid</h2>
+            <p style="font-size:1.1em; line-height:1.8; max-width:90%; margin:0 auto 25px;">
+                Maaf, QR Code yang Anda pilih <b>bukan undangan resmi Pilkades 2026</b>.<br><br>
+                Pastikan memindai <b>QR Code dari undangan kertas</b> yang dibagikan panitia.
+            </p>
+            <button class="btn btn-scan" onclick="restartScanner()" style="width:auto; padding:16px 40px; font-size:1.1em;">
+                <i class="fas fa-camera"></i> Scan Ulang dengan Kamera
+            </button>
+        </div>
+    `;
+    resetGalleryButton();
+}
+
+// Fungsi baru: restart scanner kamera setelah error
+function restartScanner() {
+    document.getElementById('reader').innerHTML = ''; // kosongin dulu
+    startScanner(); // nyalain kamera lagi
+    resetGalleryButton();
+}
+    
 function resetGalleryButton() {
   galleryBtn.innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
   galleryBtn.disabled = false;
@@ -468,5 +504,6 @@ function resetGalleryButton() {
   </script>
 </body>
 </html>
+
 
 
