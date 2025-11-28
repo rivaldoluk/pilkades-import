@@ -40,7 +40,34 @@
     .btn-copy.copied{background:#0c6e0c;}
     .footer{margin-top:40px;font-size:0.9em;color:#888;}
 
-    /* OVERLAY SCANNER CANTIK */
+    /* LAYER PERMISSION SUPER CANTIK */
+    #permissionOverlay{
+      position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#000,#1a0033);
+      display:none;align-items:center;justify-content:center;z-index:99999;flex-direction:column;
+      animation:fadeIn 0.6s;
+    }
+    #permissionOverlay.active{display:flex;}
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+    .perm-icon{
+      font-size:90px;color:#ff6b00;margin-bottom:20px;animation:pulse 2s infinite;
+    }
+    @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+    .perm-title{
+      font-size:2em;font-weight:bold;color:#ff6b00;margin:10px 0;
+    }
+    .perm-text{
+      max-width:320px;font-size:1em;line-height:1.6;color:#ddd;margin:15px 0;
+    }
+    .perm-btn{
+      background:#ff6b00;color:white;border:none;padding:18px 50px;font-size:19px;
+      border-radius:50px;cursor:pointer;box-shadow:0 10px 30px rgba(255,107,0,0.5);
+      transition:all 0.3s;font-weight:bold;
+    }
+    .perm-btn:hover{
+      background:#e55a00;transform:translateY(-5px);box-shadow:0 15px 40px rgba(255,107,0,0.7);
+    }
+
+    /* SCANNER ASLI */
     #scannerOverlay{
       position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);
       display:none;align-items:center;justify-content:center;z-index:9999;
@@ -48,24 +75,25 @@
     }
     #scannerOverlay.active{display:flex;}
     #reader{
-      width:90%;max-width:380px;border-radius:16px;overflow:hidden;
-      box-shadow:0 0 40px rgba(255,107,0,0.6);border:5px solid #ff6b00;
+      width:90%;max-width:380px;height:480px;border-radius:20px;overflow:hidden;
+      box-shadow:0 0 50px rgba(255,107,0,0.7);border:6px solid #ff6b00;position:relative;
     }
+    #reader video{width:100%;height:100%;object-fit:cover;border-radius:16px;}
     .closeScanner{
-      position:absolute;top:20px;right:20px;background:#ff2d2d;color:white;
+      position:absolute;top:15px;right:15px;background:#ff2d2d;color:white;
       width:56px;height:56px;border-radius:50%;font-size:32px;font-weight:bold;
-      display:flex;align-items:center;justify-content:center;cursor:pointer;
-      box-shadow:0 4px 15px rgba(255,0,0,0.5);z-index:1000;
-      transition:all 0.2s;
+      display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1000;
     }
-    .closeScanner:hover{transform:scale(1.1);background:#ff0000;}
-    .scanner-title{
-      margin:0 0 20px 0;color:#ff6b00;font-size:1.6em;font-weight:bold;
-    }
+    .scanner-title{margin:0 0 20px;color:#ff6b00;font-size:1.7em;font-weight:bold;}
+    
+    /* Sembunyikan tombol jelek library */
+    #reader select,#reader button,#reader .dashboard,#reader hr,#reader small,#reader .footer{display:none!important;}
+
     @media(max-width:480px){
       h1{font-size:1.9em;}
       .btn{width:100%;margin:10px 0;}
-      .closeScanner{width:50px;height:50px;font-size:28px;top:15px;right:15px;}
+      .perm-icon{font-size:70px;}
+      .perm-title{font-size:1.7em;}
     }
   </style>
 </head>
@@ -103,15 +131,27 @@
     </div>
   </div>
 
-  <!-- OVERLAY SCANNER DENGAN TOMBOL X BESAR -->
+  <!-- LAYER PERMISSION CANTIK -->
+  <div id="permissionOverlay">
+    <div class="perm-icon"><i class="fas fa-camera"></i></div>
+    <div class="perm-title">Izinkan Akses Kamera</div>
+    <div class="perm-text">
+      Kami hanya menggunakan kamera untuk memindai QR Code undangan resmi Pilkades 2026.<br><br>
+      Tidak ada foto atau video yang disimpan.
+    </div>
+    <button class="perm-btn" id="allowBtn">
+      Izinkan Kamera
+    </button>
+  </div>
+
+  <!-- SCANNER ASLI -->
   <div id="scannerOverlay">
     <div class="closeScanner" id="closeScanner">×</div>
     <h2 class="scanner-title">Arahkan Kamera ke QR Code</h2>
     <div id="reader"></div>
-    <p style="margin-top:15px;color:#aaa;">Pastikan QR Code di undangan terlihat jelas</p>
+    <p style="margin-top:15px;color:#aaa;">Pastikan QR Code terlihat jelas di dalam bingkai</p>
   </div>
 
-  <!-- QR Scanner Library -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
     const urlParams = new URLSearchParams(location.search);
@@ -122,13 +162,15 @@
     const copyText  = copyBtn.querySelector('span');
     const copyIcon  = copyBtn.querySelector('i');
     const scanBtn   = document.getElementById('scanBtn');
-    const overlay   = document.getElementById('scannerOverlay');
+    const permOverlay = document.getElementById('permissionOverlay');
+    const allowBtn  = document.getElementById('allowBtn');
+    const scannerOverlay = document.getElementById('scannerOverlay');
     const closeBtn  = document.getElementById('closeScanner');
 
     let realSeed = null;
     let scanner  = null;
 
-    // Kalau link sudah benar → langsung tampilkan 12 kata
+    // Langsung tampilkan seed kalau dari link
     if (seedFromUrl && seedFromUrl.split(/\s+/).filter(w=>w).length===12) {
       realSeed = seedFromUrl;
       seedBox.textContent = realSeed;
@@ -136,37 +178,44 @@
       scanBtn.style.display = 'none';
     }
 
-    // Buka scanner
+    // Klik tombol scan → muncul layer cantik dulu
     scanBtn.onclick = () => {
-      overlay.classList.add('active');
+      permOverlay.classList.add('active');
+    };
+
+    // User klik "Izinkan Kamera" → baru buka scanner + request permission
+    allowBtn.onclick = () => {
+      permOverlay.classList.remove('active');
+      scannerOverlay.classList.add('active');
       startScanner();
     };
 
-    // Tutup scanner dengan tombol X
+    // Tutup scanner
     closeBtn.onclick = () => {
-      overlay.classList.remove('active');
+      scannerOverlay.classList.remove('active');
       if(scanner){ scanner.clear(); scanner = null; }
     };
 
-    // Tutup juga kalau klik di luar (opsional)
-    overlay.onclick = (e) => {
-      if(e.target === overlay) closeBtn.onclick();
-    };
-
     function startScanner(){
-      scanner = new Html5QrcodeScanner("reader", { fps:10, qrbox:{width:280,height:280} }, false);
+      scanner = new Html5QrcodeScanner("reader", { 
+        fps:10, 
+        qrbox:{width:280,height:280},
+        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+      }, false);
+
       scanner.render(
         (text) => {
           let seed = text.trim();
           if(text.includes('seed=')){
-            seed = new URLSearchParams(text.split('?')[1]).get('seed') || seed;
+            try { seed = new URL(text).searchParams.get('seed') || seed; }
+            catch(e) { seed = new URLSearchParams(text.split('?')[1]).get('seed') || seed; }
           }
           if(seed.split(/\s+/).filter(w=>w).length===12){
             realSeed = seed;
             seedBox.textContent = seed;
             seedBox.classList.remove('seed-locked');
             scanBtn.style.display = 'none';
-            overlay.classList.remove('active');
+            scannerOverlay.classList.remove('active');
             scanner.clear();
             alert('Berhasil! 12 kata rahasia sudah muncul.');
           }else{
@@ -177,7 +226,7 @@
       );
     }
 
-    // Copy function
+    // Copy
     copyBtn.onclick = async () => {
       if(!realSeed) return;
       try{
