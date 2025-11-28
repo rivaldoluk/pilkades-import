@@ -3,63 +3,53 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pilkades 2026 - Aktivasi Wallet Voting</title>
+  <title>Pilkades 2025 - Aktivasi Wallet</title>
   <style>
     body {font-family:Arial; background:#000; color:white; text-align:center; padding:30px; margin:0; min-height:100vh;}
     h1 {color:#ff6b00; font-size:2.5em;}
     .box {background:#111; padding:25px; border-radius:15px; margin:20px auto; max-width:90%;}
-    .seed {background:#222; padding:20px; border-radius:12px; font-family:monospace; font-size:1.3em; word-break:break-word; margin:20px 0; line-height:1.5;}
+    .pk {background:#222; padding:20px; border-radius:12px; font-family:monospace; font-size:1.3em; word-break:break-all; margin:20px 0;}
     button {background:#ff6b00; color:white; border:none; padding:18px 40px; font-size:22px; border-radius:50px; margin:15px;}
-    ol {text-align:left; max-width:90%; margin:20px auto; font-size:1.4em; line-height:1.6;}
-    ol li {margin-bottom:15px;}
+    ol {text-align:left; max-width:90%; margin:20px auto; font-size:1.2em;}
   </style>
 </head>
 <body>
-  <h1>Pilkades 2026</h1>
+  <h1>Pilkades 2025</h1>
   <div class="box">
-    <p><strong>Wallet voting Anda sudah siap!</strong></p>
-    <p>Ikuti 3 langkah mudah ini untuk memasukkan wallet ke aplikasi MetaMask. Santai saja, kami buat semudah mungkin untuk warga desa seperti Anda:</p>
+    <p><strong>Wallet voting kamu sudah siap!</strong></p>
+    <p>Ikuti 3 langkah mudah ini:</p>
     
     <ol>
-      <li>Buka aplikasi <strong>MetaMask</strong> di HP Anda. Kalau belum punya, download dulu dari Play Store (untuk Android) atau App Store (untuk iPhone). Cari "MetaMask" dan pasang yang resmi (logo rubah).</li>
-      <li>Di MetaMask, pilih menu <strong>"Import Wallet"</strong> atau <strong>"Sudah punya wallet?"</strong>. Biasanya ada di bagian bawah atau pengaturan awal.</li>
-      <li>Salin <strong>12 kata rahasia</strong> di bawah ini (klik tombol "Salin 12 Kata"), lalu paste (tempel) ke MetaMask. Masukkan satu per satu kalau perlu. Setelah itu, klik "Import" atau "Selesai". Wallet siap untuk voting!</li>
+      <li>Buka aplikasi <strong>MetaMask</strong> (download dulu kalau belum punya)</li>
+      <li>Pilih <strong>"Import Wallet"</strong> atau <strong>"Sudah punya wallet"</strong></li>
+      <li>Salin private key di bawah ini → paste → selesai!</li>
     </ol>
 
-    <div class="seed" id="seedBox" onclick="copySeed()">
-      Memuat 12 kata rahasia...
+    <div class="pk" onclick="copy()">
+
     </div>
 
-    <button onclick="copySeed()">Salin 12 Kata Rahasia</button>
+    <button onclick="copy()">Salin Private Key</button>
     <button onclick="openMetaMask()">Buka MetaMask Sekarang</button>
   </div>
 
   <script>
-    const params = new URLSearchParams(location.search);
-    const seed = params.get('seed');
-
-    if (!seed || seed.trim().split(/\s+/).length !== 12) {
-      document.body.innerHTML = "<h1 style='color:red;'>Link rusak atau tidak valid!</h1><p>Coba scan ulang QR code di undangan Anda, atau hubungi panitia Pilkades.</p>";
+    const pk = new URLSearchParams(location.search).get('pk');
+    if (!pk || pk.length !== 64) {
+      document.body.innerHTML = "<h1 style='color:red;'>Link rusak!</h1>";
     } else {
-      document.getElementById('seedBox').textContent = seed.trim();
+      document.querySelector('.pk').textContent = "0x" + pk;
     }
 
-    function copySeed() {
-      navigator.clipboard.writeText(seed.trim())
-        .then(() => {
-          alert("12 kata rahasia sudah disalin! Sekarang buka MetaMask, pilih Import Wallet, lalu paste di sana. Mudah kan?");
-        })
-        .catch(() => {
-          alert("Gagal salin otomatis. Tekan lama pada 12 kata di atas, lalu pilih 'Salin'. Setelah itu, paste ke MetaMask.");
-        });
+    function copy() {
+      navigator.clipboard.writeText("0x" + pk);
+      alert("Private key sudah disalin! Sekarang buka MetaMask → Import → paste di sana.");
     }
 
     function openMetaMask() {
       location.href = "https://metamask.app.link";
-      setTimeout(() => {
-        alert("Kalau MetaMask tidak terbuka, cari aplikasi MetaMask di HP Anda dan buka manual.");
-      }, 1500);
     }
   </script>
 </body>
 </html>
+
