@@ -458,7 +458,7 @@
                 <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
             </button>
 
-            <button class="btn btn-metamask">
+            <button class="btn btn-metamask" id="openMetaMaskBtn">
                 <i class="fas fa-wallet"></i> Buka MetaMask Sekarang
             </button>
 
@@ -542,6 +542,23 @@
       });
   };
 
+    // === TOMBOL BUKA META MASK (100% JALAN DI SEMUA HP) ===
+document.getElementById('openMetaMaskBtn').onclick = function() {
+    const currentUrl = encodeURIComponent(window.location.href);
+    const metamaskDeepLink = `https://metamask.app.link/dapp/${currentUrl}`;
+
+    window.location.href = metamaskDeepLink;
+
+    // Kalau 2 detik kemudian masih di sini → MetaMask belum ada
+    setTimeout(() => {
+        if (document.hasFocus()) {
+            if (confirm('Kamu belum install MetaMask nih!\n\nMau download sekarang?')) {
+                window.location.href = 'https://metamask.io/download/';
+            }
+        }
+    }, 2000);
+};
+
   // === FUNGSI UTAMA ===
   function startScanner() {
     stopScanner();                    // bersihkan dulu
@@ -620,3 +637,4 @@
 </body>
 
 </html>
+
