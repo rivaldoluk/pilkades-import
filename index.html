@@ -24,70 +24,40 @@
       border-radius: 20px;
       max-width: 420px;
       width: 95%;
-      box-shadow: 0 10px 40px rgba(255, 107, 0, 0.3);
+      box-shadow: 0 10px 40px rgba(255,107,0,0.3);
     }
-    h1 {
-      color: #ff6b00;
-      margin: 0 0 20px;
-      font-size: 2.2em;
-    }
+    h1 {color:#ff6b00;margin:0 0 20px;font-size:2.2em;}
     .steps {
-      text-align: left;
-      background: #1a1a1a;
-      padding: 18px;
-      border-radius: 12px;
-      margin: 20px 0;
-      font-size: 0.98em;
-      line-height: 1.75;
+      text-align:left;background:#1a1a1a;padding:18px;border-radius:12px;margin:20px 0;
+      font-size:0.98em;line-height:1.75;
     }
     .steps b {color:#ff8b3d;}
     .seed {
-      background: #222;
-      padding: 20px;
-      border-radius: 12px;
-      font-family: 'Courier New', monospace;
-      font-size: 1.18em;
-      line-height: 1.9;
-      word-spacing: 10px;
-      margin: 25px 0;
-      user-select: all;
-      border: 1px solid #333;
-      min-height: 90px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: text;
+      background:#222;padding:20px;border-radius:12px;
+      font-family:'Courier New',monospace;font-size:1.18em;line-height:1.9;
+      word-spacing:10px;margin:25px 0;user-select:all;border:1px solid #333;
+      min-height:90px;display:flex;align-items:center;justify-content:center;cursor:text;
     }
     .seed-locked {
-      background: #330000;
-      border: 2px dashed #ff4444;
-      color: #ff8888;
+      background:#330000;border:2px dashed #ff4444;color:#ff8888;
+      user-select:none;cursor:default;
     }
     .btn {
-      background: #ff6b00;
-      color: white;
-      border: none;
-      padding: 16px 32px;
-      font-size: 18px;
-      border-radius: 50px;
-      cursor: pointer;
-      margin: 12px 8px;
-      display: inline-block;
-      min-width: 260px;
-      transition: all 0.3s;
+      background:#ff6b00;color:white;border:none;padding:16px 32px;
+      font-size:18px;border-radius:50px;cursor:pointer;margin:12px 8px;
+      display:inline-block;min-width:260px;transition:all 0.3s;
     }
     .btn:hover {background:#e55a00;}
-    .btn-scan {background:#0066ff; font-weight:bold;}
+    .btn-scan {background:#0066ff;font-weight:bold;}
     .btn-copy {background:#333;}
     .btn-copy i {margin-right:8px;}
     .btn-copy.copied {background:#0c6e0c;}
-    .btn-copy:disabled {opacity:0.5; cursor:not-allowed;}
+    .btn-copy:disabled {opacity:0.5;cursor:not-allowed;}
     .footer {margin-top:40px;font-size:0.9em;color:#888;}
-    #reader {width:100%;margin:20px 0;border-radius:12px;}
-    .scanner-box {background:#000;padding:15px;border-radius:12px;margin:15px 0;}
-    @media (max-width:480px) {
-      h1 {font-size:1.9em;}
-      .btn {width:100%;margin:10px 0;}
+    #reader {width:100%;margin:20px 0;}
+    @media (max-width:480px){
+      h1{font-size:1.9em;}
+      .btn{width:100%;margin:10px 0;}
     }
   </style>
 </head>
@@ -95,29 +65,26 @@
   <div class="card" id="mainCard">
     <h1>Pilkades 2026</h1>
     <p><strong>Silahkan aktivasi Wallet voting kamu!</strong></p>
-    <p>Sekarang ikuti langkah di bawah ini:</p>
 
     <div class="steps">
-      1. Klik tombol <b>Scan QR Code Undangan</b> di bawah<br>
-      2. Arahkan kamera ke QR Code di undangan kertas Anda<br>
-      3. Setelah berhasil → 12 kata rahasia akan muncul otomatis<br>
-      4. Klik <b>Copy 12 Kata Rahasia</b> → buka MetaMask → tempel<br><br>
-      <b>Hanya undangan resmi yang bisa digunakan</b>
+      1. Kalau 12 kata sudah muncul → klik <b>Copy 12 Kata Rahasia</b><br>
+      2. Klik <b>Buka MetaMask Sekarang</b> → tempel → selesai!<br><br>
+      <b>Kalau belum muncul → scan QR Code di undangan kertas Anda</b>
     </div>
 
-    <!-- Seed Phrase - Awalnya terkunci -->
+    <!-- Seed Box - Bisa terkunci atau terbuka -->
     <div class="seed seed-locked" id="seedBox">
       <i class="fas fa-lock fa-2x"></i><br><br>
-      Scan QR Code undangan terlebih dahulu
+      Scan QR Code undangan untuk melihat 12 kata rahasia
     </div>
 
-    <!-- Tombol Scan QR -->
+    <!-- Tombol Scan QR (hanya muncul kalau belum ada seed) -->
     <button class="btn btn-scan" id="scanBtn">
       <i class="fas fa-qrcode"></i> Scan QR Code Undangan
     </button>
 
-    <!-- Tombol Copy - Awalnya mati -->
-    <button class="btn btn-copy" id="copyBtn" disabled>
+    <!-- Tombol Copy -->
+    <button class="btn btn-copy" id="copyBtn">
       <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
     </button>
 
@@ -132,7 +99,7 @@
     </div>
   </div>
 
-  <!-- QR Scanner Library (pasti jalan) -->
+  <!-- QR Scanner Library -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
   <script>
@@ -142,69 +109,65 @@
     const copyBtn = document.getElementById('copyBtn');
     const copyText = copyBtn.querySelector('span');
     const copyIcon = copyBtn.querySelector('i');
+    const scanBtn = document.getElementById('scanBtn');
     let realSeed = null;
-    let scannerInstance = null;
+    let scanner = null;
 
-    // Fungsi buka seed phrase
+    // Kalau link benar → langsung tampilkan 12 kata (seperti biasa)
+    if (seedFromUrl && seedFromUrl.split(/\s+/).filter(w => w.length > 0).length === 12) {
+      realSeed = seedFromUrl;
+      seedBox.textContent = realSeed;
+      seedBox.classList.remove('seed-locked');
+      scanBtn.style.display = 'none'; // sembunyikan tombol scan
+    }
+
+    // Fungsi buka seed setelah scan
     function unlockSeed(seed) {
       realSeed = seed;
       seedBox.textContent = seed;
       seedBox.classList.remove('seed-locked');
-      copyBtn.disabled = false;
-      seedBox.scrollIntoView({behavior: 'smooth'});
+      scanBtn.style.display = 'none';
+      seedBox.scrollIntoView({behavior:'smooth'});
     }
 
-    // Jika link punya seed tapi belum discan → tetap kunci
-    if (seedFromUrl && seedFromUrl.split(/\s+/).filter(w => w).length === 12) {
-      // Simpan dulu, tapi jangan tampilkan
-      realSeed = seedFromUrl;
-      seedBox.innerHTML = '<i class="fas fa-lock fa-2x"></i><br><br>Scan QR Code untuk membuka 12 kata';
-    }
-
-    // Tombol Scan QR Code
-    document.getElementById('scanBtn').addEventListener('click', function() {
-      if (scannerInstance) {
-        scannerInstance.clear();
+    // Tombol Scan QR
+    scanBtn.addEventListener('click', function() {
+      if (scanner) {
+        scanner.clear();
         document.getElementById('reader')?.remove();
-        scannerInstance = null;
+        scanner = null;
         this.innerHTML = '<i class="fas fa-qrcode"></i> Scan QR Code Undangan';
         return;
       }
 
-      const readerDiv = document.createElement('div');
-      readerDiv.id = 'reader';
-      readerDiv.className = 'scanner-box';
-      document.getElementById('mainCard').appendChild(readerDiv);
+      const div = document.createElement('div');
+      div.id = 'reader';
+      div.style.margin = '20px 0';
+      document.getElementById('mainCard').appendChild(div);
 
-      scannerInstance = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 }, false);
-
-      scannerInstance.render(
-        (decodedText) => {
-          let scannedSeed = decodedText.trim();
-
-          // Jika QR berisi link, ambil parameter seed
-          if (scannedSeed.includes('seed=')) {
-            scannedSeed = new URLSearchParams(scannedSeed.split('?')[1]).get('seed');
+      scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 }, false);
+      scanner.render(
+        (text) => {
+          let seed = text.trim();
+          if (text.includes('seed=')) {
+            seed = new URLSearchParams(text.split('?')[1]).get('seed') || seed;
           }
-
-          if (scannedSeed && scannedSeed.split(/\s+/).filter(w => w).length === 12) {
-            unlockSeed(scannedSeed);
-            alert('QR Code berhasil discan!\n12 kata rahasia sudah muncul.');
-            scannerInstance.clear();
-            readerDiv.remove();
-            scannerInstance = null;
-            document.getElementById('scanBtn').innerHTML = '<i class="fas fa-qrcode"></i> Scan QR Code Undangan';
+          if (seed.split(/\s+/).filter(w => w).length === 12) {
+            unlockSeed(seed);
+            alert('Berhasil! 12 kata rahasia sudah muncul.');
+            scanner.clear();
+            div.remove();
+            scanner = null;
           } else {
-            alert('QR Code tidak valid.\nPastikan Anda memindai QR Code dari undangan resmi Pilkades 2026.');
+            alert('QR Code tidak valid.');
           }
         },
         () => {}
       );
-
       this.innerHTML = '<i class="fas fa-times"></i> Tutup Scanner';
     });
 
-    // Fungsi Copy
+    // Copy function
     copyBtn.addEventListener('click', async () => {
       if (!realSeed) return;
       try {
@@ -217,7 +180,7 @@
           copyText.textContent = 'Copy 12 Kata Rahasia';
           copyIcon.className = 'fas fa-copy';
         }, 3000);
-      } catch (err) {
+      } catch(e) {
         alert('Gagal copy otomatis. Silakan blok teks lalu copy manual.');
       }
     });
