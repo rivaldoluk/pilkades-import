@@ -31,27 +31,28 @@
       margin: 0 0 20px;
       font-size: 2.2em;
     }
-    ol {
+    .steps {
       text-align: left;
+      background: #1a1a1a;
+      padding: 18px;
+      border-radius: 12px;
       margin: 20px 0;
-      padding-left: 20px;
+      font-size: 0.98em;
+      line-height: 1.75;
     }
-    ol li {
-      margin: 12px 0;
-      line-height: 1.5;
-    }
+    .steps b {color:#ff8b3d;}
     .seed {
       background: #222;
       padding: 20px;
       border-radius: 12px;
       font-family: 'Courier New', monospace;
-      font-size: 1.15em;
-      line-height: 1.8;
-      word-spacing: 8px;
+      font-size: 1.18em;
+      line-height: 1.9;
+      word-spacing: 10px;
       margin: 25px 0;
       user-select: all;
       border: 1px solid #333;
-      min-height: 80px;
+      min-height: 90px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -67,13 +68,12 @@
       cursor: pointer;
       margin: 12px 8px;
       display: inline-block;
-      min-width: 240px;
+      min-width: 260px;
       transition: all 0.3s;
     }
     .btn:hover {background:#e55a00;}
     .btn-copy {
       background: #333;
-      position: relative;
     }
     .btn-copy i {margin-right:8px;}
     .btn-copy.copied {
@@ -87,6 +87,7 @@
     @media (max-width: 480px) {
       h1 {font-size:1.9em;}
       .btn {width:100%; margin:10px 0;}
+      .steps {font-size:0.95em;}
     }
   </style>
 </head>
@@ -94,42 +95,49 @@
   <div class="card">
     <h1>Pilkades 2026</h1>
     <p><strong>Wallet voting kamu sudah siap!</strong></p>
+    <p>Sekarang ikuti langkah ini dengan teliti:</p>
 
-    <ol>
-      <li>Buka aplikasi <strong>MetaMask</strong> (download dulu kalau belum punya)</li>
-      <li>Pilih <strong>“Import Wallet”</strong> atau <strong>“Sudah punya wallet”</strong></li>
-      <li>Salin 12 kata di bawah ini → paste → selesai!</li>
-    </ol>
+    <div class="steps">
+      1. Klik tombol <b>Buka MetaMask Sekarang</b> di bawah<br>
+      2. Pilih <b>Saya sudah memiliki dompet</b><br>
+      3. Pilih <b>Impor menggunakan frasa pemulihan rahasia</b><br>
+      4. Klik kolom → pilih <b>Tempel</b> (12 kata otomatis masuk)<br>
+      5. Klik <b>Lanjutkan</b><br>
+      6. Buat kata sandi baru (minimal 8 karakter)<br>
+      7. Centang kotak kecil: <b>“Jika saya lupa kata sandi ini...”</b><br>
+      8. Klik <b>Buat Kata Sandi</b> → <b>Lanjutkan</b><br>
+      9. Muncul “Dompet Anda sudah siap” → klik <b>Selesai</b><br><br>
+      <b>Selesai! Wallet voting sudah aktif.</b>
+    </div>
 
     <div class="seed" id="seedBox">Sedang memuat 12 kata…</div>
 
-    <!-- Tombol 1: Copy 12 Kata -->
+    <!-- Tombol Copy -->
     <button class="btn btn-copy" id="copyBtn">
       <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
     </button>
 
-    <!-- Tombol 2: Buka MetaMask (hanya redirect ke app) -->
+    <!-- Tombol Buka MetaMask -->
     <button class="btn" onclick="location.href='https://metamask.app.link'">
       <i class="fas fa-external-link-alt"></i> Buka MetaMask Sekarang
     </button>
 
     <div class="footer">
-      Panitia Desa • Sistem Voting Blockchain 2026
+      Panitia Desa • Sistem Voting Blockchain 2026<br>
+      Hubungi panitia jika ada kendala
     </div>
   </div>
 
   <script>
-    // Ambil seed phrase dari parameter URL (?seed=...)
     const params = new URLSearchParams(location.search);
     const seed = params.get('seed')?.trim();
 
-    if (!seed || seed.split(/\s+/).filter(word => word.length > 0).length !== 12) {
+    if (!seed || seed.split(/\s+/).filter(w => w).length !== 12) {
       document.body.innerHTML = "<div style='color:red;padding:50px;font-size:2em;'>Link tidak valid atau sudah rusak!</div>";
     } else {
-      // Tampilkan seed phrase
       document.getElementById('seedBox').textContent = seed;
 
-      // ---------- FUNGSI COPY KE CLIPBOARD ----------
+      // Fungsi Copy
       const copyBtn = document.getElementById('copyBtn');
       const copyText = copyBtn.querySelector('span');
       const copyIcon = copyBtn.querySelector('i');
@@ -146,7 +154,7 @@
             copyIcon.className = 'fas fa-copy';
           }, 3000);
         } catch (err) {
-          alert('Gagal copy otomatis. Silakan blok teks di atas lalu copy manual.');
+          alert('Gagal copy otomatis. Silakan blok teks lalu copy manual.');
         }
       });
     }
