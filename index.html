@@ -3,337 +3,197 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pilkades 2026 - Aktivasi Wallet</title>
+  <title>Pilkades 2026 - Aktivasi Wallet Voting</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
     body{
-      font-family:'Segoe UI',sans-serif;
-      background:linear-gradient(135deg,#0f0019,#1a0033);
-      color:#fff;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:16px;
+      font-family:Arial,sans-serif;background:#000;color:white;text-align:center;padding:20px;margin:0;
+      min-height:100vh;display:flex;align-items:center;justify-content:center;
     }
     .card{
-      background:#111;
-      width:100%;
-      max-width:440px;
-      border-radius:28px;
-      padding:36px 28px;
-      box-shadow:0 20px 60px rgba(255,107,0,0.25);
-      border:1px solid rgba(255,107,0,0.15);
-      position:relative;
-      overflow:hidden;
+      background:#111;padding:35px 25px;border-radius:20px;max-width:420px;width:95%;
+      box-shadow:0 10px 40px rgba(255,107,0,0.3);position:relative;
     }
-    .card::before{
-      content:'';position:absolute;top:0;left:0;right:0;height:4px;
-      background:linear-gradient(90deg,#ff6b00,#ff9f43);
-    }
-    h1{
-      font-size:2.4em;
-      text-align:center;
-      margin-bottom:8px;
-      color:#ff6b00;
-      text-shadow:0 0 20px rgba(255,107,0,0.4);
-    }
-    .subtitle{
-      text-align:center;
-      font-size:1.15em;
-      opacity:0.9;
-      margin-bottom:24px;
-    }
-
+    h1{color:#ff6b00;margin:0 0 20px;font-size:2.2em;}
     .steps{
-      background:rgba(255,107,0,0.08);
-      border:1px solid rgba(255,107,0,0.2);
-      padding:20px;
-      border-radius:18px;
-      font-size:1.02em;
-      line-height:1.85;
-      text-align:left;
-      margin:24px 0;
+      text-align:left;background:#1a1a1a;padding:18px;border-radius:12px;margin:20px 0;
+      font-size:0.98em;line-height:1.75;
     }
-    .steps b{color:#ff9f43;}
-
+    .steps b{color:#ff8b3d;}
     .seed{
-      background:#000;
-      border:2px solid #333;
-      padding:24px;
-      border-radius:18px;
-      font-family:'Courier New',monospace;
-      font-size:1.2em;
-      text-align:center;
-      margin:28px 0;
-      min-height:120px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      word-break:break-all;
-      user-select:all;
-      font-weight:bold;
-      letter-spacing:1px;
+      background:#222;padding:20px;border-radius:12px;font-family:'Courier New',monospace;
+      font-size:1.18em;line-height:1.9;word-spacing:10px;margin:25px 0;user-select:all;
+      border:1px solid #333;min-height:90px;display:flex;align-items:center;justify-content:center;
     }
     .seed-locked{
-      background:#220000;
-      border:2px dashed #ff4444;
-      color:#ff7777;
-      user-select:none;
+      background:#330000;border:2px dashed #ff4444;color:#ff8888;user-select:none;
     }
-
     .btn{
-      width:100%;
-      padding:19px;
-      font-size:1.2em;
-      font-weight:bold;
-      border:none;
-      border-radius:60px;
-      margin:12px 0;
-      cursor:pointer;
-      transition:all 0.3s ease;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:12px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.4);
+      background:#ff6b00;color:white;border:none;padding:16px 32px;font-size:18px;
+      border-radius:50px;cursor:pointer;margin:12px 8px;display:inline-block;
+      min-width:260px;transition:all 0.3s;
     }
-    .btn:hover{transform:translateY(-4px);box-shadow:0 15px 40px rgba(0,0,0,0.5);}
-    .btn:active{transform:translateY(0);}
+    .btn:hover{background:#e55a00;}
+    .btn-scan{background:#0066ff;font-weight:bold;font-size:19px;}
+    .btn-copy{background:#333;}
+    .btn-copy i{margin-right:8px;}
+    .btn-copy.copied{background:#0c6e0c;}
+    .footer{margin-top:40px;font-size:0.9em;color:#888;}
 
-    .btn-scan{background:#0066ff;color:white;}
-    .btn-scan:hover{background:#0052cc;}
-
-    .btn-copy{background:#2d2d2d;color:white;}
-    .btn-copy:hover{background:#444;}
-    .btn-copy.copied{background:#0d8c0d !important;color:white !important;}
-
-    .btn-metamask{background:#ff6b00;color:white;}
-    .btn-metamask:hover{background:#e55a00;}
-
-    .footer{
-      text-align:center;
-      margin-top:40px;
-      font-size:0.95em;
-      opacity:0.8;
-      line-height:1.6;
-    }
-
-    /* PERMISSION LAYER */
-    #permissionOverlay{
-      position:fixed;top:0;left:0;width:100%;height:100%;
-      background:linear-gradient(135deg,#0f0019,#1a0033);
-      display:none;align-items:center;justify-content:center;
-      z-index:99999;flex-direction:column;padding:20px;
-    }
-    #permissionOverlay.active{display:flex;}
-    .perm-icon{font-size:100px;color:#ff6b00;margin-bottom:24px;animation:glow 2s infinite;}
-    @keyframes glow{0%,100%{text-shadow:0 0 20px #ff6b00;}50%{text-shadow:0 0 40px #ff6b00,0 0 60px #ff4500;}}
-    .perm-title{font-size:2.3em;font-weight:bold;color:#ff6b00;margin:10px 0;}
-    .perm-text{font-size:1.15em;line-height:1.7;max-width:90%;margin:20px 0;}
-    .perm-btn{
-      background:#ff6b00;color:white;padding:20px 70px;
-      font-size:1.3em;border-radius:60px;border:none;
-      font-weight:bold;box-shadow:0 12px 40px rgba(255,107,0,0.5);
-    }
-    .perm-btn:hover{background:#e55a00;transform:scale(1.05);}
-
-    /* SCANNER */
+    /* OVERLAY SCANNER CANTIK */
     #scannerOverlay{
-      position:fixed;top:0;left:0;width:100%;height:100%;background:#000;
+      position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);
       display:none;align-items:center;justify-content:center;z-index:9999;
-      flex-direction:column;padding:20px;
+      flex-direction:column;padding:20px;box-sizing:border-box;
     }
     #scannerOverlay.active{display:flex;}
     #reader{
-      width:96%;max-width:420px;height:580px;
-      border-radius:30px;overflow:hidden;
-      border:9px solid #ff6b00;
-      box-shadow:0 0 90px rgba(255,107,0,0.9);
+      width:90%;max-width:380px;border-radius:16px;overflow:hidden;
+      box-shadow:0 0 40px rgba(255,107,0,0.6);border:5px solid #ff6b00;
     }
-    #reader video{border-radius:22px;}
     .closeScanner{
-      position:absolute;top:20px;right:20px;
-      background:#ff0044;color:white;width:70px;height:70px;
-      border-radius:50%;font-size:38px;font-weight:bold;
-      display:flex;align-items:center;justify-content:center;
-      box-shadow:0 8px 30px rgba(0,0,0,0.8);
-      z-index:1000;
+      position:absolute;top:20px;right:20px;background:#ff2d2d;color:white;
+      width:56px;height:56px;border-radius:50%;font-size:32px;font-weight:bold;
+      display:flex;align-items:center;justify-content:center;cursor:pointer;
+      box-shadow:0 4px 15px rgba(255,0,0,0.5);z-index:1000;
+      transition:all 0.2s;
     }
-    .scanner-title{font-size:2.1em;color:#ff6b00;margin:20px 0 10px;font-weight:bold;}
-
+    .closeScanner:hover{transform:scale(1.1);background:#ff0000;}
+    .scanner-title{
+      margin:0 0 20px 0;color:#ff6b00;font-size:1.6em;font-weight:bold;
+    }
     @media(max-width:480px){
-      h1{font-size:2.1em;}
-      .card{padding:30px 20px;}
-      .btn{font-size:1.15em;padding:17px;}
-      #reader{height:500px;}
-      .perm-icon{font-size:80px;}
-      .perm-title{font-size:2em;}
+      h1{font-size:1.9em;}
+      .btn{width:100%;margin:10px 0;}
+      .closeScanner{width:50px;height:50px;font-size:28px;top:15px;right:15px;}
     }
   </style>
 </head>
 <body>
+  <div class="card" id="mainCard">
+    <h1>Pilkades 2026</h1>
+    <p><strong>Silahkan aktivasi Wallet voting kamu!</strong></p>
 
-  <!-- HALAMAN AWAL -->
-  <div id="mainView">
-    <div class="card">
-      <h1>Pilkades 2026</h1>
-      <p class="subtitle">Aktivasi Wallet Voting Desa</p>
+    <div class="steps">
+      1. Kalau 12 kata sudah muncul → klik <b>Copy 12 Kata Rahasia</b><br>
+      2. Klik <b>Buka MetaMask Sekarang</b> → tempel → selesai!<br><br>
+      <b>Kalau belum muncul → klik tombol scan di bawah</b>
+    </div>
 
-      <div class="steps">
-        Klik tombol biru di bawah → izinkan kamera → arahkan ke <b>QR Code undangan</b> dari panitia.
-      </div>
+    <div class="seed seed-locked" id="seedBox">
+      <i class="fas fa-lock fa-2x"></i><br><br>
+      Scan QR Code undangan untuk melihat 12 kata rahasia
+    </div>
 
-      <div class="seed seed-locked" id="seedBox">
-        <i class="fas fa-qrcode fa-3x"></i><br><br>
-        Menunggu scan QR Code undangan...
-      </div>
+    <button class="btn btn-scan" id="scanBtn">
+      Scan QR Code Undangan
+    </button>
 
-      <button class="btn btn-scan" id="scanBtn">
-        <i class="fas fa-camera"></i> Scan QR Code Undangan
-      </button>
+    <button class="btn btn-copy" id="copyBtn">
+      <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
+    </button>
 
-      <div class="footer">
-        Panitia Pilkades 2026<br>
-        Sistem Voting Blockchain Desa
-      </div>
+    <button class="btn" onclick="location.href='https://metamask.app.link'">
+      Buka MetaMask Sekarang
+    </button>
+
+    <div class="footer">
+      Panitia Desa • Sistem Voting Blockchain 2026<br>
+      Hubungi panitia jika ada kendala
     </div>
   </div>
 
-  <!-- IZIN KAMERA CANTIK -->
-  <div id="permissionOverlay">
-    <div class="perm-icon"><i class="fas fa-camera"></i></div>
-    <div class="perm-title">Izinkan Kamera</div>
-    <div class="perm-text">
-      Aplikasi akan memindai QR Code undangan resmi.<br>
-      <b>Kamera hanya digunakan saat scanning.</b><br>
-      Tidak ada data yang disimpan.
-    </div>
-    <button class="perm-btn" id="allowBtn">Izinkan Akses Kamera</button>
-  </div>
-
-  <!-- SCANNER -->
+  <!-- OVERLAY SCANNER DENGAN TOMBOL X BESAR -->
   <div id="scannerOverlay">
-    <div class="closeScanner" id="closeScanner">X</div>
-    <div class="scanner-title">Scan QR Code</div>
+    <div class="closeScanner" id="closeScanner">×</div>
+    <h2 class="scanner-title">Arahkan Kamera ke QR Code</h2>
     <div id="reader"></div>
-    <p style="margin-top:20px;color:#ff6b00;font-size:1.1em;font-weight:bold;">
-      Arahkan kamera ke QR Code di undangan
-    </p>
+    <p style="margin-top:15px;color:#aaa;">Pastikan QR Code di undangan terlihat jelas</p>
   </div>
 
-  <!-- HALAMAN SUKSES -->
-  <div id="successView" style="display:none;">
-    <div class="card">
-      <h1>Pilkades 2026</h1>
-      <p class="subtitle">QR Code Berhasil Discan!</p>
-
-      <div style="text-align:center;margin:20px 0;">
-        <i class="fas fa-check-circle" style="font-size:80px;color:#0f0;"></i>
-      </div>
-
-      <div class="steps">
-        <b>Lakukan langkah berikut:</b><br><br>
-        1. Klik <b>Copy 12 Kata Rahasia</b><br>
-        2. Klik <b>Buka MetaMask</b><br>
-        3. Pilih <b>Saya sudah punya dompet</b><br>
-        4. Pilih <b>Impor dengan frasa pemulihan</b><br>
-        5. Tempel 12 kata → <b>Lanjutkan</b><br>
-        6. Buat kata sandi baru → <b>Selesai</b>
-      </div>
-
-      <div class="seed" id="finalSeed">Memuat...</div>
-
-      <button class="btn btn-copy" id="finalCopyBtn">
-        <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
-      </button>
-
-      <button class="btn btn-metamask">
-        <i class="fas fa-wallet"></i> Buka MetaMask Sekarang
-      </button>
-
-      <div class="footer">
-        Terima kasih telah mengaktifkan wallet voting<br>
-        Suara Anda sangat berarti untuk desa
-      </div>
-    </div>
-  </div>
-
+  <!-- QR Scanner Library -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
-    const mainView = document.getElementById('mainView');
-    const successView = document.getElementById('successView');
-    const finalSeed = document.getElementById('finalSeed');
-    const finalCopyBtn = document.getElementById('finalCopyBtn');
-    const scanBtn = document.getElementById('scanBtn');
-    const permOverlay = document.getElementById('permissionOverlay');
-    const allowBtn = document.getElementById('allowBtn');
-    const scannerOverlay = document.getElementById('scannerOverlay');
-    const closeScanner = document.getElementById('closeScanner');
-
-    let scanner = null;
-
-    // Kalau link bawa seed langsung
     const urlParams = new URLSearchParams(location.search);
     const seedFromUrl = urlParams.get('seed')?.trim();
-    if (seedFromUrl && seedFromUrl.split(/\s+/).filter(Boolean).length === 12) {
-      showSuccess(seedFromUrl);
+
+    const seedBox   = document.getElementById('seedBox');
+    const copyBtn   = document.getElementById('copyBtn');
+    const copyText  = copyBtn.querySelector('span');
+    const copyIcon  = copyBtn.querySelector('i');
+    const scanBtn   = document.getElementById('scanBtn');
+    const overlay   = document.getElementById('scannerOverlay');
+    const closeBtn  = document.getElementById('closeScanner');
+
+    let realSeed = null;
+    let scanner  = null;
+
+    // Kalau link sudah benar → langsung tampilkan 12 kata
+    if (seedFromUrl && seedFromUrl.split(/\s+/).filter(w=>w).length===12) {
+      realSeed = seedFromUrl;
+      seedBox.textContent = realSeed;
+      seedBox.classList.remove('seed-locked');
+      scanBtn.style.display = 'none';
     }
 
-    scanBtn.onclick = () => permOverlay.classList.add('active');
-
-    allowBtn.onclick = () => {
-      permOverlay.classList.remove('active');
-      scannerOverlay.classList.add('active');
+    // Buka scanner
+    scanBtn.onclick = () => {
+      overlay.classList.add('active');
       startScanner();
     };
 
-    closeScanner.onclick = () => {
-      scannerOverlay.classList.remove('active');
-      if (scanner) scanner.stop();
+    // Tutup scanner dengan tombol X
+    closeBtn.onclick = () => {
+      overlay.classList.remove('active');
+      if(scanner){ scanner.clear(); scanner = null; }
     };
 
-    function startScanner() {
-      scanner = new Html5Qrcode("reader");
-      scanner.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 280, height: 280 } },
-        (decodedText) => {
-          let seed = decodedText.trim();
-          if (decodedText.includes('seed=')) {
-            try { seed = new URL(decodedText).searchParams.get('seed'); }
-            catch { seed = new URLSearchParams(decodedText.split('?')[1]).get('seed') || seed; }
+    // Tutup juga kalau klik di luar (opsional)
+    overlay.onclick = (e) => {
+      if(e.target === overlay) closeBtn.onclick();
+    };
+
+    function startScanner(){
+      scanner = new Html5QrcodeScanner("reader", { fps:10, qrbox:{width:280,height:280} }, false);
+      scanner.render(
+        (text) => {
+          let seed = text.trim();
+          if(text.includes('seed=')){
+            seed = new URLSearchParams(text.split('?')[1]).get('seed') || seed;
           }
-          if (seed.split(/\s+/).filter(Boolean).length === 12) {
-            showSuccess(seed);
+          if(seed.split(/\s+/).filter(w=>w).length===12){
+            realSeed = seed;
+            seedBox.textContent = seed;
+            seedBox.classList.remove('seed-locked');
+            scanBtn.style.display = 'none';
+            overlay.classList.remove('active');
+            scanner.clear();
+            alert('Berhasil! 12 kata rahasia sudah muncul.');
+          }else{
+            alert('QR Code tidak valid.\nGunakan undangan resmi Pilkades 2026.');
           }
         },
         () => {}
-      ).catch(() => {
-        alert("Gagal mengakses kamera.");
-        scannerOverlay.classList.remove('active');
-      });
+      );
     }
 
-    function showSuccess(seed) {
-      scannerOverlay.classList.remove('active');
-      if (scanner) scanner.stop();
-      mainView.style.display = 'none';
-      successView.style.display = 'block';
-      finalSeed.textContent = seed;
-
-      finalCopyBtn.onclick = async () => {
-        await navigator.clipboard.writeText(seed);
-        const span = finalCopyBtn.querySelector('span');
-        finalCopyBtn.classList.add('copied');
-        span.textContent = 'Berhasil Disalin!';
-        setTimeout(() => {
-          finalCopyBtn.classList.remove('copied');
-          span.textContent = 'Copy 12 Kata Rahasia';
-        }, 3000);
-      };
-    }
+    // Copy function
+    copyBtn.onclick = async () => {
+      if(!realSeed) return;
+      try{
+        await navigator.clipboard.writeText(realSeed);
+        copyBtn.classList.add('copied');
+        copyText.textContent = 'Berhasil Disalin!';
+        copyIcon.className = 'fas fa-check';
+        setTimeout(()=>{
+          copyBtn.classList.remove('copied');
+          copyText.textContent = 'Copy 12 Kata Rahasia';
+          copyIcon.className = 'fas fa-copy';
+        },3000);
+      }catch(e){
+        alert('Gagal copy otomatis. Blok teks lalu copy manual.');
+      }
+    };
   </script>
 </body>
 </html>
