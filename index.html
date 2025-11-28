@@ -6,87 +6,24 @@
   <title>Pilkades 2026 - Aktivasi Wallet Voting</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #000;
-      color: white;
-      text-align: center;
-      padding: 20px;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .card {
-      background: #111;
-      padding: 35px 25px;
-      border-radius: 20px;
-      max-width: 420px;
-      width: 95%;
-      box-shadow: 0 10px 40px rgba(255, 107, 0, 0.3);
-    }
-    h1 {
-      color: #ff6b00;
-      margin: 0 0 20px;
-      font-size: 2.2em;
-    }
-    .steps {
-      text-align: left;
-      background: #1a1a1a;
-      padding: 18px;
-      border-radius: 12px;
-      margin: 20px 0;
-      font-size: 0.98em;
-      line-height: 1.75;
-    }
+    body {font-family:Arial,sans-serif;background:#000;color:white;text-align:center;padding:20px;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+    .card {background:#111;padding:35px 25px;border-radius:20px;max-width:420px;width:95%;box-shadow:0 10px 40px rgba(255,107,0,0.3);}
+    h1 {color:#ff6b00;margin:0 0 20px;font-size:2.2em;}
+    .steps {text-align:left;background:#1a1a1a;padding:18px;border-radius:12px;margin:20px 0;font-size:0.98em;line-height:1.8;}
     .steps b {color:#ff8b3d;}
-    .seed {
-      background: #222;
-      padding: 20px;
-      border-radius: 12px;
-      font-family: 'Courier New', monospace;
-      font-size: 1.18em;
-      line-height: 1.9;
-      word-spacing: 10px;
-      margin: 25px 0;
-      user-select: all;
-      border: 1px solid #333;
-      min-height: 90px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: text;
-    }
-    .btn {
-      background: #ff6b00;
-      color: white;
-      border: none;
-      padding: 16px 32px;
-      font-size: 18px;
-      border-radius: 50px;
-      cursor: pointer;
-      margin: 12px 8px;
-      display: inline-block;
-      min-width: 260px;
-      transition: all 0.3s;
-    }
-    .btn:hover {background:#e55a00;}
-    .btn-copy {
-      background: #333;
-    }
+    .seed {background:#222;padding:20px;border-radius:12px;font-family:'Courier New',monospace;font-size:1.18em;line-height:1.9;word-spacing:10px;margin:25px 0;user-select:all;border:2px dashed #444;min-height:90px;display:flex;align-items:center;justify-content:center;cursor:text;}
+    .btn {background:#ff6b00;color:white;border:none;padding:16px 32px;font-size:18px;border-radius:50px;cursor:pointer;margin:12px 8px;display:inline-block;min-width:260px;transition:all 0.3s;position:relative;}
+    .btn:hover {background:#e55a00;transform:scale(1.03);}
+    .btn-main {background:#ff4500;font-size:20px;font-weight:bold;padding:18px;}
+    .btn-copy {background:#333;}
     .btn-copy i {margin-right:8px;}
-    .btn-copy.copied {
-      background: #0c6e0c;
-    }
-    .footer {
-      margin-top: 40px;
-      font-size: 0.9em;
-      color: #888;
-    }
-    @media (max-width: 480px) {
+    .btn-copy.copied {background:#0c6e0c;}
+    .notification {position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#0c6e0c;color:white;padding:16px 32px;border-radius:50px;font-size:18px;font-weight:bold;z-index:9999;box-shadow:0 5px 20px rgba(0,0,0,0.5);opacity:0;transition:all 0.4s;}
+    .notification.show {opacity:1;top:30px;}
+    .footer {margin-top:40px;font-size:0.9em;color:#888;}
+    @media (max-width:480px) {
       h1 {font-size:1.9em;}
-      .btn {width:100%; margin:10px 0;}
+      .btn {width:100%;margin:10px 0;}
       .steps {font-size:0.95em;}
     }
   </style>
@@ -95,37 +32,47 @@
   <div class="card">
     <h1>Pilkades 2026</h1>
     <p><strong>Silahkan aktivasi Wallet voting kamu!</strong></p>
-    <p>Sekarang ikuti langkah dibawah ini:</p>
+    <p>Klik tombol besar di bawah → selesai dalam 30 detik!</p>
 
     <div class="steps">
-      1. Klik tombol <b>Copy 12 Kata Rahasia</b> di bawah<br>
-      2. Klik tombol <b>Buka MetaMask Sekarang</b> di bawah<br>
-      3. Pilih <b>Saya sudah memiliki dompet</b><br>
-      4. Pilih <b>Impor menggunakan frasa pemulihan rahasia</b><br>
-      5. Klik <b>Tempel</b> (12 kata otomatis masuk) → <b>Lanjutkan</b><br>
-      6. Buat kata sandi baru (minimal 8 karakter)<br>
-      7. Centang kotak kecil: <b>“Jika saya lupa kata sandi ini...”</b><br>
-      8. Klik <b>Buat Kata Sandi</b> → <b>Lanjutkan</b><br>
-      9. Muncul “Dompet Anda sudah siap” → klik <b>Selesai</b><br><br>
-      <b><strong>Selesai! Wallet voting sudah aktif.</strong></b>
+      1. Klik tombol <b>Copy & Buka MetaMask Sekaligus</b><br>
+      2. Pilih <b>Saya sudah memiliki dompet</b><br>
+      3. Pilih <b>Impor menggunakan frasa pemulihan rahasia</b><br>
+      4. Otomatis terisi → klik <b>Lanjutkan</b><br>
+      5. Buat kata sandi → centang → <b>Selesai</b><br><br>
+      <b>Selesai! Wallet sudah aktif untuk voting.</b>
     </div>
 
     <div class="seed" id="seedBox">Sedang memuat 12 kata…</div>
 
-    <!-- Tombol Copy -->
+    <!-- FITUR UTAMA: Satu Klik Aja! -->
+    <button class="btn btn-main" id="oneClickBtn">
+      <i class="fas fa-bolt"></i> Copy & Buka MetaMask Sekaligus
+    </button>
+
+    <!-- Tombol Cadangan -->
     <button class="btn btn-copy" id="copyBtn">
       <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
     </button>
 
-    <!-- Tombol Buka MetaMask -->
-    <button class="btn" onclick="location.href='https://metamask.app.link'">
+    <button class="btn" onclick="openMetaMask()">
       <i class="fas fa-external-link-alt"></i> Buka MetaMask Sekarang
+    </button>
+
+    <!-- Tombol Video Tutorial (GANTI LINK SESUAI VIDEO KAMU) -->
+    <button class="btn" style="background:#1a1a1a;" onclick="window.open('https://www.youtube.com/shorts/ContohVideoKamu', '_blank')">
+      <i class="fas fa-video"></i> Lihat Video Tutorial (30 detik)
     </button>
 
     <div class="footer">
       Panitia Desa • Sistem Voting Blockchain 2026<br>
-      Hubungi panitia jika ada kendala
+      Hubungi panitia jika ada kendala: 085XXX
     </div>
+  </div>
+
+  <!-- Notifikasi Besar -->
+  <div class="notification" id="notif">
+    <i class="fas fa-check-circle"></i> 12 Kata Sudah di Clipboard!
   </div>
 
   <script>
@@ -137,33 +84,56 @@
     } else {
       document.getElementById('seedBox').textContent = seed;
 
-      // Fungsi Copy
-      const copyBtn = document.getElementById('copyBtn');
-      const copyText = copyBtn.querySelector('span');
-      const copyIcon = copyBtn.querySelector('i');
+      const notif = document.getElementById('notif');
 
-      copyBtn.addEventListener('click', async () => {
+      // Fungsi Copy + Notifikasi
+      async function copyAndNotify() {
         try {
           await navigator.clipboard.writeText(seed);
-          copyBtn.classList.add('copied');
-          copyText.textContent = 'Berhasil Disalin!';
-          copyIcon.className = 'fas fa-check';
-          setTimeout(() => {
-            copyBtn.classList.remove('copied');
-            copyText.textContent = 'Copy 12 Kata Rahasia';
-            copyIcon.className = 'fas fa-copy';
-          }, 3000);
+          notif.classList.add('show');
+          setTimeout(() => notif.classList.remove('show'), 3000);
         } catch (err) {
           alert('Gagal copy otomatis. Silakan blok teks lalu copy manual.');
         }
+      }
+
+      // Tombol Copy Biasa
+      const copyBtn = document.getElementById('copyBtn');
+      const copyText = copyBtn.querySelector('span');
+      copyBtn.addEventListener('click', async () => {
+        await copyAndNotify();
+        copyBtn.classList.add('copied');
+        copyText.textContent = 'Berhasil Disalin!';
+        setTimeout(() => {
+          copyBtn.classList.remove('copied');
+          copyText.textContent = 'Copy 12 Kata Rahasia';
+        }, 3000);
       });
+
+      // FITUR ANDALAN: Satu Klik Copy + Buka MetaMask
+      document.getElementById('oneClickBtn').addEventListener('click', async () => {
+        await copyAndNotify();
+        setTimeout(openMetaMask, 800); // kasih jeda biar copy dulu
+      });
+    }
+
+    // Fungsi buka MetaMask dengan deteksi instalasi
+    function openMetaMask() {
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+      if (isAndroid || isIOS) {
+        location.href = "metamask://";
+        // Fallback kalau belum install
+        setTimeout(() => {
+          if (confirm('MetaMask belum terinstall?\nKlik OK untuk download sekarang.')) {
+            location.href = "https://metamask.app.link";
+          }
+        }, 1500);
+      } else {
+        location.href = "https://metamask.io";
+      }
     }
   </script>
 </body>
 </html>
-
-
-
-
-
-
