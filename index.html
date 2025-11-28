@@ -5,64 +5,121 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Pilkades 2026 - Aktivasi Wallet Voting</title>
   <style>
-    body {font-family:Arial,sans-serif; background:#000; color:white; text-align:center; padding:20px; margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;}
-    .card {background:#111; padding:30px; border-radius:20px; max-width:420px; width:95%; box-shadow:0 10px 30px rgba(255,107,0,0.3);}
-    h1 {color:#ff6b00; margin:0 0 20px; font-size:2.2em;}
-    .seed {background:#222; padding:18px; border-radius:12px; font-family:monospace; font-size:1.15em; line-height:1.6; word-spacing:8px; margin:20px 0;}
-    button {background:#ff6b00; color:white; border:none; padding:16px 32px; font-size:20px; border-radius:50px; cursor:pointer; margin:10px;}
-    button:hover {background:#e55a00;}
-    .footer {margin-top:30px; font-size:0.9em; color:#888;}
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: #000;
+      color: white;
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .card {
+      background: #111;
+      padding: 30px 25px;
+      border-radius: 20px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(255, 107, 0, 0.2);
+    }
+    h1 {
+      color: #ff6b00;
+      font-size: 2.3em;
+      margin-bottom: 15px;
+    }
+    .seed {
+      background: #222;
+      padding: 20px;
+      border-radius: 14px;
+      font-family: 'Courier New', monospace;
+      font-size: 1.25em;
+      line-height: 1.8;
+      word-spacing: 10px;
+      margin: 25px 0;
+      border: 2px solid #333;
+      user-select: all;
+    }
+    .btn {
+      background: #ff6b00;
+      color: white;
+      border: none;
+      padding: 18px;
+      font-size: 1.4em;
+      border-radius: 50px;
+      width: 100%;
+      margin: 12px 0;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-copy {
+      background: #333;
+      font-size: 1.2em;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 0.9em;
+      color: #888;
+    }
+    .check {
+      color: #0f0;
+      font-size: 1.5em;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>Pilkades 2026</h1>
-    <p><strong>Wallet voting kamu sudah siap!</strong></p>
-    <p>Klik tombol di bawah → MetaMask akan terbuka otomatis dan langsung mengisi 12 kata rahasiamu.</p>
+    <p><strong>Wallet voting Anda sudah aktif!</strong></p>
+    <p>Ikuti 3 langkah mudah ini:</p>
 
-    <div class="seed" id="seedBox">Sedang memuat 12 kata…</div>
+    <div class="seed" id="seedBox">Memuat 12 kata rahasia…</div>
 
-    <button id="importBtn" onclick="importToMetaMask()">Import ke MetaMask Sekarang</button>
-    <button onclick="location.href='https://metamask.app.link'">Buka MetaMask (jika tombol tidak jalan)</button>
+    <button class="btn btn-copy" onclick="copySeed()">
+      Salin 12 Kata Rahasia
+    </button>
+
+    <button class="btn" onclick="openMetaMask()">
+      Buka MetaMask Sekarang
+    </button>
+
+    <div style="margin-top:25px; line-height:1.7; font-size:1.1em;">
+      <div class="check">Checkmark 1. Buka MetaMask</div>
+      <div class="check">Checkmark 2. Pilih "Import Wallet"</div>
+      <div class="check">Checkmark 3. Paste 12 kata di atas → Selesai!</div>
+    </div>
 
     <div class="footer">
-      Panitia Desa • Sistem Voting Blockchain 2026
+      Panitia Pilkades • Sistem Blockchain 2026<br>
+      Hubungi petugas jika ada kendala
     </div>
   </div>
 
   <script>
-    // Ambil seed phrase dari URL (?seed=...)
     const params = new URLSearchParams(location.search);
     const seed = params.get('seed');
 
-    if (!seed || seed.split(/\s+/).length !== 12) {
-      document.body.innerHTML = "<h1 style='color:red;padding:50px;'>Link tidak valid atau sudah rusak!</h1>";
+    if (!seed || seed.trim().split(/\s+/).length !== 12) {
+      document.body.innerHTML = "<h1 style='color:red; padding:50px;'>Link tidak valid atau rusak!</h1>";
     } else {
       // Tampilkan 12 kata
-      document.getElementById('seedBox').textContent = seed;
+      document.getElementById('seedBox').textContent = seed.trim();
 
-      // Fungsi import otomatis ke MetaMask (deep link)
-      window.importToMetaMask = function() {
-        const metamaskDeepLink = `https://metamask.app.link/dapp/${location.origin}${location.pathname}?seed=${encodeURIComponent(seed)}`;
-        location.href = `ethereum:${encodeURIComponent(seed)}@import`; // cara paling cepat (beberapa versi langsung buka import)
-        setTimeout(() => {
-          location.href = "https://metamask.app.link"; // fallback
-        }, 800);
-        alert("MetaMask sedang dibuka…\n12 kata akan otomatis terisi!\nKalau tidak jalan, klik tombol kedua.");
+      // Fungsi copy
+      window.copySeed = function() {
+        navigator.clipboard.writeText(seed.trim()).then(() => {
+          alert("Checkmark 12 kata rahasia sudah disalin!\nSekarang buka MetaMask → Import → Paste di sana.");
+        }).catch(() => {
+          alert("Gagal copy. Silakan tekan lama pada 12 kata di atas → Salin");
+        });
       };
-    }
-  </script>
 
-  <!-- Fallback terbaik 2025: langsung arahkan ke MetaMask Mobile + auto-fill -->
-  <script>
-    // Cara terbaik 2025: pakai intent MetaMask (work di Android & iOS)
-    if (seed) {
-      document.getElementById('importBtn').onclick = function() {
-        const intent = `metamask://wc?uri=${encodeURIComponent('import:' + seed)}`;
-        location.href = intent;
-        setTimeout(() => {
-          location.href = "https://metamask.app.link";
-        }, 1000);
+      // Buka MetaMask
+      window.openMetaMask = function() {
+        location.href = "https://metamask.app.link";
       };
     }
   </script>
