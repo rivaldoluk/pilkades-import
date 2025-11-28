@@ -154,15 +154,41 @@
     }
     #reader video{border-radius:22px;}
     .closeScanner{
-      position:absolute;top:20px;right:20px;
-      background:#ff0044;color:white;width:70px;height:70px;
-      border-radius:50%;font-size:38px;font-weight:bold;
-      display:flex;align-items:center;justify-content:center;
-      box-shadow:0 8px 30px rgba(0,0,0,0.8);
-      z-index:1000;
-    }
-    .scanner-title{font-size:2.1em;color:#ff6b00;margin:20px 0 10px;font-weight:bold;}
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 0, 68, 0.9);
+  color: white;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+  z-index: 1000;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  border: 2px solid rgba(255,255,255,0.2);
+  transition: all 0.2s ease;
+}
 
+.closeScanner:hover{
+  background: #ff0044;
+  transform: scale(1.1);
+}
+
+/* Responsif untuk HP kecil */
+@media (max-width: 480px) {
+  .closeScanner{
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+    top: 12px;
+    right: 12px;
+  }
+}
     @media(max-width:480px){
       h1{font-size:2.1em;}
       .card{padding:30px 20px;}
@@ -215,7 +241,7 @@
 
   <!-- SCANNER -->
   <div id="scannerOverlay">
-    <div class="closeScanner" id="closeScanner">X</div>
+    <div class="closeScanner" id="closeScanner"><i class="fas fa-times"></i></div>
     <div class="scanner-title">Scan QR Code</div>
     <div id="reader"></div>
     <p style="margin-top:20px;color:#ff6b00;font-size:1.1em;font-weight:bold;">
@@ -342,6 +368,7 @@
   </script>
 </body>
 </html>
+
 
 
 
