@@ -6,99 +6,24 @@
   <title>Pilkades 2026 - Aktivasi Wallet Voting</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #000;
-      color: white;
-      text-align: center;
-      padding: 20px;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .card {
-      background: #111;
-      padding: 35px 25px;
-      border-radius: 20px;
-      max-width: 420px;
-      width: 95%;
-      box-shadow: 0 10px 40px rgba(255,107,0,0.3);
-    }
-    h1 {
-      color: #ff6b00;
-      margin: 0 0 20px;
-      font-size: 2.2em;
-    }
-    .steps {
-      text-align: left;
-      background: #1a1a1a;
-      padding: 18px;
-      border-radius: 12px;
-      margin: 20px 0;
-      font-size: 0.98em;
-      line-height: 1.75;
-    }
+    body {font-family:Arial,sans-serif;background:#000;color:white;text-align:center;padding:20px;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+    .card {background:#111;padding:35px 25px;border-radius:20px;max-width:420px;width:95%;box-shadow:0 10px 40px rgba(255,107,0,0.3);}
+    h1 {color:#ff6b00;margin:0 0 20px;font-size:2.2em;}
+    .steps {text-align:left;background:#1a1a1a;padding:18px;border-radius:12px;margin:20px 0;font-size:0.98em;line-height:1.75;}
     .steps b {color:#ff8b3d;}
-    .seed {
-      background: #222;
-      padding: 20px;
-      border-radius: 12px;
-      font-family: 'Courier New', monospace;
-      font-size: 1.18em;
-      line-height: 1.9;
-      word-spacing: 10px;
-      margin: 25px 0;
-      user-select: all;
-      border: 1px solid #333;
-      min-height: 90px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: text;
-    }
-    .btn {
-      background: #ff6b00;
-      color: white;
-      border: none;
-      padding: 16px 32px;
-      font-size: 18px;
-      border-radius: 50px;
-      cursor: pointer;
-      margin: 12px 8px;
-      display: inline-block;
-      min-width: 260px;
-      transition: all 0.3s;
-    }
+    .seed {background:#222;padding:20px;border-radius:12px;font-family:'Courier New',monospace;font-size:1.18em;line-height:1.9;word-spacing:10px;margin:25px 0;user-select:all;border:1px solid #333;min-height:90px;display:flex;align-items:center;justify-content:center;cursor:text;}
+    .seed-locked {background:#330000;border:2px dashed #ff4444;color:#ff8888;}
+    .btn {background:#ff6b00;color:white;border:none;padding:16px 32px;font-size:18px;border-radius:50px;cursor:pointer;margin:12px 8px;display:inline-block;min-width:260px;transition:all 0.3s;}
     .btn:hover {background:#e55a00;}
-    .btn-copy {
-      background: #333;
-    }
+    .btn-copy {background:#333;}
     .btn-copy i {margin-right:8px;}
-    .btn-copy.copied {
-      background: #0c6e0c;
-    }
-    .footer {
-      margin-top: 40px;
-      font-size: 0.9em;
-      color: #888;
-    }
-    .error {
-      background: #330000;
-      color: #ff6b6b;
-      padding: 40px 20px;
-      border-radius: 16px;
-      border: 2px solid #ff4444;
-      max-width: 420px;
-      margin: 20px;
-      font-size: 1.1em;
-      line-height: 1.7;
-    }
-    @media (max-width: 480px) {
+    .btn-copy.copied {background:#0c6e0c;}
+    .btn-scan {background:#0066ff;}
+    .footer {margin-top:40px;font-size:0.9em;color:#888;}
+    .hidden {display:none;}
+    @media (max-width:480px) {
       h1 {font-size:1.9em;}
-      .btn {width:100%; margin:10px 0;}
-      .steps {font-size:0.95em;}
+      .btn {width:100%;margin:10px 0;}
     }
   </style>
 </head>
@@ -106,24 +31,27 @@
   <div class="card">
     <h1>Pilkades 2026</h1>
     <p><strong>Silahkan aktivasi Wallet voting kamu!</strong></p>
-    <p>Sekarang ikuti langkah di bawah ini:</p>
 
     <div class="steps">
-      1. Klik tombol <b>Copy 12 Kata Rahasia</b> di bawah<br>
-      2. Klik tombol <b>Buka MetaMask Sekarang</b> di bawah<br>
-      3. Pilih <b>Saya sudah memiliki dompet</b><br>
-      4. Pilih <b>Impor menggunakan frasa pemulihan rahasia</b><br>
-      5. Klik <b>Tempel</b> (12 kata otomatis masuk) → <b>Lanjutkan</b><br>
-      6. Buat kata sandi baru (minimal 8 karakter)<br>
-      7. Centang kotak kecil: <b>“Jika saya lupa kata sandi ini...”</b><br>
-      8. Klik <b>Buat Kata Sandi</b> → <b>Lanjutkan</b><br>
-      9. Muncul “Dompet Anda sudah siap” → klik <b>Selesai</b><br><br>
-      <b><strong>Selesai! Wallet voting sudah aktif.</strong></b>
+      1. Scan QR Code di undangan kertas Anda<br>
+      2. Klik tombol <b>Copy 12 Kata Rahasia</b><br>
+      3. Buka MetaMask → impor wallet → tempel<br><br>
+      <b>Setelah scan, 12 kata rahasia akan muncul otomatis.</b>
     </div>
 
-    <div class="seed" id="seedBox">Sedang memuat 12 kata…</div>
+    <!-- Area Seed Phrase (awalnya terkunci) -->
+    <div class="seed seed-locked" id="seedBox">
+      <i class="fas fa-lock"></i><br><br>
+      Silakan scan QR Code undangan Anda terlebih dahulu
+    </div>
 
-    <button class="btn btn-copy" id="copyBtn">
+    <!-- Tombol Scan QR Code -->
+    <button class="btn btn-scan" id="scanBtn">
+      <i class="fas fa-qrcode"></i> Scan QR Code Undangan
+    </button>
+
+    <!-- Tombol Copy (awalnya disable) -->
+    <button class="btn btn-copy" id="copyBtn" disabled>
       <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
     </button>
 
@@ -137,45 +65,83 @@
     </div>
   </div>
 
+  <!-- Scanner QR Code (menggunakan library ringan, no install) -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
     const params = new URLSearchParams(location.search);
-    const seed = params.get('seed')?.trim();
+    const expectedSeed = params.get('seed')?.trim();
 
-    if (!seed || seed.split(/\s+/).filter(w => w.length > 0).length !== 12) {
-      // PESAN ERROR YANG LEBIH BAIK & SOPAN
-      document.body.innerHTML = `
-        <div class="error">
-          <h2>Link Tidak Dapat Digunakan</h2>
-          <p>Maaf, link aktivasi wallet yang Anda buka tidak valid atau sudah kadaluarsa.</p>
-          <p>Silakan hubungi <strong>Panitia Pilkades 2026</strong> setempat untuk mendapatkan link yang baru.</p>
-          <p>Terima kasih atas pengertian Anda.</p>
-          <br>
-          <small>— Panitia Desa</small>
-        </div>
-      `;
-    } else {
-      document.getElementById('seedBox').textContent = seed;
+    const seedBox = document.getElementById('seedBox');
+    const copyBtn = document.getElementById('copyBtn');
+    const copyText = copyBtn.querySelector('span');
+    const copyIcon = copyBtn.querySelector('i');
+    let realSeed = null;
 
-      const copyBtn = document.getElementById('copyBtn');
-      const copyText = copyBtn.querySelector('span');
-      const copyIcon = copyBtn.querySelector('i');
-
-      copyBtn.addEventListener('click', async () => {
-        try {
-          await navigator.clipboard.writeText(seed);
-          copyBtn.classList.add('copied');
-          copyText.textContent = 'Berhasil Disalin!';
-          copyIcon.className = 'fas fa-check';
-          setTimeout(() => {
-            copyBtn.classList.remove('copied');
-            copyText.textContent = 'Copy 12 Kata Rahasia';
-            copyIcon.className = 'fas fa-copy';
-          }, 3000);
-        } catch (err) {
-          alert('Gagal copy otomatis. Silakan blok teks lalu copy manual.');
-        }
-      });
+    // Jika link sudah punya seed langsung (untuk testing), langsung tampilkan
+    if (expectedSeed && expectedSeed.split(/\s+/).filter(w => w).length === 12) {
+      unlockSeed(expectedSeed);
     }
+
+    // Fungsi buka seed
+    function unlockSeed(seed) {
+      realSeed = seed;
+      seedBox.textContent = seed;
+      seedBox.classList.remove('seed-locked');
+      copyBtn.disabled = false;
+    }
+
+    // Tombol Scan QR
+    document.getElementById('scanBtn').addEventListener('click', () => {
+      const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 }, false);
+      
+      // Tempat scanner muncul
+      const readerDiv = document.createElement('div');
+      readerDiv.id = 'reader';
+      readerDiv.style.margin = '20px';
+      document.querySelector('.card').appendChild(readerDiv);
+
+      scanner.render(
+        (decodedText) => {
+          const scannedSeed = decodedText.trim();
+          if (scannedSeed.split(/\s+/).filter(w => w).length === 12) {
+            unlockSeed(scannedSeed);
+            scanner.clear();
+            readerDiv.remove();
+            seedBox.scrollIntoView({behavior: 'smooth'});
+          } else {
+            alert('QR Code tidak valid. Pastikan Anda scan QR Code undangan resmi Pilkades.');
+          }
+        },
+        (error) => {}
+      );
+
+      // Ganti tombol jadi "Tutup Scanner"
+      document.getElementById('scanBtn').innerHTML = '<i class="fas fa-times"></i> Tutup Scanner';
+      document.getElementById('scanBtn').onclick = () => {
+        scanner.clear();
+        readerDiv.remove();
+        document.getElementById('scanBtn').innerHTML = '<i class="fas fa-qrcode"></i> Scan QR Code Undangan';
+        document.getElementById('scanBtn').onclick = arguments.callee;
+      };
+    });
+
+    // Fungsi Copy
+    copyBtn.addEventListener('click', async () => {
+      if (!realSeed) return;
+      try {
+        await navigator.clipboard.writeText(realSeed);
+        copyBtn.classList.add('copied');
+        copyText.textContent = 'Berhasil Disalin!';
+        copyIcon.className = 'fas fa-check';
+        setTimeout(() => {
+          copyBtn.classList.remove('copied');
+          copyText.textContent = 'Copy 12 Kata Rahasia';
+          copyIcon.className = 'fas fa-copy';
+        }, 3000);
+      } catch (err) {
+        alert('Gagal copy. Silakan blok teks lalu copy manual.');
+      }
+    });
   </script>
 </body>
 </html>
