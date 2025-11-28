@@ -3,273 +3,209 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pilkades 2026 - Aktivasi Wallet</title>
+  <title>Pilkades 2026 - Aktivasi Wallet Voting</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{
-      font-family:'Segoe UI',sans-serif;
-      background:linear-gradient(135deg,#0f0019,#1a0033);
-      color:#fff;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:16px;
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #000;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .card{
-      background:#111;
-      width:100%;
-      max-width:440px;
-      border-radius:28px;
-      padding:36px 28px;
-      box-shadow:0 20px 60px rgba(255,107,0,0.25);
-      border:1px solid rgba(255,107,0,0.15);
-      position:relative;
-      overflow:hidden;
+    .card {
+      background: #111;
+      padding: 35px 25px;
+      border-radius: 20px;
+      max-width: 420px;
+      width: 95%;
+      box-shadow: 0 10px 40px rgba(255, 107, 0, 0.3);
     }
-    .card::before{
-      content:'';position:absolute;top:0;left:0;right:0;height:4px;
-      background:linear-gradient(90deg,#ff6b00,#ff9f43);
+    h1 {
+      color: #ff6b00;
+      margin: 0 0 20px;
+      font-size: 2.2em;
     }
-    h1{
-      font-size:2.4em;
-      text-align:center;
-      margin-bottom:8px;
-      color:#ff6b00;
-      text-shadow:0 0 20px rgba(255,107,0,0.4);
+    .steps {
+      text-align: left;
+      background: #1a1a1a;
+      padding: 18px;
+      border-radius: 12px;
+      margin: 20px 0;
+      font-size: 0.98em;
+      line-height: 1.75;
     }
-    .subtitle{
-      text-align:center;
-      font-size:1.15em;
-      opacity:0.9;
-      margin-bottom:24px;
+    .steps b {color:#ff8b3d;}
+    .seed {
+      background: #222;
+      padding: 20px;
+      border-radius: 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 1.18em;
+      line-height: 1.9;
+      word-spacing: 10px;
+      margin: 25px 0;
+      user-select: all;
+      border: 1px solid #333;
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: text;
     }
-
-    .steps{
-      background:rgba(255,107,0,0.08);
-      border:1px solid rgba(255,107,0,0.2);
-      padding:20px;
-      border-radius:18px;
-      font-size:1.02em;
-      line-height:1.85;
-      text-align:left;
-      margin:24px 0;
+    .seed-locked {
+      background: #330000;
+      border: 2px dashed #ff4444;
+      color: #ff8888;
+      user-select: none;
     }
-    .steps b{color:#ff9f43;}
-
-    .seed{
-      background:#000;
-      border:2px solid #333;
-      padding:24px;
-      border-radius:18px;
-      font-family:'Courier New',monospace;
-      font-size:1.2em;
-      text-align:center;
-      margin:28px 0;
-      min-height:120px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      word-break:break-all;
-      user-select:all;
-      font-weight:bold;
-      letter-spacing:1px;
+    .btn {
+      background: #ff6b00;
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      font-size: 18px;
+      border-radius: 50px;
+      cursor: pointer;
+      margin: 12px 8px;
+      display: inline-block;
+      min-width: 260px;
+      transition: all 0.3s;
     }
-    .seed-locked{
-      background:#220000;
-      border:2px dashed #ff4444;
-      color:#ff7777;
-      user-select:none;
-    }
-
-    .btn{
-      width:100%;
-      padding:19px;
-      font-size:1.2em;
-      font-weight:bold;
-      border:none;
-      border-radius:60px;
-      margin:12px 0;
-      cursor:pointer;
-      transition:all 0.3s ease;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:12px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.4);
-    }
-    .btn:hover{transform:translateY(-4px);box-shadow:0 15px 40px rgba(0,0,0,0.5);}
-    .btn:active{transform:translateY(0);}
-
-    .btn-scan{background:#0066ff;color:white;}
-    .btn-scan:hover{background:#0052cc;}
-
-    .btn-copy{background:#2d2d2d;color:white;}
-    .btn-copy:hover{background:#444;}
-    .btn-copy.copied{background:#0d8c0d !important;color:white !important;}
-
-    .btn-metamask{background:#ff6b00;color:white;}
-    .btn-metamask:hover{background:#e55a00;}
-
-    .footer{
-      text-align:center;
-      margin-top:40px;
-      font-size:0.95em;
-      opacity:0.8;
-      line-height:1.6;
+    .btn:hover {background:#e55a00;}
+    .btn-scan {background:#0066ff; font-weight:bold;}
+    .btn-copy {background:#333;}
+    .btn-copy i {margin-right:8px;}
+    .btn-copy.copied {background:#0c6e0c;}
+    .footer {
+      margin-top: 40px;
+      font-size: 0.9em;
+      color: #888;
     }
 
-    /* PERMISSION LAYER */
+    /* LAYER IZIN KAMERA CANTIK */
     #permissionOverlay{
       position:fixed;top:0;left:0;width:100%;height:100%;
-      background:linear-gradient(135deg,#0f0019,#1a0033);
+      background:linear-gradient(135deg,#000,#1a0033);
       display:none;align-items:center;justify-content:center;
       z-index:99999;flex-direction:column;padding:20px;
+      animation:fade 0.5s;
     }
     #permissionOverlay.active{display:flex;}
-    .perm-icon{font-size:100px;color:#ff6b00;margin-bottom:24px;animation:glow 2s infinite;}
-    @keyframes glow{0%,100%{text-shadow:0 0 20px #ff6b00;}50%{text-shadow:0 0 40px #ff6b00,0 0 60px #ff4500;}}
-    .perm-title{font-size:2.3em;font-weight:bold;color:#ff6b00;margin:10px 0;}
-    .perm-text{font-size:1.15em;line-height:1.7;max-width:90%;margin:20px 0;}
-    .perm-btn{
-      background:#ff6b00;color:white;padding:20px 70px;
-      font-size:1.3em;border-radius:60px;border:none;
-      font-weight:bold;box-shadow:0 12px 40px rgba(255,107,0,0.5);
-    }
-    .perm-btn:hover{background:#e55a00;transform:scale(1.05);}
+    @keyframes fade{from{opacity:0}to{opacity:1}}
+    .perm-icon{font-size:90px;color:#ff6b00;margin-bottom:20px;animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+    .perm-title{font-size:2em;font-weight:bold;color:#ff6b00;margin:10px 0;}
+    .perm-text{line-height:1.7;max-width:340px;color:#ddd;}
+    .perm-btn{background:#ff6b00;padding:18px 50px;font-size:19px;border-radius:50px;border:none;cursor:pointer;margin-top:30px;box-shadow:0 10px 30px rgba(255,107,0,0.5);}
 
     /* SCANNER */
-    #scannerOverlay{
-      position:fixed;top:0;left:0;width:100%;height:100%;background:#000;
-      display:none;align-items:center;justify-content:center;z-index:9999;
-      flex-direction:column;padding:20px;
-    }
+    #scannerOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column;}
     #scannerOverlay.active{display:flex;}
-    #reader{
-      width:96%;max-width:420px;height:580px;
-      border-radius:30px;overflow:hidden;
-      border:9px solid #ff6b00;
-      box-shadow:0 0 90px rgba(255,107,0,0.9);
-    }
-    #reader video{border-radius:22px;}
-    .closeScanner{
-      position:absolute;top:20px;right:20px;
-      background:#ff0044;color:white;width:70px;height:70px;
-      border-radius:50%;font-size:38px;font-weight:bold;
-      display:flex;align-items:center;justify-content:center;
-      box-shadow:0 8px 30px rgba(0,0,0,0.8);
-      z-index:1000;
-    }
-    .scanner-title{font-size:2.1em;color:#ff6b00;margin:20px 0 10px;font-weight:bold;}
+    #reader{width:92%;max-width:400px;height:520px;border-radius:24px;overflow:hidden;border:7px solid #ff6b00;box-shadow:0 0 70px rgba(255,107,0,0.8);}
+    #reader video{width:100%;height:100%;object-fit:cover;border-radius:18px;}
+    .closeScanner{position:absolute;top:15px;right:15px;background:#ff2d2d;color:white;width:60px;height:60px;border-radius:50%;font-size:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1000;}
 
-    @media(max-width:480px){
-      h1{font-size:2.1em;}
-      .card{padding:30px 20px;}
-      .btn{font-size:1.15em;padding:17px;}
-      #reader{height:500px;}
-      .perm-icon{font-size:80px;}
-      .perm-title{font-size:2em;}
+    @media (max-width: 480px) {
+      h1 {font-size:1.9em;}
+      .btn {width:100%; margin:10px 0;}
+      .steps {font-size:0.95em;}
+      #reader{height:460px;}
     }
   </style>
 </head>
 <body>
 
-  <!-- HALAMAN AWAL -->
-  <div id="mainView">
-    <div class="card">
-      <h1>Pilkades 2026</h1>
-      <p class="subtitle">Aktivasi Wallet Voting Desa</p>
+  <!-- HALAMAN AWAL: SCAN QR -->
+  <div id="scanView" class="card">
+    <h1>Pilkades 2026</h1>
+    <p><strong>Aktivasi Wallet Voting</strong></p>
 
-      <div class="steps">
-        Klik tombol biru di bawah → izinkan kamera → arahkan ke <b>QR Code undangan</b> dari panitia.
-      </div>
+    <div class="steps">
+      Kalau 12 kata belum muncul → klik tombol biru di bawah<br><br>
+      <b>Izinkan kamera → arahkan ke QR Code undangan dari panitia</b>
+    </div>
 
-      <div class="seed seed-locked" id="seedBox">
-        <i class="fas fa-qrcode fa-3x"></i><br><br>
-        Menunggu scan QR Code undangan...
-      </div>
+    <div class="seed seed-locked" id="seedBox">
+      <i class="fas fa-lock fa-2x"></i><br><br>
+      Scan QR Code undangan untuk melihat 12 kata rahasia
+    </div>
 
-      <button class="btn btn-scan" id="scanBtn">
-        <i class="fas fa-camera"></i> Scan QR Code Undangan
-      </button>
+    <button class="btn btn-scan" id="scanBtn">Scan QR Code Undangan</button>
 
-      <div class="footer">
-        Panitia Pilkades 2026<br>
-        Sistem Voting Blockchain Desa
-      </div>
+    <div class="footer">
+      Panitia Desa • Sistem Voting Blockchain 2026<br>
+      Hubungi panitia jika ada kendala
     </div>
   </div>
 
-  <!-- IZIN KAMERA CANTIK -->
+  <!-- LAYER IZIN KAMERA -->
   <div id="permissionOverlay">
     <div class="perm-icon"><i class="fas fa-camera"></i></div>
-    <div class="perm-title">Izinkan Kamera</div>
+    <div class="perm-title">Izinkan Akses Kamera</div>
     <div class="perm-text">
-      Aplikasi akan memindai QR Code undangan resmi.<br>
-      <b>Kamera hanya digunakan saat scanning.</b><br>
-      Tidak ada data yang disimpan.
+      Kami hanya menggunakan kamera untuk memindai QR Code undangan resmi.<br><br>
+      <b>Tidak ada foto atau video yang disimpan.</b>
     </div>
-    <button class="perm-btn" id="allowBtn">Izinkan Akses Kamera</button>
+    <button class="perm-btn" id="allowBtn">Izinkan Kamera</button>
   </div>
 
   <!-- SCANNER -->
   <div id="scannerOverlay">
     <div class="closeScanner" id="closeScanner">X</div>
-    <div class="scanner-title">Scan QR Code</div>
+    <h2 style="color:#ff6b00;font-size:1.8em;margin:20px 0;">Arahkan ke QR Code</h2>
     <div id="reader"></div>
-    <p style="margin-top:20px;color:#ff6b00;font-size:1.1em;font-weight:bold;">
-      Arahkan kamera ke QR Code di undangan
-    </p>
   </div>
 
-  <!-- HALAMAN SUKSES -->
-  <div id="successView" style="display:none;">
-    <div class="card">
-      <h1>Pilkades 2026</h1>
-      <p class="subtitle">QR Code Berhasil Discan!</p>
+  <!-- HALAMAN SUKSES — PAKAI DESAIN KAMU 100% -->
+  <div id="successView" class="card" style="display:none;">
+    <h1>Pilkades 2026</h1>
+    <p><strong>Silahkan aktivasi Wallet voting kamu!</strong></p>
+    <p>Sekarang ikuti langkah dibawah ini:</p>
 
-      <div style="text-align:center;margin:20px 0;">
-        <i class="fas fa-check-circle" style="font-size:80px;color:#0f0;"></i>
-      </div>
+    <div class="steps">
+      1. Klik tombol <b>Copy 12 Kata Rahasia</b> di bawah<br>
+      2. Klik tombol <b>Buka MetaMask Sekarang</b> di bawah<br>
+      3. Pilih <b>Saya sudah memiliki dompet</b><br>
+      4. Pilih <b>Impor menggunakan frasa pemulihan rahasia</b><br>
+      5. Klik <b>Tempel</b> (12 kata otomatis masuk) → <b>Lanjutkan</b><br>
+      6. Buat kata sandi baru (minimal 8 karakter)<br>
+      7. Centang kotak kecil: <b>“Jika saya lupa kata sandi ini...”</b><br>
+      8. Klik <b>Buat Kata Sandi</b> → <b>Lanjutkan</b><br>
+      9. Muncul “Dompet Anda sudah siap” → klik <b>Selesai</b><br><br>
+      <b style="color:#0f0;"><strong>Selesai! Wallet voting sudah aktif.</strong></b>
+    </div>
 
-      <div class="steps">
-        <b>Lakukan langkah berikut:</b><br><br>
-        1. Klik tombol <b>Copy 12 Kata Rahasia</b> di bawah<br>
-        2. Klik tombol <b>Buka MetaMask Sekarang</b> di bawah<br>
-        3. Pilih <b>Saya sudah memiliki dompet</b><br>
-        4. Pilih <b>Impor menggunakan frasa pemulihan rahasia</b><br>
-        5. Klik <b>Tempel</b> (12 kata otomatis masuk) → <b>Lanjutkan</b><br>
-        6. Buat kata sandi baru (minimal 8 karakter)<br>
-        7. Centang kotak kecil: <b>“Jika saya lupa kata sandi ini...”</b><br>
-        8. Klik <b>Buat Kata Sandi</b> → <b>Lanjutkan</b><br>
-        9. Muncul “Dompet Anda sudah siap” → klik <b>Selesai</b><br><br>
-      </div>
+    <div class="seed" id="finalSeed">Memuat 12 kata...</div>
 
-      <div class="seed" id="finalSeed">Memuat...</div>
+    <button class="btn btn-copy" id="copyBtn">
+      <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
+    </button>
 
-      <button class="btn btn-copy" id="finalCopyBtn">
-        <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
-      </button>
+    <button class="btn" onclick="location.href='https://metamask.app.link'">
+      <i class="fas fa-external-link-alt"></i> Buka MetaMask Sekarang
+    </button>
 
-      <button class="btn btn-metamask">
-        <i class="fas fa-wallet"></i> Buka MetaMask Sekarang
-      </button>
-
-      <div class="footer">
-        Terima kasih telah mengaktifkan wallet voting<br>
-        Suara Anda sangat berarti untuk desa
-      </div>
+    <div class="footer">
+      Panitia Desa • Sistem Voting Blockchain 2026<br>
+      Hubungi panitia jika ada kendala
     </div>
   </div>
 
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
-    const mainView = document.getElementById('mainView');
+    const scanView = document.getElementById('scanView');
     const successView = document.getElementById('successView');
     const finalSeed = document.getElementById('finalSeed');
-    const finalCopyBtn = document.getElementById('finalCopyBtn');
-    const scanBtn = document.getElementById('scanBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const copyText = copyBtn.querySelector('span');
+    const copyIcon = copyBtn.querySelector('i');
+
     const permOverlay = document.getElementById('permissionOverlay');
     const allowBtn = document.getElementById('allowBtn');
     const scannerOverlay = document.getElementById('scannerOverlay');
@@ -277,14 +213,16 @@
 
     let scanner = null;
 
-    // Kalau link bawa seed langsung
-    const urlParams = new URLSearchParams(location.search);
-    const seedFromUrl = urlParams.get('seed')?.trim();
-    if (seedFromUrl && seedFromUrl.split(/\s+/).filter(Boolean).length === 12) {
+    // Kalau link langsung bawa seed
+    const params = new URLSearchParams(location.search);
+    const seedFromUrl = params.get('seed')?.trim();
+    if (seedFromUrl && seedFromUrl.split(/\s+/).filter(w=>w).length === 12) {
       showSuccess(seedFromUrl);
     }
 
-    scanBtn.onclick = () => permOverlay.classList.add('active');
+    document.getElementById('scanBtn').onclick = () => {
+      permOverlay.classList.add('active');
+    };
 
     allowBtn.onclick = () => {
       permOverlay.classList.remove('active');
@@ -308,11 +246,10 @@
             try { seed = new URL(decodedText).searchParams.get('seed'); }
             catch { seed = new URLSearchParams(decodedText.split('?')[1]).get('seed') || seed; }
           }
-          if (seed.split(/\s+/).filter(Boolean).length === 12) {
+          if (seed.split(/\s+/).filter(w=>w).length === 12) {
             showSuccess(seed);
           }
-        },
-        () => {}
+        }
       ).catch(() => {
         alert("Gagal mengakses kamera.");
         scannerOverlay.classList.remove('active');
@@ -322,22 +259,26 @@
     function showSuccess(seed) {
       scannerOverlay.classList.remove('active');
       if (scanner) scanner.stop();
-      mainView.style.display = 'none';
+      scanView.style.display = 'none';
       successView.style.display = 'block';
       finalSeed.textContent = seed;
 
-      finalCopyBtn.onclick = async () => {
-        await navigator.clipboard.writeText(seed);
-        const span = finalCopyBtn.querySelector('span');
-        finalCopyBtn.classList.add('copied');
-        span.textContent = 'Berhasil Disalin!';
-        setTimeout(() => {
-          finalCopyBtn.classList.remove('copied');
-          span.textContent = 'Copy 12 Kata Rahasia';
-        }, 3000);
+      copyBtn.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(seed);
+          copyBtn.classList.add('copied');
+          copyText.textContent = 'Berhasil Disalin!';
+          copyIcon.className = 'fas fa-check';
+          setTimeout(() => {
+            copyBtn.classList.remove('copied');
+            copyText.textContent = 'Copy 12 Kata Rahasia';
+            copyIcon.className = 'fas fa-copy';
+          }, 3000);
+        } catch(e) {
+          alert('Gagal copy otomatis. Blok teks lalu copy manual.');
+        }
       };
     }
   </script>
 </body>
 </html>
-
