@@ -1,650 +1,237 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Pilkades 2026 - Aktivasi Wallet</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pilkades 2026 - Aktivasi Wallet</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Segoe UI',sans-serif;background:#000;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;}
+    .card{background:#111;width:100%;max-width:440px;border-radius:28px;padding:36px 28px;box-shadow:0 20px 60px rgba(255,107,0,0.25);border:1px solid rgba(255,107,0,0.15);position:relative;overflow:hidden;}
+    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#ff6b00,#ff9f43);}
+    h1{font-size:2.4em;text-align:center;margin-bottom:8px;color:#ff6b00;text-shadow:0 0 20px rgba(255,107,0,0.4);}
+    .subtitle{text-align:center;font-size:1.15em;opacity:0.9;margin-bottom:24px;}
+    .steps{background:rgba(255,107,0,0.08);border:1px solid rgba(255,107,0,0.2);padding:20px;border-radius:18px;font-size:1.02em;line-height:1.85;margin:24px 0;}
+    .steps b{color:#ff9f43;}
+    .seed{background:#000;border:2px solid #333;padding:20px;border-radius:12px;font-family:'Courier New',monospace;font-size:1.18em;line-height:1.9;word-spacing:10px;margin:25px 0;user-select:all;min-height:90px;display:flex;align-items:center;justify-content:center;}
+    .seed-locked{background:#220000;border:2px dashed #ff4444;color:#ff7777;user-select:none;}
+    .btn{width:100%;padding:19px;font-size:1.2em;font-weight:bold;border:none;border-radius:60px;margin:12px 0;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,0.4);}
+    .btn:hover{transform:translateY(-4px);box-shadow:0 15px 40px rgba(0,0,0,0.5);}
+    .btn-scan{background:#0066ff;color:white;}.btn-scan:hover{background:#0052cc;}
+    .btn-copy{background:#2d2d2d;color:white;}.btn-copy:hover{background:#444;}.btn-copy.copied{background:#0d8c0d !important;}
+    .btn-metamask{background:#ff6b00;color:white;}.btn-metamask:hover{background:#e55a00;}
+    .btn-gallery{background:#2c3e50;color:white;margin-top:16px;font-size:1.1em;padding:16px;border:2px solid #34495e;}
+    .btn-gallery:hover{background:#34495e;border-color:#ff6b00;}
+    .footer{text-align:center;margin-top:40px;font-size:0.95em;opacity:0.8;line-height:1.6;}
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #000;
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
+    /* POPUP ERROR CANTIK */
+    #errorPopup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;z-index:99999;flex-direction:column;padding:20px;}
+    #errorPopup.active{display:flex;}
+    .error-icon{font-size:90px;color:#ff4444;margin-bottom:20px;}
+    .error-title{font-size:2.2em;color:#ff6b00;margin:15px 0;font-weight:bold;}
+    .error-text{font-size:1.15em;line-height:1.8;max-width:90%;margin:20px 0;text-align:center;}
+    .error-btn{background:#0066ff;color:white;padding:18px 50px;font-size:1.2em;border-radius:60px;border:none;margin-top:20px;}
 
-        .card {
-            background: #111;
-            width: 100%;
-            max-width: 440px;
-            border-radius: 28px;
-            padding: 36px 28px;
-            box-shadow: 0 20px 60px rgba(255, 107, 0, 0.25);
-            border: 1px solid rgba(255, 107, 0, 0.15);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #ff6b00, #ff9f43);
-        }
-
-        h1 {
-            font-size: 2.4em;
-            text-align: center;
-            margin-bottom: 8px;
-            color: #ff6b00;
-            text-shadow: 0 0 20px rgba(255, 107, 0, 0.4);
-        }
-
-        .subtitle {
-            text-align: center;
-            font-size: 1.15em;
-            opacity: 0.9;
-            margin-bottom: 24px;
-        }
-
-        .steps {
-            background: rgba(255, 107, 0, 0.08);
-            border: 1px solid rgba(255, 107, 0, 0.2);
-            padding: 20px;
-            border-radius: 18px;
-            font-size: 1.02em;
-            line-height: 1.85;
-            text-align: left;
-            margin: 24px 0;
-        }
-
-        .steps b {
-            color: #ff9f43;
-        }
-
-        .seed {
-            background: #000;
-            border: 2px solid #333;
-            padding: 20px;
-            border-radius: 12px;
-            font-family: 'Courier New', monospace;
-            font-size: 1.18em;
-            line-height: 1.9;
-            word-spacing: 10px;
-            margin: 25px 0;
-            user-select: all;
-            border: 1px solid #333;
-            min-height: 90px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: text;
-        }
-
-        .seed-locked {
-            background: #220000;
-            border: 2px dashed #ff4444;
-            color: #ff7777;
-            user-select: none;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 19px;
-            font-size: 1.2em;
-            font-weight: bold;
-            border: none;
-            border-radius: 60px;
-            margin: 12px 0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        .btn:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-scan {
-            background: #0066ff;
-            color: white;
-        }
-
-        .btn-scan:hover {
-            background: #0052cc;
-        }
-
-        .btn-copy {
-            background: #2d2d2d;
-            color: white;
-        }
-
-        .btn-copy:hover {
-            background: #444;
-        }
-
-        .btn-copy.copied {
-            background: #0d8c0d !important;
-            color: white !important;
-        }
-
-        .btn-metamask {
-            background: #ff6b00;
-            color: white;
-        }
-
-        .btn-metamask:hover {
-            background: #e55a00;
-        }
-
-        .btn-gallery {
-            background: #2c3e50;
-            color: white;
-            margin-top: 16px;
-            font-size: 1.1em;
-            padding: 16px;
-            border: 2px solid #34495e;
-        }
-
-        .btn-gallery:hover {
-            background: #34495e;
-            border-color: #ff6b00;
-        }
-
-        .btn-gallery i {
-            margin-right: 10px;
-        }
-
-        /* Responsif khusus tombol galeri */
-        @media (max-width:480px) {
-            .btn-gallery {
-                font-size: 1.05em;
-                padding: 14px;
-            }
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 0.95em;
-            opacity: 0.8;
-            line-height: 1.6;
-        }
-
-        /* PERMISSION LAYER */
-        #permissionOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0f0019, #1a0033);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 99999;
-            flex-direction: column;
-            padding: 20px;
-        }
-
-        #permissionOverlay.active {
-            display: flex;
-        }
-
-        .perm-icon {
-            font-size: 100px;
-            color: #ff6b00;
-            margin-bottom: 24px;
-            animation: glow 2s infinite;
-        }
-
-        @keyframes glow {
-
-            0%,
-            100% {
-                text-shadow: 0 0 20px #ff6b00;
-            }
-
-            50% {
-                text-shadow: 0 0 40px #ff6b00, 0 0 60px #ff4500;
-            }
-        }
-
-        .perm-title {
-            font-size: 2.3em;
-            font-weight: bold;
-            color: #ff6b00;
-            margin: 10px 0;
-        }
-
-        .perm-text {
-            font-size: 1.15em;
-            line-height: 1.7;
-            max-width: 90%;
-            margin: 20px 0;
-        }
-
-        .perm-btn {
-            background: #ff6b00;
-            color: white;
-            padding: 20px 70px;
-            font-size: 1.3em;
-            border-radius: 60px;
-            border: none;
-            font-weight: bold;
-            box-shadow: 0 12px 40px rgba(255, 107, 0, 0.5);
-        }
-
-        .perm-btn:hover {
-            background: #e55a00;
-            transform: scale(1.05);
-        }
-
-        #reader .btn-scan {
-            background: #0066ff;
-            margin-top: 20px;
-        }
-
-        #reader .btn-scan:hover {
-            background: #0052cc;
-        }
-
-        /* SCANNER */
-        #scannerOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            flex-direction: column;
-            padding: 20px;
-        }
-
-        #scannerOverlay.active {
-            display: flex;
-        }
-
-        #reader {
-            width: 96%;
-            max-width: 420px;
-            height: 580px;
-            border-radius: 30px;
-            overflow: hidden;
-            border: 9px solid #ff6b00;
-            box-shadow: 0 0 90px rgba(255, 107, 0, 0.9);
-        }
-
-        #reader video {
-            border-radius: 22px;
-        }
-
-        .closeScanner {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: rgba(255, 0, 68, 0.9);
-            color: white;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            font-size: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
-            z-index: 1000;
-            cursor: pointer;
-            backdrop-filter: blur(8px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.2s ease;
-        }
-
-        .closeScanner:hover {
-            background: #ff0044;
-            transform: scale(1.1);
-        }
-
-        /* Responsif untuk HP kecil */
-        @media (max-width: 480px) {
-            .closeScanner {
-                width: 42px;
-                height: 42px;
-                font-size: 20px;
-                top: 12px;
-                right: 12px;
-            }
-        }
-
-        @media(max-width:480px) {
-            h1 {
-                font-size: 2.1em;
-            }
-
-            .card {
-                padding: 30px 20px;
-            }
-
-            .btn {
-                font-size: 1.15em;
-                padding: 17px;
-            }
-
-            #reader {
-                height: 500px;
-            }
-
-            .perm-icon {
-                font-size: 80px;
-            }
-
-            .perm-title {
-                font-size: 2em;
-            }
-        }
-    </style>
+    /* SCANNER */
+    #permissionOverlay,#scannerOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column;padding:20px;}
+    #permissionOverlay.active,#scannerOverlay.active{display:flex;}
+    #permissionOverlay{background:linear-gradient(135deg,#0f0019,#1a0033);}
+    #reader{width:96%;max-width:420px;height:580px;border-radius:30px;overflow:hidden;border:9px solid #ff6b00;box-shadow:0 0 90px rgba(255,107,0,0.9);}
+    .closeScanner{position:absolute;top:16px;right:16px;background:rgba(255,0,68,0.9);color:white;width:48px;height:48px;border-radius:50%;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(0,0,0,0.6);z-index:1000;cursor:pointer;border:2px solid rgba(255,255,255,0.2);}
+    .closeScanner:hover{background:#ff0044;transform:scale(1.1);}
+    @media(max-width:480px){
+      .closeScanner{width:42px;height:42px;font-size:20px;top:12px;right:12px;}
+      #reader{height:500px;}
+      h1{font-size:2.1em;}.card{padding:30px 20px;}.btn{font-size:1.15em;padding:17px;}
+    }
+  </style>
 </head>
-
 <body>
 
-    <!-- HALAMAN AWAL -->
-    <div id="mainView">
-        <div class="card">
-            <h1>Pilkades 2026</h1>
-            <p class="subtitle">Aktivasi Wallet Voting Desa</p>
-
-            <div class="steps">
-                Klik tombol biru di bawah → izinkan kamera → arahkan ke <b>QR Code undangan</b> dari panitia.
-            </div>
-
-            <div class="seed seed-locked" id="seedBox">
-                <i class="fas fa-qrcode fa-3x"></i><br><br>
-                Menunggu scan QR Code undangan...
-            </div>
-
-            <button class="btn btn-scan" id="scanBtn">
-                <i class="fas fa-camera"></i> Scan QR Code Undangan
-            </button>
-
-            <div class="footer">
-                Panitia Desa • Sistem Voting Blockchain 2026<br>
-                Hubungi panitia jika ada kendala
-            </div>
-        </div>
+  <!-- HALAMAN AWAL -->
+  <div id="mainView">
+    <div class="card">
+      <h1>Pilkades 2026</h1>
+      <p class="subtitle">Aktivasi Wallet Voting Desa</p>
+      <div class="steps">Klik tombol biru → izinkan kamera → arahkan ke <b>QR Code undangan</b> dari panitia.</div>
+      <div class="seed seed-locked"><i class="fas fa-qrcode fa-3x"></i><br><br>Menunggu scan QR Code...</div>
+      <button class="btn btn-scan" id="scanBtn"><i class="fas fa-camera"></i> Scan QR Code Undangan</button>
+      <div class="footer">Panitia Desa • Sistem Voting Blockchain 2026</div>
     </div>
+  </div>
 
-    <!-- IZIN KAMERA CANTIK -->
-    <div id="permissionOverlay">
-        <div class="perm-icon"><i class="fas fa-camera"></i></div>
-        <div class="perm-title">Izinkan Kamera</div>
-        <div class="perm-text">
-            Aplikasi akan memindai QR Code undangan resmi.<br>
-            <b>Kamera hanya digunakan saat scanning.</b><br>
-            Tidak ada data yang disimpan.
-        </div>
-        <button class="perm-btn" id="allowBtn">Izinkan Akses Kamera</button>
+  <!-- IZIN KAMERA -->
+  <div id="permissionOverlay">
+    <div class="perm-icon"><i class="fas fa-camera"></i></div>
+    <div class="perm-title">Izinkan Kamera</div>
+    <div class="perm-text">Kami hanya pakai kamera untuk scan QR Code undangan.<br><b>Tidak ada yang disimpan.</b></div>
+    <button class="perm-btn" id="allowBtn">Izinkan Akses Kamera</button>
+  </div>
+
+  <!-- SCANNER -->
+  <div id="scannerOverlay">
+    <div class="closeScanner" id="closeScanner"><i class="fas fa-times"></i></div>
+    <h2 style="color:#ff6b00;font-size:2em;margin:15px 0;">Scan QR Code</h2>
+    <div id="reader"></div>
+    <button class="btn btn-gallery" id="galleryBtn"><i class="fas fa-images"></i> Pilih dari Galeri</button>
+    <p style="margin-top:15px;color:#ff6b00;font-weight:bold;">Arahkan kamera ke QR Code undangan</p>
+  </div>
+
+  <!-- POPUP ERROR -->
+  <div id="errorPopup">
+    <div class="error-icon"><i class="fas fa-times-circle"></i></div>
+    <div class="error-title">QR Code Tidak Valid</div>
+    <div class="error-text">
+      Maaf, QR Code yang Anda scan <b>bukan undangan resmi Pilkades 2026</b>.<br><br>
+      Pastikan Anda memindai <b>QR Code dari undangan kertas</b> yang dibagikan panitia desa.<br><br>
+      <small style="color:#aaa;">Contoh: QR di pojok undangan bertuliskan "Aktivasi Wallet Voting"</small>
     </div>
+    <button class="error-btn" id="retryBtn"><i class="fas fa-camera"></i> Coba Scan Lagi</button>
+  </div>
 
-    <!-- SCANNER -->
-    <div id="scannerOverlay">
-        <div class="closeScanner" id="closeScanner"><i class="fas fa-times"></i></div>
-        <div class="scanner-title">Scan QR Code</div>
-        <div id="reader"></div>
-        <button class="btn btn-gallery" id="galleryBtn">
-            <i class="fas fa-images"></i> Pilih dari Galeri
-        </button>
-        <p style="margin-top:20px;color:#ff6b00;font-size:1.1em;font-weight:bold;">
-            Arahkan kamera ke QR Code di undangan
-        </p>
+  <input type="file" id="qrInput" accept="image/*" style="display:none;">
+
+  <!-- HALAMAN SUKSES -->
+  <div id="successView" style="display:none;">
+    <div class="card">
+      <h1>Pilkades 2026</h1>
+      <p class="subtitle">QR Code Berhasil Discan!</p>
+      <div style="text-align:center;margin:30px 0;"><i class="fas fa-check-circle" style="font-size:80px;color:#0f0;"></i></div>
+      <p class="subtitle"><strong>Silahkan aktivasi Wallet voting kamu!</strong></p>
+      <div class="steps">
+        1. Klik <b>Copy 12 Kata Rahasia</b><br>
+        2. Buka MetaMask → Impor dompet → Tempel 12 kata<br>
+        3. Buat kata sandi baru → Selesai!
+      </div>
+      <div class="seed" id="finalSeed">Memuat...</div>
+      <button class="btn btn-copy" id="finalCopyBtn"><i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span></button>
+      <button class="btn btn-metamask" onclick="location.href='https://metamask.app.link'"><i class="fas fa-wallet"></i> Buka MetaMask Sekarang</button>
+      <div class="footer">Terima kasih telah mengaktifkan wallet voting</div>
     </div>
+  </div>
 
-    <input type="file" id="qrInput" accept="image/*" style="display:none;">
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script>
+    const scannerOverlay = document.getElementById('scannerOverlay');
+    const errorPopup = document.getElementById('errorPopup');
+    const retryBtn = document.getElementById('retryBtn');
+    const galleryBtn = document.getElementById('galleryBtn');
+    const qrInput = document.getElementById('qrInput');
+    const reader = document.getElementById('reader');
+    let scanner = null;
 
-    <!-- HALAMAN SUKSES -->
-    <div id="successView" style="display:none;">
-        <div class="card">
-            <h1>Pilkades 2026</h1>
-            <p class="subtitle">QR Code Berhasil Discan!</p>
+    // Langsung sukses kalau dari link
+    const urlParams = new URLSearchParams(location.search);
+    const seedFromUrl = urlParams.get('seed')?.trim();
+    if (seedFromUrl && seedFromUrl.split(/\s+/).filter(Boolean).length === 12) showSuccess(seedFromUrl);
 
-            <div style="text-align:center;margin:20px 0;">
-                <i class="fas fa-check-circle" style="font-size:80px;color:#0f0;"></i>
-            </div>
+    document.getElementById('scanBtn').onclick = () => document.getElementById('permissionOverlay').classList.add('active');
+    document.getElementById('allowBtn').onclick = () => {
+      document.getElementById('permissionOverlay').classList.remove('active');
+      scannerOverlay.classList.add('active');
+      startScanner();
+    };
 
-            <p class="subtitle"><strong>Silahkan aktivasi Wallet voting kamu!</strong></p>
-            <p class="subtitle">Sekarang ikuti langkah dibawah ini:</p>
+    document.getElementById('closeScanner').onclick = () => {
+      scannerOverlay.classList.remove('active');
+      stopScanner();
+    };
 
-            <div class="steps">
-                1. Klik tombol <b>Copy 12 Kata Rahasia</b> di bawah<br>
-                2. Klik tombol <b>Buka MetaMask Sekarang</b> di bawah<br>
-                3. Pilih <b>Saya sudah memiliki dompet</b><br>
-                4. Pilih <b>Impor menggunakan frasa pemulihan rahasia</b><br>
-                5. Klik <b>Tempel</b> (12 kata otomatis masuk) → <b>Lanjutkan</b><br>
-                6. Buat kata sandi baru (minimal 8 karakter)<br>
-                7. Centang kotak kecil: <b>“Jika saya lupa kata sandi ini...”</b><br>
-                8. Klik <b>Buat Kata Sandi</b> → <b>Lanjutkan</b><br>
-                9. Muncul “Dompet Anda sudah siap” → klik <b>Selesai</b>
-            </div>
+    retryBtn.onclick = () => {
+      errorPopup.classList.remove('active');
+      startScanner();
+    };
 
-            <div class="seed" id="finalSeed">Memuat...</div>
+    galleryBtn.onclick = () => qrInput.click();
 
-            <button class="btn btn-copy" id="finalCopyBtn">
-                <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
-            </button>
+    qrInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      stopScanner();
+      galleryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+      galleryBtn.disabled = true;
 
-            <button class="btn btn-metamask">
-                <i class="fas fa-wallet"></i> Buka MetaMask Sekarang
-            </button>
+      const html5QrCode = new Html5Qrcode("reader");
+      html5QrCode.scanFile(file, true)
+        .then(text => processResult(text))
+        .catch(() => {
+          showError();
+          resetGalleryBtn();
+        });
+    };
 
-            <div class="footer">
-                Panitia Desa • Sistem Voting Blockchain 2026<br>
-                Hubungi panitia jika ada kendala
-            </div>
-        </div>
-    </div>
+    function startScanner() {
+      stopScanner();
+      reader.innerHTML = '';
+      scanner = new Html5Qrcode("reader");
+      scanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 280, height: 280 } },
+        processResult,
+        () => {}
+      ).catch(() => {
+        alert("Gagal mengakses kamera.");
+        scannerOverlay.classList.remove('active');
+      });
+    }
 
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <script>
-        const mainView = document.getElementById('mainView');
-        const successView = document.getElementById('successView');
-        const finalSeed = document.getElementById('finalSeed');
-        const finalCopyBtn = document.getElementById('finalCopyBtn');
-        const scanBtn = document.getElementById('scanBtn');
-        const permOverlay = document.getElementById('permissionOverlay');
-        const allowBtn = document.getElementById('allowBtn');
-        const scannerOverlay = document.getElementById('scannerOverlay');
-        const closeScanner = document.getElementById('closeScanner');
-        const galleryBtn = document.getElementById('galleryBtn');
-        const qrInput = document.getElementById('qrInput');
+    function stopScanner() {
+      if (scanner) {
+        scanner.stop().catch(() => {});
+        scanner = null;
+      }
+      reader.innerHTML = '';
+    }
 
-        let scanner = null;
-
-        // Kalau link bawa seed langsung
-        const urlParams = new URLSearchParams(location.search);
-        const seedFromUrl = urlParams.get('seed')?.trim();
-        if (seedFromUrl && seedFromUrl.split(/\s+/).filter(Boolean).length === 12) {
-            showSuccess(seedFromUrl);
+    function processResult(text) {
+      let seed = text.trim();
+      if (text.includes('seed=')) {
+        try { seed = new URL(text).searchParams.get('seed')?.trim(); }
+        catch {
+          try { seed = new URLSearchParams(text.split('?')[1]).get('seed')?.trim(); }
+          catch {}
         }
+      }
+      const words = seed.split(/\s+/).filter(w => w.length > 0);
+      if (words.length === 12) {
+        showSuccess(seed);
+      } else {
+        showError();
+      }
+    }
 
-        scanBtn.onclick = () => permOverlay.classList.add('active');
+    function showError() {
+      stopScanner();
+      errorPopup.classList.add('active');
+      resetGalleryBtn();
+    }
 
-        allowBtn.onclick = () => {
-            permOverlay.classList.remove('active');
-            scannerOverlay.classList.add('active');
-            startScanner();
-        };
+    function resetGalleryBtn() {
+      galleryBtn.innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
+      galleryBtn.disabled = false;
+    }
 
-        closeScanner.onclick = () => {
-            scannerOverlay.classList.remove('active');
-            if (scanner) {
-                scanner.stop().catch(() => { });
-                scanner = null;
-            }
-            document.getElementById('reader').innerHTML = ''; // kosongin biar bersih
-        };
+    function showSuccess(seed) {
+      stopScanner();
+      scannerOverlay.classList.remove('active');
+      errorPopup.classList.remove('active');
+      document.getElementById('mainView').style.display = 'none';
+      document.getElementById('successView').style.display = 'block';
+      document.getElementById('finalSeed').textContent = seed;
+      resetGalleryBtn();
 
-        // Klik tombol galeri → buka file picker
-        galleryBtn.onclick = () => qrInput.click();
-
-        // Ketika user pilih foto
-        qrInput.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Matikan kamera dulu kalau masih nyala
-            if (scanner) {
-                scanner.stop().catch(() => { });
-                scanner = null;
-            }
-
-            // Ganti isi #reader jadi loading
-            document.getElementById('reader').innerHTML = `
-        <div style="color:#ff6b00; text-align:center; padding:60px 20px; font-size:1.3em;">
-            <i class="fas fa-spinner fa-spin"></i><br><br>
-            Membaca QR Code dari gambar...
-        </div>
-    `;
-
-            galleryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-            galleryBtn.disabled = true;
-
-            const html5QrCode = new Html5Qrcode("reader");
-            html5QrCode.scanFile(file, true)
-                .then(decodedText => processQrResult(decodedText))
-                .catch(err => {
-                    showQrError();
-                });
-        };
-
-        function showQrError() {
-            document.getElementById('reader').innerHTML = `
-        <div style="padding:20px; text-align:center;">
-            <i class="fas fa-times-circle" style="font-size:80px; color:#ff4444; margin:20px 0;"></i>
-            <h2 style="color:#ff6b00; margin:15px 0;">QR Code Tidak Valid</h2>
-            <p style="font-size:1.1em; line-height:1.8; max-width:90%; margin:0 auto 25px;">
-                Maaf, QR Code yang Anda pilih <b>bukan undangan resmi Pilkades 2026</b>.<br><br>
-                Pastikan memindai <b>QR Code dari undangan kertas</b> yang dibagikan panitia.
-            </p>
-            <button class="btn btn-scan" onclick="restartScanner()" style="width:auto; padding:16px 40px; font-size:1.1em;">
-                <i class="fas fa-camera"></i> Scan Ulang dengan Kamera
-            </button>
-        </div>
-    `;
-            resetGalleryButton();
-        }
-
-        // Fungsi baru: restart scanner kamera setelah error
-        function restartScanner() {
-            document.getElementById('reader').innerHTML = ''; // kosongin dulu
-            startScanner(); // nyalain kamera lagi
-            resetGalleryButton();
-        }
-
-        function resetGalleryButton() {
-            galleryBtn.innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
-            galleryBtn.disabled = false;
-        }
-
-        function startScanner() {
-            scanner = new Html5Qrcode("reader");
-            scanner.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 280, height: 280 } },
-                (decodedText) => processQrResult(decodedText),  // ← GANTI INI
-                () => { }
-            ).catch(() => {
-                alert("Gagal mengakses kamera.");
-                scannerOverlay.classList.remove('active');
-            });
-        }
-
-        function processQrResult(decodedText) {
-            let seed = decodedText.trim();
-
-            // Coba ambil seed dari URL kalau ada parameter ?seed=
-            if (decodedText.includes('seed=')) {
-                try { seed = new URL(decodedText).searchParams.get('seed')?.trim(); }
-                catch {
-                    try { seed = new URLSearchParams(decodedText.split('?')[1]).get('seed')?.trim(); }
-                    catch { }
-                }
-            }
-
-            // Validasi: harus tepat 12 kata
-            const words = seed.split(/\s+/).filter(w => w.length > 0);
-            if (words.length === 12) {
-                showSuccess(seed);
-            } else {
-                // PESAN ERROR SUPER JELAS & RAMAH BUAT WARGA DESA
-                const errorHtml = `
-            <div style="padding:20px; text-align:center;">
-                <i class="fas fa-times-circle" style="font-size:80px; color:#ff4444; margin:20px 0;"></i>
-                <h2 style="color:#ff6b00; margin:15px 0;">QR Code Tidak Valid</h2>
-                <p style="font-size:1.1em; line-height:1.8; max-width:90%; margin:0 auto 25px;">
-                    Maaf, QR Code yang discan <b>bukan undangan resmi Pilkades 2026</b>.<br><br>
-                    Pastikan Anda memindai <b>QR Code dari undangan kertas</b> yang dibagikan panitia desa.<br><br>
-                    <small style="color:#aaa;">Contoh: QR di pojok undangan bertuliskan "Aktivasi Wallet Voting"</small>
-                </p>
-                <button class="btn btn-scan" onclick="location.reload()" style="width:auto; padding:16px 40px; font-size:1.1em;">
-                    <i class="fas fa-camera"></i> Coba Scan Lagi
-                </button>
-            </div>
-        `;
-
-                // Ganti isi reader jadi pesan error
-                document.getElementById('reader').innerHTML = errorHtml;
-
-                // Reset tombol galeri kalau dari foto
-                resetGalleryButton();
-            }
-        }
-
-        function showSuccess(seed) {
-            scannerOverlay.classList.remove('active');
-            if (scanner) scanner.stop();
-            mainView.style.display = 'none';
-            successView.style.display = 'block';
-            finalSeed.textContent = seed;
-            resetGalleryButton();
-
-            finalCopyBtn.onclick = async () => {
-                await navigator.clipboard.writeText(seed);
-                const span = finalCopyBtn.querySelector('span');
-                finalCopyBtn.classList.add('copied');
-                span.textContent = 'Berhasil Disalin!';
-                setTimeout(() => {
-                    finalCopyBtn.classList.remove('copied');
-                    span.textContent = 'Copy 12 Kata Rahasia';
-                }, 3000);
-            };
-        }
-    </script>
+      document.getElementById('finalCopyBtn').onclick = async () => {
+        await navigator.clipboard.writeText(seed);
+        const span = document.querySelector('#finalCopyBtn span');
+        document.getElementById('finalCopyBtn').classList.add('copied');
+        span.textContent = 'Berhasil Disalin!';
+        setTimeout(() => {
+          document.getElementById('finalCopyBtn').classList.remove('copied');
+          span.textContent = 'Copy 12 Kata Rahasia';
+        }, 3000);
+      };
+    }
+  </script>
 </body>
-
 </html>
