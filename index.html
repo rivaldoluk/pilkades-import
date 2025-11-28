@@ -40,32 +40,61 @@
     .btn-copy.copied{background:#0c6e0c;}
     .footer{margin-top:40px;font-size:0.9em;color:#888;}
 
-    /* OVERLAY SCANNER CANTIK */
+    /* OVERLAY SCANNER SUPER CANTIK */
     #scannerOverlay{
-      position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);
+      position:fixed;top:0;left:0;width:100%;height:100%;background:#000;
       display:none;align-items:center;justify-content:center;z-index:9999;
       flex-direction:column;padding:20px;box-sizing:border-box;
     }
     #scannerOverlay.active{display:flex;}
+    
+    /* Sembunyikan semua kontrol bawaan library */
+    #reader __select, #reader select, #reader button, #reader .dashboard, #reader .footer {display:none !important;}
+    
     #reader{
-      width:90%;max-width:380px;border-radius:16px;overflow:hidden;
-      box-shadow:0 0 40px rgba(255,107,0,0.6);border:5px solid #ff6b00;
+      width:90%;max-width:380px;height:480px;border-radius:20px;overflow:hidden;
+      position:relative;border:6px solid #ff6b00;box-shadow:0 0 50px rgba(255,107,0,0.7);
     }
+    #reader video{
+      width:100%;height:100%;object-fit:cover;border-radius:16px;
+    }
+    .scanner-frame{
+      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      width:260px;height:260px;border:3px solid #ff6b00;
+      border-radius:16px;pointer-events:none;
+      box-shadow:0 0 30px rgba(255,107,0,0.8);
+    }
+    .scanner-frame::before,.scanner-frame::after{
+      content:"";position:absolute;width:50px;height:50px;border:6px solid #ff6b00;
+    }
+    .scanner-frame::before{top:-6px;left:-6px;border-right:none;border-bottom:none;border-radius:16px 0 0 0;}
+    .scanner-frame::after{top:-6px;right:-6px;border-left:none;border-bottom:none;border-radius:0 16px 0 0;}
+    .scanner-frame::after + .scanner-frame::before{
+      bottom:-6px;left:-6px;border-top:none;border-right:none;border-radius:0 0 0 16px;
+    }
+    .scanner-frame::after + .scanner-frame::after{
+      bottom:-6px;right:-6px;border-top:none;border-left:none;border-radius:0 0 16px 0;
+    }
+
     .closeScanner{
       position:absolute;top:20px;right:20px;background:#ff2d2d;color:white;
       width:56px;height:56px;border-radius:50%;font-size:32px;font-weight:bold;
       display:flex;align-items:center;justify-content:center;cursor:pointer;
-      box-shadow:0 4px 15px rgba(255,0,0,0.5);z-index:1000;
-      transition:all 0.2s;
+      box-shadow:0 4px 20px rgba(0,0,0,0.7);z-index:1000;
     }
-    .closeScanner:hover{transform:scale(1.1);background:#ff0000;}
+    .closeScanner:hover{transform:scale(1.15);background:#ff0000;}
+
     .scanner-title{
-      margin:0 0 20px 0;color:#ff6b00;font-size:1.6em;font-weight:bold;
+      margin:20px 0 10px;color:#ff6b00;font-size:1.7em;font-weight:bold;
+    }
+    .scanner-info{
+      color:#ccc;font-size:0.95em;margin-top:10px;
     }
     @media(max-width:480px){
       h1{font-size:1.9em;}
       .btn{width:100%;margin:10px 0;}
-      .closeScanner{width:50px;height:50px;font-size:28px;top:15px;right:15px;}
+      #reader{height:420px;}
+      .closeScanner{width:50px;height:50px;font-size:28px;}
     }
   </style>
 </head>
@@ -103,15 +132,16 @@
     </div>
   </div>
 
-  <!-- OVERLAY SCANNER DENGAN TOMBOL X BESAR -->
+  <!-- SCANNER CANTIK TANPA TULISAN GANGGU -->
   <div id="scannerOverlay">
     <div class="closeScanner" id="closeScanner">×</div>
-    <h2 class="scanner-title">Arahkan Kamera ke QR Code</h2>
-    <div id="reader"></div>
-    <p style="margin-top:15px;color:#aaa;">Pastikan QR Code di undangan terlihat jelas</p>
+    <h2 class="scanner-title">Arahkan ke QR Code</h2>
+    <div id="reader">
+      <div class="scanner-frame"></div>
+    </div>
+    <p class="scanner-info">Pastikan QR Code di undangan terlihat jelas di dalam kotak</p>
   </div>
 
-  <!-- QR Scanner Library -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
     const urlParams = new URLSearchParams(location.search);
@@ -128,7 +158,7 @@
     let realSeed = null;
     let scanner  = null;
 
-    // Kalau link sudah benar → langsung tampilkan 12 kata
+    // Kalau link benar → langsung tampilkan
     if (seedFromUrl && seedFromUrl.split(/\s+/).filter(w=>w).length===12) {
       realSeed = seedFromUrl;
       seedBox.textContent = realSeed;
@@ -136,30 +166,30 @@
       scanBtn.style.display = 'none';
     }
 
-    // Buka scanner
     scanBtn.onclick = () => {
       overlay.classList.add('active');
       startScanner();
     };
 
-    // Tutup scanner dengan tombol X
     closeBtn.onclick = () => {
       overlay.classList.remove('active');
       if(scanner){ scanner.clear(); scanner = null; }
     };
 
-    // Tutup juga kalau klik di luar (opsional)
-    overlay.onclick = (e) => {
-      if(e.target === overlay) closeBtn.onclick();
-    };
-
     function startScanner(){
-      scanner = new Html5QrcodeScanner("reader", { fps:10, qrbox:{width:280,height:280} }, false);
+      scanner = new Html5QrcodeScanner("reader", {
+        fps: 10,
+        qrbox: { width: 260, height: 260 },
+        showZoomSliderIfSupported: false,
+        showTorchButtonIfSupported: false,
+        defaultZoomValueIfSupported: 1.5
+      }, false);
+
       scanner.render(
-        (text) => {
-          let seed = text.trim();
-          if(text.includes('seed=')){
-            seed = new URLSearchParams(text.split('?')[1]).get('seed') || seed;
+        (decodedText) => {
+          let seed = decodedText.trim();
+          if(decodedText.includes('seed=')){
+            seed = new URLSearchParams(decodedText.split('?')[1]).get('seed') || seed;
           }
           if(seed.split(/\s+/).filter(w=>w).length===12){
             realSeed = seed;
@@ -170,14 +200,13 @@
             scanner.clear();
             alert('Berhasil! 12 kata rahasia sudah muncul.');
           }else{
-            alert('QR Code tidak valid.\nGunakan undangan resmi Pilkades 2026.');
+            alert('QR Code tidak valid.');
           }
         },
         () => {}
       );
     }
 
-    // Copy function
     copyBtn.onclick = async () => {
       if(!realSeed) return;
       try{
