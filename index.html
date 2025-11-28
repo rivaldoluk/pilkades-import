@@ -162,7 +162,13 @@
       font-weight:bold;box-shadow:0 12px 40px rgba(255,107,0,0.5);
     }
     .perm-btn:hover{background:#e55a00;transform:scale(1.05);}
-
+    #reader .btn-scan {
+    background: #0066ff;
+    margin-top: 20px;
+}
+#reader .btn-scan:hover {
+    background: #0052cc;
+}
     /* SCANNER */
     #scannerOverlay{
       position:fixed;top:0;left:0;width:100%;height:100%;background:#000;
@@ -400,17 +406,45 @@ function resetGalleryButton() {
 }
 
     function processQrResult(decodedText) {
-      let seed = decodedText.trim();
-      if (decodedText.includes('seed=')) {
-        try { seed = new URL(decodedText).searchParams.get('seed'); }
-        catch { seed = new URLSearchParams(decodedText.split('?')[1]).get('seed') || seed; }
-      }
-      if (seed.split(/\s+/).filter(Boolean).length === 12) {
-        showSuccess(seed);
-      } else {
-        alert("QR Code tidak valid. Pastikan itu QR undangan resmi.");
-      }
+    let seed = decodedText.trim();
+
+    // Coba ambil seed dari URL kalau ada parameter ?seed=
+    if (decodedText.includes('seed=')) {
+        try { seed = new URL(decodedText).searchParams.get('seed')?.trim(); }
+        catch {
+            try { seed = new URLSearchParams(decodedText.split('?')[1]).get('seed')?.trim(); }
+            catch { }
+        }
     }
+
+    // Validasi: harus tepat 12 kata
+    const words = seed.split(/\s+/).filter(w => w.length > 0);
+    if (words.length === 12) {
+        showSuccess(seed);
+    } else {
+        // PESAN ERROR SUPER JELAS & RAMAH BUAT WARGA DESA
+        const errorHtml = `
+            <div style="padding:20px; text-align:center;">
+                <i class="fas fa-times-circle" style="font-size:80px; color:#ff4444; margin:20px 0;"></i>
+                <h2 style="color:#ff6b00; margin:15px 0;">QR Code Tidak Valid</h2>
+                <p style="font-size:1.1em; line-height:1.8; max-width:90%; margin:0 auto 25px;">
+                    Maaf, QR Code yang discan <b>bukan undangan resmi Pilkades 2026</b>.<br><br>
+                    Pastikan Anda memindai <b>QR Code dari undangan kertas</b> yang dibagikan panitia desa.<br><br>
+                    <small style="color:#aaa;">Contoh: QR di pojok undangan bertuliskan "Aktivasi Wallet Voting"</small>
+                </p>
+                <button class="btn btn-scan" onclick="location.reload()" style="width:auto; padding:16px 40px; font-size:1.1em;">
+                    <i class="fas fa-camera"></i> Coba Scan Lagi
+                </button>
+            </div>
+        `;
+
+        // Ganti isi reader jadi pesan error
+        document.getElementById('reader').innerHTML = errorHtml;
+        
+        // Reset tombol galeri kalau dari foto
+        resetGalleryButton();
+    }
+}
 
     function showSuccess(seed) {
       scannerOverlay.classList.remove('active');
@@ -434,4 +468,5 @@ function resetGalleryButton() {
   </script>
 </body>
 </html>
+
 
