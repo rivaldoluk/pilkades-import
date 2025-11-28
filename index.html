@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     body{font-family:Arial,sans-serif;background:#000;color:white;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;}
-    .card{background:#111;padding:35px 25px;border-radius:20px;max-width:420px;width:95%;box-shadow:0 10px 40px rgba(255,107,0,0.3);}
+    .card{background:#111;padding:35px 25px;border-radius:20px;max-width:420px;width:95%;box-shadow:0 10px 40px rgba(255,107,0,0.3);position:relative;}
     h1{color:#ff6b00;margin:0 0 20px;font-size:2.2em;text-align:center;}
     .steps{background:#1a1a1a;padding:18px;border-radius:12px;margin:20px 0;font-size:0.98em;line-height:1.75;text-align:left;}
     .steps b{color:#ff8b3d;}
@@ -21,11 +21,8 @@
     .btn-copy.copied{background:#0c6e0c;}
     .footer{margin-top:40px;font-size:0.9em;color:#888;text-align:center;}
 
-    /* LAYER PERMISSION CANTIK */
-    #permissionOverlay{
-      position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#000,#1a0033);
-      display:none;align-items:center;justify-content:center;z-index:99999;flex-direction:column;
-    }
+    /* LAYER PERMISSION */
+    #permissionOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#000,#1a0033);display:none;align-items:center;justify-content:center;z-index:99999;flex-direction:column;}
     #permissionOverlay.active{display:flex;animation:fadeIn 0.5s;}
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
     .perm-icon{font-size:90px;color:#ff6b00;margin-bottom:20px;animation:pulse 2s infinite;}
@@ -44,6 +41,11 @@
     .scanner-title{margin:20px 0 10px;color:#ff6b00;font-size:1.8em;font-weight:bold;}
     .scanner-subtitle{color:#aaa;}
 
+    /* TAMPILAN SETELAH SCAN BERHASIL */
+    #successView{display:none;}
+    #successView.active{display:block;}
+    .success-title{color:#0f0;font-size:1.4em;font-weight:bold;margin:15px 0;}
+
     @media(max-width:480px){
       .btn{width:100%;margin:10px 0;}
       #reader{height:460px;}
@@ -53,32 +55,37 @@
 </head>
 <body>
 
-  <div class="card">
-    <h1>Pilkades 2026</h1>
-    <p style="margin:10px 0 20px;"><strong>Aktivasi Wallet Voting</strong></p>
+  <!-- HALAMAN AWAL: SCAN QR -->
+  <div id="mainView">
+    <div class="card">
+      <h1>Pilkades 2026</h1>
+      <p style="margin:10px 0 20px;"><strong>Aktivasi Wallet Voting</strong></p>
 
-    <div class="steps">
-      1. Kalau 12 kata sudah muncul → klik <b>Copy 12 Kata Rahasia</b><br>
-      2. Klik <b>Buka MetaMask Sekarang</b> → tempel → selesai!<br><br>
-      <b>Kalau belum muncul → klik tombol scan</b>
-    </div>
+      <div class="steps">
+        1. Kalau 12 kata sudah muncul → klik <b>Copy 12 Kata Rahasia</b><br>
+        2. Klik <b>Buka MetaMask Sekarang</b> → tempel → selesai!<br><br>
+        <b>Kalau belum muncul → klik tombol scan</b>
+      </div>
 
-    <div class="seed seed-locked" id="seedBox">
-      <i class="fas fa-lock fa-2x"></i><br><br>
-      Scan QR Code undangan untuk melihat 12 kata rahasia
-    </div>
+      <div class="seed seed-locked" id="seedBox">
+        <i class="fas fa-lock fa-2x"></i><br><br>
+        Scan QR Code undangan untuk melihat 12 kata rahasia
+      </div>
 
-    <button class="btn btn-scan" id="scanBtn">Scan QR Code Undangan</button>
+      <button class="btn btn-scan" id="scanBtn">Scan QR Code Undangan</button>
 
-    <button class="btn btn-copy" id="copyBtn">
-      <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
-    </button>
+      <button class="btn btn-copy" id="copyBtn" style="display:none;">
+        <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
+      </button>
 
-    <button class="btn" onclick="location.href='https://metamask.app.link'">Buka MetaMask Sekarang</button>
+      <button class="btn" onclick="location.href='https://metamask.app.link'" style="display:none;" id="openMetamask">
+        <i class="fas fa-external-link-alt"></i> Buka MetaMask Sekarang
+      </button>
 
-    <div class="footer">
-      Panitia Desa • Sistem Voting Blockchain 2026<br>
-      Hubungi panitia jika ada kendala
+      <div class="footer">
+        Panitia Desa • Sistem Voting Blockchain 2026<br>
+        Hubungi panitia jika ada kendala
+      </div>
     </div>
   </div>
 
@@ -93,43 +100,77 @@
     <button class="perm-btn" id="allowBtn">Izinkan Kamera</button>
   </div>
 
-  <!-- SCANNER UTAMA -->
+  <!-- SCANNER -->
   <div id="scannerOverlay">
-    <div class="closeScanner" id="closeScanner">×</div>
+    <div class="closeScanner" id="closeScanner">X</div>
     <h2 class="scanner-title">Arahkan ke QR Code</h2>
     <div id="reader"></div>
     <p class="scanner-subtitle">Pastikan QR Code berada di tengah</p>
   </div>
 
+  <!-- TAMPILAN SUKSES (SETELAH SCAN BERHASIL) -->
+  <div id="successView">
+    <div class="card">
+      <h1>Pilkades 2026</h1>
+      <p><strong>Selamat! QR Code berhasil discan</strong></p>
+      <p>Sekarang ikuti langkah di bawah ini:</p>
+
+      <div class="steps">
+        1. Klik tombol <b>Copy 12 Kata Rahasia</b> di bawah<br>
+        2. Klik tombol <b>Buka MetaMask Sekarang</b> di bawah<br>
+        3. Pilih <b>Saya sudah memiliki dompet</b><br>
+        4. Pilih <b>Impor menggunakan frasa pemulihan rahasia</b><br>
+        5. Klik <b>Tempel</b> (12 kata otomatis masuk) → <b>Lanjutkan</b><br>
+        6. Buat kata sandi baru (minimal 8 karakter)<br>
+        7. Centang kotak kecil: <b>“Jika saya lupa kata sandi ini...”</b><br>
+        8. Klik <b>Buat Kata Sandi</b> → <b>Lanjutkan</b><br>
+        9. Muncul “Dompet Anda sudah siap” → klik <b>Selesai</b><br><br>
+        <b style="color:#0f0;">Selesai! Wallet voting sudah aktif.</b>
+      </div>
+
+      <div class="seed" id="finalSeed">Memuat 12 kata...</div>
+
+      <button class="btn btn-copy" id="finalCopyBtn">
+        <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
+      </button>
+
+      <button class="btn" onclick="location.href='https://metamask.app.link'">
+        <i class="fas fa-external-link-alt"></i> Buka MetaMask Sekarang
+      </button>
+
+      <div class="footer">
+        Panitia Desa • Sistem Voting Blockchain 2026<br>
+        Hubungi panitia jika ada kendala
+      </div>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
-    const urlParams = new URLSearchParams(location.search);
-    const seedFromUrl = urlParams.get('seed')?.trim();
-
+    const mainView = document.getElementById('mainView');
+    const successView = document.getElementById('successView');
     const seedBox = document.getElementById('seedBox');
+    const finalSeed = document.getElementById('finalSeed');
     const copyBtn = document.getElementById('copyBtn');
-    const copyText = copyBtn.querySelector('span');
-    const copyIcon = copyBtn.querySelector('i');
+    const finalCopyBtn = document.getElementById('finalCopyBtn');
+    const openMetamask = document.getElementById('openMetamask');
     const scanBtn = document.getElementById('scanBtn');
     const permOverlay = document.getElementById('permissionOverlay');
     const allowBtn = document.getElementById('allowBtn');
     const scannerOverlay = document.getElementById('scannerOverlay');
-    const closeBtn = document.getElementById('closeScanner');
+    const closeScanner = document.getElementById('closeScanner');
 
     let realSeed = null;
     let html5QrCode = null;
 
-    // Langsung tampilkan seed kalau dari link
+    // Langsung buka success kalau dari link
+    const urlParams = new URLSearchParams(location.search);
+    const seedFromUrl = urlParams.get('seed')?.trim();
     if (seedFromUrl && seedFromUrl.split(/\s+/).filter(w=>w).length === 12) {
-      realSeed = seedFromUrl;
-      seedBox.textContent = realSeed;
-      seedBox.classList.remove('seed-locked');
-      scanBtn.style.display = 'none';
+      showSuccess(seedFromUrl);
     }
 
-    scanBtn.onclick = () => {
-      permOverlay.classList.add('active');
-    };
+    scanBtn.onclick = () => permOverlay.classList.add('active');
 
     allowBtn.onclick = async () => {
       permOverlay.classList.remove('active');
@@ -148,26 +189,20 @@
               try { seed = new URL(decodedText).searchParams.get('seed'); }
               catch(e) { seed = new URLSearchParams(decodedText.split('?')[1]).get('seed') || seed; }
             }
-
             if (seed && seed.split(/\s+/).filter(w=>w).length === 12) {
               realSeed = seed;
-              seedBox.textContent = seed;
-              seedBox.classList.remove('seed-locked');
-              scanBtn.style.display = 'none';
-              scannerOverlay.classList.remove('active');
-              html5QrCode.stop();
-              alert('Berhasil! 12 kata rahasia sudah muncul.');
+              showSuccess(seed);
             }
           },
-          (error) => { /* diam saja */ }
+          () => {}
         );
       } catch (err) {
-        alert("Gagal mengakses kamera. Pastikan Anda mengizinkan akses.");
+        alert("Gagal mengakses kamera. Silakan coba lagi.");
         scannerOverlay.classList.remove('active');
       }
     };
 
-    closeBtn.onclick = () => {
+    closeScanner.onclick = () => {
       scannerOverlay.classList.remove('active');
       if (html5QrCode) {
         html5QrCode.stop().catch(() => {});
@@ -175,23 +210,29 @@
       }
     };
 
-    // Copy
-    copyBtn.onclick = async () => {
-      if (!realSeed) return;
-      try {
-        await navigator.clipboard.writeText(realSeed);
-        copyBtn.classList.add('copied');
-        copyText.textContent = 'Berhasil Disalin!';
-        copyIcon.className = 'fas fa-check';
-        setTimeout(() => {
-          copyBtn.classList.remove('copied');
-          copyText.textContent = 'Copy 12 Kata Rahasia';
-          copyIcon.className = 'fas fa-copy';
-        }, 3000);
-      } catch(e) {
-        alert('Gagal copy otomatis. Blok teks lalu copy manual.');
-      }
-    };
+    function showSuccess(seed) {
+      realSeed = seed;
+      mainView.style.display = 'none';
+      successView.classList.add('active');
+      finalSeed.textContent = seed;
+
+      // Tombol copy di halaman sukses
+      finalCopyBtn.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(seed);
+          finalCopyBtn.classList.add('copied');
+          finalCopyBtn.querySelector('span').textContent = 'Berhasil Disalin!';
+          finalCopyBtn.querySelector('i').className = 'fas fa-check';
+          setTimeout(() => {
+            finalCopyBtn.classList.remove('copied');
+            finalCopyBtn.querySelector('span').textContent = 'Copy 12 Kata Rahasia';
+            finalCopyBtn.querySelector('i').className = 'fas fa-copy';
+          }, 3000);
+        } catch(e) {
+          alert('Gagal copy otomatis. Blok teks lalu copy manual.');
+        }
+      };
+    }
   </script>
 </body>
 </html>
