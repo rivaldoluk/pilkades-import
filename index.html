@@ -21,65 +21,30 @@
     .btn-copy.copied{background:#0c6e0c;}
     .footer{margin-top:40px;font-size:0.9em;color:#888;}
 
-    /* SCANNER OVERLAY SUPER PREMIUM */
-    #scannerOverlay{
-      position:fixed;top:0;left:0;width:100%;height:100%;background:#000;
-      display:none;align-items:center;justify-content:center;z-index:9999;
-      flex-direction:column;padding:20px;box-sizing:border-box;
-    }
+    /* SCANNER CANTIK */
+    #scannerOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column;padding:20px;box-sizing:border-box;}
     #scannerOverlay.active{display:flex;}
-    
-    /* Sembunyikan semua elemen bawaan library yang jelek */
-    #reader select,
-    #reader button,
-    #reader .dashboard,
-    #reader .footer,
-    #reader hr,
-    #reader small {display:none !important;}
 
-    #reader{
-      width:92%;max-width:400px;height:520px;border-radius:24px;overflow:hidden;
-      position:relative;border:7px solid #ff6b00;
-      box-shadow:0 0 60px rgba(255,107,0,0.8);
-    }
+    /* Sembunyikan semua kontrol bawaan library */
+    #reader * {font-family:inherit !important;}
+    #reader select, #reader button:not(#html5-qrcode-button-camera-start):not(#html5-qrcode-button-camera-stop),
+    #reader .dashboard, #reader hr, #reader small, #reader .footer {display:none !important;}
+
+    #reader{width:92%;max-width:400px;height:520px;border-radius:24px;overflow:hidden;position:relative;border:7px solid #ff6b00;box-shadow:0 0 60px rgba(255,107,0,0.8);}
     #reader video{width:100%;height:100%;object-fit:cover;border-radius:18px;}
 
-    /* Kotak scan animasi menyala */
-    .scan-box{
-      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-      width:270px;height:270px;border:4px solid #ff6b00;
-      border-radius:20px;pointer-events:none;
-      box-shadow:0 0 40px rgba(255,107,0,0.9);
-      animation:pulse 2s infinite;
-    }
-    @keyframes pulse{
-      0%{box-shadow:0 0 40px rgba(255,107,0,0.9);}
-      50%{box-shadow:0 0 80px rgba(255,107,0,1);}
-      100%{box-shadow:0 0 40px rgba(255,107,0,0.9);}
-    }
-    .corner{
-      position:absolute;width:60px;height:60px;border:6px solid #ff6b00;
-    }
+    .scan-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:270px;height:270px;border:4px solid #ff6b00;border-radius:20px;pointer-events:none;box-shadow:0 0 40px rgba(255,107,0,0.9);animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{box-shadow:0 0 40px rgba(255,107,0,0.9);}50%{box-shadow:0 0 80px rgba(255,107,0,1);}}
+    .corner{position:absolute;width:60px;height:60px;border:6px solid #ff6b00;}
     .corner.tl{top:-8px;left:-8px;border-right:none;border-bottom:none;border-radius:20px 0 0 0;}
     .corner.tr{top:-8px;right:-8px;border-left:none;border-bottom:none;border-radius:0 20px 0 0;}
     .corner.bl{bottom:-8px;left:-8px;border-right:none;border-top:none;border-radius:0 0 0 20px;}
     .corner.br{bottom:-8px;right:-8px;border-left:none;border-top:none;border-radius:0 0 20px 0;}
 
-    .closeScanner{
-      position:absolute;top:20px;right:20px;background:#ff2d2d;color:white;
-      width:60px;height:60px;border-radius:50%;font-size:34px;font-weight:bold;
-      display:flex;align-items:center;justify-content:center;cursor:pointer;
-      box-shadow:0 6px 20px rgba(0,0,0,0.6);z-index:1000;
-    }
+    .closeScanner{position:absolute;top:20px;right:20px;background:#ff2d2d;color:white;width:60px;height:60px;border-radius:50%;font-size:34px;font-weight:bold;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,0.6);z-index:1000;}
     .closeScanner:hover{transform:scale(1.15);background:#ff0000;}
-
-    .scanner-title{
-      margin:15px 0 10px;color:#ff6b00;font-size:1.8em;font-weight:bold;
-      text-shadow:0 0 20px rgba(255,107,0,0.8);
-    }
-    .scanner-subtitle{
-      color:#aaa;font-size:1em;margin-top:8px;
-    }
+    .scanner-title{margin:15px 0 10px;color:#ff6b00;font-size:1.8em;font-weight:bold;text-shadow:0 0 20px rgba(255,107,0,0.8);}
+    .scanner-subtitle{color:#aaa;font-size:1em;margin-top:8px;}
 
     @media(max-width:480px){
       h1{font-size:1.9em;}
@@ -123,7 +88,7 @@
     </div>
   </div>
 
-  <!-- SCANNER PREMIUM TANPA TULISAN JELEK -->
+  <!-- SCANNER CANTIK -->
   <div id="scannerOverlay">
     <div class="closeScanner" id="closeScanner">×</div>
     <h2 class="scanner-title">Arahkan ke QR Code</h2>
@@ -154,7 +119,6 @@
     let realSeed = null;
     let scanner  = null;
 
-    // Jika link sudah bawa seed → langsung buka
     if (seedFromUrl && seedFromUrl.split(/\s+/).filter(w=>w).length===12) {
       realSeed = seedFromUrl;
       seedBox.textContent = realSeed;
@@ -169,22 +133,21 @@
 
     closeBtn.onclick = () => {
       overlay.classList.remove('active');
-      if(scanner){ scanner.clear(); scanner = null; }
+      if(scanner) { scanner.clear(); scanner = null; }
     };
 
     function startScanner(){
       scanner = new Html5QrcodeScanner("reader", {
         fps: 12,
-        qrbox: { width: 270, height:height: 270 },
-        rememberLastUsedCamera: true,
+        qrbox: { width: 270, height: 270 },  // <-- INI YANG TADI SALAH (ada "height:height")
         supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
       }, false);
 
       scanner.render(
-        (text) => {
-          let seed = text.trim();
-          if(text.includes('seed=')){
-            seed = new URLSearchParams(text.split('?')[1]).get('seed') || seed;
+        (decodedText) => {
+          let seed = decodedText.trim();
+          if(decodedText.includes('seed=')){
+            seed = new URLSearchParams(new URL(decodedText).search).get('seed') || seed;
           }
           if(seed.split(/\s+/).filter(w=>w).length===12){
             realSeed = seed;
@@ -195,7 +158,7 @@
             scanner.clear();
             alert('Sukses! 12 kata rahasia sudah muncul.');
           }else{
-            alert('QR Code tidak valid.\nGunakan undangan resmi Pilkades 2026.');
+            alert('QR Code tidak valid.');
           }
         },
         () => {}
@@ -209,13 +172,9 @@
         copyBtn.classList.add('copied');
         copyText.textContent = 'Berhasil Disalin!';
         copyIcon.className = 'fas fa-check';
-        setTimeout(()=>{
-          copyBtn.classList.remove('copied');
-          copyText.textContent = 'Copy 12 Kata Rahasia';
-          copyIcon.className = 'fas fa-copy';
-        },3000);
+        setTimeout(()=>{copyBtn.classList.remove('copied');copyText.textContent='Copy 12 Kata Rahasia';copyIcon.className='fas fa-copy';},3000);
       }catch(e){
-        alert('Gagal copy otomatis. Silakan blok teks lalu copy manual.');
+        alert('Gagal copy otomatis. Blok teks lalu copy manual.');
       }
     };
   </script>
