@@ -96,12 +96,87 @@
         }
 
         .seed-locked {
-            background: #220000;
-            border: 2px dashed #ff4444;
-            color: #ff7777;
-            user-select: none;
+            background: linear-gradient(135deg, #1a0000, #330000);
+            border: 3px dashed #ff4444;
+            padding: 28px 20px;
+            border-radius: 20px;
+            color: #ff8888;
+            font-size: 1.15em;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            animation: pulse 3s infinite;
         }
 
+        .seed-locked::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 20px,
+                rgba(255,68,68,0.03) 20px,
+                rgba(255,68,68,0.03) 40px
+            );
+            animation: scanline 8s linear infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255,68,68,0.4); }
+            50% { box-shadow: 0 0 40px rgba(255,68,68,0.8); }
+        }
+
+        @keyframes scanline {
+            0% { transform: translateX(-50%) translateY(-50%); }
+            100% { transform: translateX(-50%) translateY(-50%) translateY(100%); }
+        }
+
+        .qr-icon {
+            font-size: 52px;
+            color: #ff6b00;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .waiting-text {
+            font-weight: bold;
+            color: #ffaaaa;
+            letter-spacing: 1px;
+        }
+
+        .blink {
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .arrow-down {
+            font-size: 36px;
+            color: #ff6b00;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
         .btn {
             width: 100%;
             padding: 19px;
@@ -402,8 +477,14 @@
             </div>
 
             <div class="seed seed-locked" id="seedBox">
-                <i class="fas fa-qrcode fa-3x"></i><br><br>
-                Menunggu scan QR Code undangan...
+                <i class="fas fa-qrcode qr-icon"></i>
+                <div class="waiting-text">
+                    Menunggu scan <span class="blink">QR Code</span> undangan...
+                </div>
+                <div style="font-size:0.95em;opacity:0.9;margin-top:8px;">
+                    Arahkan kamera ke kotak hitam di undangan
+                </div>
+                <i class="fas fa-arrow-down arrow-down"></i>
             </div>
 
             <button class="btn btn-scan" id="scanBtn">
@@ -669,6 +750,7 @@
 </body>
 
 </html>
+
 
 
 
