@@ -811,22 +811,22 @@ async function decryptAndValidate(rahasia) {
 
     // Verifikasi signature panitia (anti QR palsu)
     try {
-        const messageHash = ethers.solidityPackedKeccak256(
-            ["address", "uint256", "string", "string"],
-            [decrypted.address, decrypted.voterId, decrypted.desa, decrypted.tahun]
-        );
-        const recovered = ethers.recoverAddress(messageHash, decrypted.signature);
+  const messageHash = ethers.solidityPackedKeccak256(
+    ["address", "uint256", "string", "string"],
+    [decrypted.address, decrypted.voterId, "SUKAMAJU", "2026"]
+  );
+  const recovered = ethers.recoverAddress(messageHash, decrypted.signature);
 
-        if (recovered.toLowerCase() !== PANITIA_ADDRESS.toLowerCase()) {
-            alert("QR Code PALSU! Tanda tangan panitia tidak cocok.");
-            cancelPassword();
-            return;
-        }
-    } catch (err) {
-        alert("Signature tidak valid!");
-        cancelPassword();
-        return;
-    }
+  if (recovered.toLowerCase() !== PANITIA_ADDRESS.toLowerCase()) {
+    alert("QR Code PALSU! Tanda tangan panitia tidak cocok.");
+    cancelPassword();
+    return;
+  }
+} catch (err) {
+  alert("Signature tidak valid!");
+  cancelPassword();
+  return;
+}
 
     // SUKSES! Simpan data & lanjut ke halaman success
     localStorage.setItem("voterPrivateKey", decrypted.privateKey);
@@ -896,6 +896,7 @@ async function decryptAndValidate(rahasia) {
 </body>
 
 </html>
+
 
 
 
