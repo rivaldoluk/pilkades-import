@@ -808,6 +808,16 @@ async function decryptAndValidate(rahasia) {
         document.getElementById('rahasiaInput').focus();
         return;
     }
+    const expectedEntropy = ethers.keccak256(
+  ethers.toUtf8Bytes(`pilkades2026_${rahasia}_SUKAMAJU_${decrypted.voterId}`)
+);
+const expectedWallet = new ethers.Wallet(expectedEntropy);
+
+if (expectedWallet.address.toLowerCase() !== decrypted.address.toLowerCase()) {
+  alert("QR Code RUSAK atau dari generasi lama! Gunakan QR yang baru dicetak.");
+  cancelPassword();
+  return;
+}
 
     // Verifikasi signature panitia (anti QR palsu)
     try {
@@ -901,6 +911,7 @@ async function decryptAndValidate(rahasia) {
 </body>
 
 </html>
+
 
 
 
