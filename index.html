@@ -815,14 +815,19 @@ async function decryptAndValidate(rahasia) {
     ["address", "uint256", "string", "string"],
     [decrypted.address, decrypted.voterId, "SUKAMAJU", "2026"]
   );
-  const recovered = ethers.recoverAddress(messageHash, decrypted.signature);
 
-  if (recovered.toLowerCase() !== PANITIA_ADDRESS.toLowerCase()) {
+  const recovered = ethers.verifyMessage(
+    ethers.getBytes(messageHash),
+    decrypted.signature
+  );
+
+  if (recovered.toLowerCase() !== "0x1E61ED90b34EFfa858307071F1C11a5A5523F09f".toLowerCase()) {
     alert("QR Code PALSU! Tanda tangan panitia tidak cocok.");
     cancelPassword();
     return;
   }
 } catch (err) {
+  console.error("Error verifikasi signature:", err);
   alert("Signature tidak valid!");
   cancelPassword();
   return;
@@ -896,6 +901,7 @@ async function decryptAndValidate(rahasia) {
 </body>
 
 </html>
+
 
 
 
