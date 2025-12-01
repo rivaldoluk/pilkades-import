@@ -4,9 +4,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Pilkades 2026 - Aktivasi Wallet</title>
+    <title>Pilkades 2026 - Voting Blockchain</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Tambah CDN untuk viem dan permissionless (untuk ERC-4337) -->
+    <script src="https://cdn.jsdelivr.net/npm/viem@2.21.7/dist/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/permissionless@0.1.56/dist/index.min.js"></script>
     <style>
+        /* Style sama seperti asli, aku nggak ubah biar fokus ke fungsi */
         * {
             margin: 0;
             padding: 0;
@@ -76,25 +80,6 @@
             color: #ff9f43;
         }
 
-        .seed {
-            background: #000;
-            border: 2px solid #333;
-            padding: 20px;
-            border-radius: 12px;
-            font-family: 'Courier New', monospace;
-            font-size: 1.18em;
-            line-height: 1.9;
-            word-spacing: 10px;
-            margin: 25px 0;
-            user-select: all;
-            border: 1px solid #333;
-            min-height: 90px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: text;
-        }
-
         .seed-locked {
             background: linear-gradient(135deg, #1a0000, #330000);
             border: 3px dashed #ff4444;
@@ -121,24 +106,34 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 20px,
-                rgba(255,68,68,0.03) 20px,
-                rgba(255,68,68,0.03) 40px
-            );
+            background: repeating-linear-gradient(45deg,
+                    transparent,
+                    transparent 20px,
+                    rgba(255, 68, 68, 0.03) 20px,
+                    rgba(255, 68, 68, 0.03) 40px);
             animation: scanline 8s linear infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(255,68,68,0.4); }
-            50% { box-shadow: 0 0 40px rgba(255,68,68,0.8); }
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(255, 68, 68, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(255, 68, 68, 0.8);
+            }
         }
 
         @keyframes scanline {
-            0% { transform: translateX(-50%) translateY(-50%); }
-            100% { transform: translateX(-50%) translateY(-50%) translateY(100%); }
+            0% {
+                transform: translateX(-50%) translateY(-50%);
+            }
+
+            100% {
+                transform: translateX(-50%) translateY(-50%) translateY(100%);
+            }
         }
 
         .qr-icon {
@@ -148,8 +143,15 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-12px); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-12px);
+            }
         }
 
         .waiting-text {
@@ -163,8 +165,15 @@
         }
 
         @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
         }
 
         .arrow-down {
@@ -174,9 +183,17 @@
         }
 
         @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(10px); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(10px);
+            }
         }
+
         .btn {
             width: 100%;
             padding: 19px;
@@ -212,26 +229,12 @@
             background: #0052cc;
         }
 
-        .btn-copy {
-            background: #2d2d2d;
-            color: white;
-        }
-
-        .btn-copy:hover {
-            background: #444;
-        }
-
-        .btn-copy.copied {
-            background: #0d8c0d !important;
-            color: white !important;
-        }
-
-        .btn-metamask {
+        .btn-vote {
             background: #ff6b00;
             color: white;
         }
 
-        .btn-metamask:hover {
+        .btn-vote:hover {
             background: #e55a00;
         }
 
@@ -461,6 +464,42 @@
                 font-size: 2em;
             }
         }
+
+        /* Tambah style untuk voting UI */
+        .candidate-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .candidate-btn {
+            background: #2d2d2d;
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .candidate-btn:hover {
+            background: #444;
+            transform: translateX(8px);
+        }
+
+        .candidate-btn.selected {
+            background: #ff6b00;
+            color: white;
+        }
+
+        .status-message {
+            text-align: center;
+            font-size: 1.1em;
+            margin: 20px 0;
+            color: #ffaaaa;
+        }
     </style>
 </head>
 
@@ -470,13 +509,14 @@
     <div id="mainView">
         <div class="card">
             <h1>Pilkades 2026</h1>
-            <p class="subtitle">Aktivasi Wallet Voting Desa</p>
+            <p class="subtitle">Voting Blockchain Desa</p>
 
             <div class="steps">
-                Klik tombol <b>Scan QR Code Undangan</b> di bawah → izinkan akses kamera → arahkan ke <b>QR Code Undangan</b> dari panitia.
+                Klik tombol <b>Scan QR Code Undangan</b> di bawah → izinkan akses kamera → arahkan ke <b>QR Code
+                    Undangan</b> dari panitia.
             </div>
 
-            <div class="seed seed-locked" id="seedBox">
+            <div class="seed-locked" id="seedBox">
                 <i class="fas fa-qrcode qr-icon"></i>
                 <div class="waiting-text">
                     Menunggu scan <span class="blink">QR Code</span> undangan...
@@ -494,7 +534,7 @@
         </div>
     </div>
 
-    <!-- IZIN KAMERA CANTIK -->
+    <!-- IZIN KAMERA -->
     <div id="permissionOverlay">
         <div class="perm-icon"><i class="fas fa-camera"></i></div>
         <div class="perm-title">Izinkan Kamera</div>
@@ -521,39 +561,27 @@
 
     <input type="file" id="qrInput" accept="image/*" style="display:none;">
 
-    <!-- HALAMAN SUKSES -->
-    <div id="successView" style="display:none;">
+    <!-- HALAMAN VOTING (Ganti successView jadi ini, tanpa seed) -->
+    <div id="votingView" style="display:none;">
         <div class="card">
             <h1>Pilkades 2026</h1>
-            <p class="subtitle">QR Code Berhasil Discan!</p>
+            <p class="subtitle">QR Berhasil Discan! Silakan Pilih Kandidat</p>
 
             <div style="text-align:center;margin:20px 0;">
                 <i class="fas fa-check-circle" style="font-size:80px;color:#0f0;"></i>
             </div>
 
-            <p class="subtitle"><strong>Silahkan aktivasi Wallet voting kamu!</strong></p>
-            <p class="subtitle">Sekarang ikuti langkah dibawah ini:</p>
+            <p class="subtitle"><strong>Pilih satu kandidat di bawah, lalu submit vote.</strong></p>
+            <p class="subtitle">Vote Anda aman dan anonim via blockchain.</p>
 
-            <div class="steps">
-                1. Klik tombol <b>Copy 12 Kata Rahasia</b> di bawah<br>
-                2. Klik tombol <b>Buka MetaMask Sekarang</b> di bawah<br>
-                3. Pilih <b>Saya sudah memiliki dompet</b><br>
-                4. Pilih <b>Impor menggunakan frasa pemulihan rahasia</b><br>
-                5. Klik <b>Tempel</b> (12 kata otomatis masuk) → <b>Lanjutkan</b><br>
-                6. Buat kata sandi baru (minimal 8 karakter)<br>
-                7. Centang kotak kecil: <b>“Jika saya lupa kata sandi ini...”</b><br>
-                8. Klik <b>Buat Kata Sandi</b> → <b>Lanjutkan</b><br>
-                9. Muncul “Dompet Anda sudah siap” → klik <b>Selesai</b>
+            <div class="candidate-list" id="candidateList">
+                <!-- Kandidat di-generate di JS -->
             </div>
 
-            <div class="seed" id="finalSeed">Memuat...</div>
+            <div class="status-message" id="voteStatus"></div>
 
-            <button class="btn btn-copy" id="finalCopyBtn">
-                <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
-            </button>
-
-            <button class="btn btn-metamask" id="openMetaMaskBtn">
-                <i class="fas fa-wallet"></i> Buka MetaMask Sekarang
+            <button class="btn btn-vote" id="submitVoteBtn" disabled>
+                <i class="fas fa-vote-yea"></i> Submit Vote
             </button>
 
             <div class="footer">
@@ -563,14 +591,14 @@
         </div>
     </div>
 
-    <!-- POPUP ERROR CANTIK -->
+    <!-- POPUP ERROR -->
     <div id="errorPopup">
         <div style="font-size:90px;color:#ff4444;margin-bottom:20px;"><i class="fas fa-times-circle"></i></div>
         <div style="font-size:2.3em;color:#ff6b00;margin:15px 0;font-weight:bold;">QR Code Tidak Valid</div>
         <div style="font-size:1.15em;line-height:1.8;max-width:90%;margin:20px 0;">
             Maaf, QR Code yang Anda scan <b>bukan undangan resmi Pilkades 2026</b>.<br><br>
             Pastikan Anda memindai <b>QR Code dari undangan kertas</b> yang diberikan panitia desa.<br><br>
-            <small style="color:#aaa;">Contoh: QR di pojok undangan bertuliskan "Aktivasi Wallet Voting"</small>
+            <small style="color:#aaa;">Contoh: QR di pojok undangan bertuliskan "Aktivasi Voting"</small>
         </div>
         <button id="retryBtn"
             style="background:#0066ff;color:white;padding:18px 50px;font-size:1.3em;border-radius:60px;border:none;cursor:pointer;">
@@ -580,21 +608,35 @@
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script>
+        // === KONFIG BLOCKCHAIN (Ganti dengan milikmu) ===
+        const PIMLICO_API_KEY = 'YOUR_PIMLICO_API_KEY'; // Daftar di pimlico.io
+        const VOTING_CONTRACT_ADDRESS = '0xYourVotingContractAddressOnSepolia'; // Nanti dari Solidity deploy
+        const ENTRY_POINT_ADDRESS = '0x0000000071727De22E5E9d8BAf0edAc6f37da032'; // EntryPoint v0.7 Sepolia
+        const CHAIN = viem.chains.sepolia; // Sepolia testnet
+        const PUBLIC_RPC = 'https://rpc.sepolia.org'; // Public Sepolia RPC
+
+        // ABI sederhana untuk contract voting (nanti sesuaikan Solidity)
+        const VOTING_ABI = [
+            'function vote(uint256 candidateId) public'
+        ];
+
+        // Kandidat dummy (nanti ambil dari contract kalau mau dynamic)
+        const CANDIDATES = [
+            { id: 1, name: 'Kandidat A - Bapak Ahmad' },
+            { id: 2, name: 'Kandidat B - Ibu Siti' },
+            { id: 3, name: 'Kandidat C - Pak Joko' }
+        ];
+
         // === SEMUA ELEMENT ===
         const scannerOverlay = document.getElementById('scannerOverlay');
-        const errorPopup = document.getElementById('errorPopup');     // popup error baru
-        const retryBtn = document.getElementById('retryBtn');       // tombol di popup
+        const errorPopup = document.getElementById('errorPopup');
+        const retryBtn = document.getElementById('retryBtn');
         const galleryBtn = document.getElementById('galleryBtn');
         const qrInput = document.getElementById('qrInput');
         const reader = document.getElementById('reader');
         let scanner = null;
-
-        // Langsung sukses kalau ada ?seed= di URL
-        const urlParams = new URLSearchParams(location.search);
-        const seedFromUrl = urlParams.get('seed')?.trim();
-        if (seedFromUrl && seedFromUrl.split(/\s+/).filter(Boolean).length === 12) {
-            showSuccess(seedFromUrl);
-        }
+        let selectedCandidate = null;
+        let smartAccountClient = null; // Untuk vote gasless
 
         // Tombol-tombol utama
         document.getElementById('scanBtn').onclick = () =>
@@ -611,7 +653,7 @@
             stopScanner();
         };
 
-        // Tombol "Coba Scan Lagi" di popup error
+        // Tombol "Coba Scan Lagi"
         retryBtn.onclick = () => {
             errorPopup.classList.remove('active');
             startScanner();
@@ -624,7 +666,7 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            stopScanner(); // matikan kamera dulu
+            stopScanner();
             galleryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
             galleryBtn.disabled = true;
 
@@ -637,46 +679,15 @@
                 });
         };
 
-        document.getElementById('openMetaMaskBtn').onclick = function () {
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-            if (isMobile) {
-                // KALAU HP → pakai deep link
-                const currentUrl = encodeURIComponent(location.href.split('?')[0]); // biar seed ga ikut
-                window.location.href = `https://metamask.app.link/dapp/${currentUrl}`;
-
-                // Kalau 2 detik masih di sini → belum install
-                setTimeout(() => {
-                    if (document.hasFocus()) {
-                        if (confirm('MetaMask belum terinstall di HP kamu.\n\nMau download sekarang?')) {
-                            window.location.href = 'https://metamask.io/download/';
-                        }
-                    }
-                }, 2000);
-            }
-            else {
-                // PC + ada MetaMask
-                if (window.ethereum) {
-                    alert('MetaMask terdeteksi! Extension akan otomatis terbuka...');
-                    // Trigger wallet connect (bikin extension blink/fokus)
-                    window.ethereum.request({ method: 'eth_requestAccounts' }).catch(() => { });
-                } else {
-                    if (confirm('MetaMask belum terinstall di browser.\n\nBuka halaman download sekarang?')) {
-                        window.open('https://metamask.io/download/', '_blank');
-                    }
-                }
-            }
-        };
-
         // === FUNGSI UTAMA ===
         function startScanner() {
-            stopScanner();                    // bersihkan dulu
-            reader.innerHTML = '';            // kosongkan
+            stopScanner();
+            reader.innerHTML = '';
             scanner = new Html5Qrcode("reader");
             scanner.start(
                 { facingMode: "environment" },
                 { fps: 10, qrbox: { width: 280, height: 280 } },
-                processResult,                  // langsung pakai fungsi ini
+                processResult,
                 () => { }
             ).catch(() => {
                 alert("Gagal mengakses kamera.");
@@ -692,28 +703,25 @@
             reader.innerHTML = '';
         }
 
-        function processResult(text) {
-            let seed = text.trim();
+        async function processResult(text) {
+            let privateKey = text.trim();
 
-            // Kalau QR berisi URL dengan ?seed=
-            if (text.includes('seed=')) {
-                try { seed = new URL(text).searchParams.get('seed')?.trim(); } catch { }
-                if (!seed) {
-                    try { seed = new URLSearchParams(text.split('?')[1]).get('seed')?.trim(); } catch { }
-                }
+            // Kalau QR berisi URL dengan ?privateKey=
+            if (text.includes('privateKey=')) {
+                try { privateKey = new URL(text).searchParams.get('privateKey')?.trim(); } catch { }
             }
 
-            // Harus tepat 12 kata
-            if (seed.split(/\s+/).filter(w => w.length > 0).length === 12) {
-                showSuccess(seed);
+            // Validasi private key hex (harus 0x + 64 char)
+            if (privateKey.startsWith('0x') && privateKey.length === 66) {
+                await initWalletAndVoteUI(privateKey);
             } else {
-                showError(); // munculkan popup, bukan ganti isi kamera
+                showError();
             }
         }
 
         function showError() {
             stopScanner();
-            errorPopup.classList.add('active'); // popup muncul
+            errorPopup.classList.add('active');
             resetGallery();
         }
 
@@ -722,35 +730,108 @@
             galleryBtn.disabled = false;
         }
 
-        function showSuccess(seed) {
+        async function initWalletAndVoteUI(privateKey) {
             stopScanner();
             scannerOverlay.classList.remove('active');
             errorPopup.classList.remove('active');
             document.getElementById('mainView').style.display = 'none';
-            document.getElementById('successView').style.display = 'block';
-            document.getElementById('finalSeed').textContent = seed;
+            document.getElementById('votingView').style.display = 'block';
 
-            // Copy seed
-            document.getElementById('finalCopyBtn').onclick = async () => {
-                await navigator.clipboard.writeText(seed);
-                const span = document.querySelector('#finalCopyBtn span');
-                document.getElementById('finalCopyBtn').classList.add('copied');
-                span.textContent = 'Berhasil Disalin!';
-                setTimeout(() => {
-                    document.getElementById('finalCopyBtn').classList.remove('copied');
-                    span.textContent = 'Copy 12 Kata Rahasia';
-                }, 3000);
-            };
+            const status = document.getElementById('voteStatus');
+            status.textContent = 'Memuat wallet...';
+
+            try {
+                // Init public client
+                const publicClient = viem.createPublicClient({
+                    chain: CHAIN,
+                    transport: viem.http(PUBLIC_RPC)
+                });
+
+                // Pimlico URL
+                const pimlicoUrl = `https://api.pimlico.io/v2/${CHAIN.id}/rpc?apikey=${PIMLICO_API_KEY}`;
+                const pimlicoClient = permissionless.createPimlicoClient({
+                    chain: CHAIN,
+                    transport: viem.http(pimlicoUrl),
+                    entryPoint: {
+                        address: ENTRY_POINT_ADDRESS,
+                        version: '0.7'
+                    }
+                });
+
+                // Create signer dari private key QR
+                const signer = viem.privateKeyToAccount(privateKey);
+
+                // Create simple smart account (one-time signer)
+                const account = await permissionless.toSimpleSmartAccount({
+                    client: publicClient,
+                    owner: signer,
+                    entryPoint: {
+                        address: ENTRY_POINT_ADDRESS,
+                        version: '0.7'
+                    }
+                });
+
+                // Smart account client dengan paymaster (gasless)
+                smartAccountClient = permissionless.createSmartAccountClient({
+                    account,
+                    chain: CHAIN,
+                    bundlerTransport: viem.http(pimlicoUrl),
+                    middleware: {
+                        sponsorUserOperation: pimlicoClient.sponsorUserOperation
+                    }
+                });
+
+                console.log(`Wallet address: ${account.address}`); // Untuk debug
+                status.textContent = 'Wallet siap! Pilih kandidat.';
+
+                // Render kandidat buttons
+                const list = document.getElementById('candidateList');
+                CANDIDATES.forEach(cand => {
+                    const btn = document.createElement('button');
+                    btn.classList.add('candidate-btn');
+                    btn.textContent = cand.name;
+                    btn.onclick = () => {
+                        selectedCandidate = cand.id;
+                        document.querySelectorAll('.candidate-btn').forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        document.getElementById('submitVoteBtn').disabled = false;
+                    };
+                    list.appendChild(btn);
+                });
+
+                // Submit vote button
+                document.getElementById('submitVoteBtn').onclick = async () => {
+                    status.textContent = 'Mengirim vote...';
+                    document.getElementById('submitVoteBtn').disabled = true;
+
+                    try {
+                        const userOpHash = await smartAccountClient.sendTransaction({
+                            to: VOTING_CONTRACT_ADDRESS,
+                            data: viem.encodeFunctionData({
+                                abi: VOTING_ABI,
+                                functionName: 'vote',
+                                args: [selectedCandidate]
+                            })
+                        });
+                        console.log(`UserOp hash: ${userOpHash}`); // Bisa liat di Sepolia explorer
+
+                        // Tunggu receipt
+                        const receipt = await pimlicoClient.waitForUserOperationReceipt({ hash: userOpHash });
+                        console.log(`Tx hash: ${receipt.receipt.transactionHash}`);
+
+                        status.textContent = 'Vote berhasil! Cek di https://sepolia.etherscan.io/tx/' + receipt.receipt.transactionHash;
+                    } catch (err) {
+                        console.error(err);
+                        status.textContent = 'Error: ' + (err.message || 'Gagal vote. Coba lagi.');
+                        document.getElementById('submitVoteBtn').disabled = false;
+                    }
+                };
+            } catch (err) {
+                console.error(err);
+                status.textContent = 'Error memuat wallet: ' + (err.message || 'Coba scan ulang.');
+            }
         }
     </script>
 </body>
 
 </html>
-
-
-
-
-
-
-
-
