@@ -26,33 +26,27 @@
         .waiting-text{font-weight:bold;color:#ffaaaa;letter-spacing:1px}
         .blink{animation:blink 1.5s infinite}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
-        .success-check{font-size:80px;color:#0f0;animation:float 3s ease-in-out infinite}
+        .success-icon{font-size:80px;color:#0f0;animation:float 3s ease-in-out infinite}
         .btn{width:100%;padding:19px;font-size:1.2em;font-weight:bold;border:none;border-radius:60px;margin:12px 0;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,0.4)}
         .btn:hover{transform:translateY(-4px);box-shadow:0 15px 40px rgba(0,0,0,0.5)}
-        .btn-primary{background:#ff6b00;color:white}
-        .btn-primary:hover{background:#e55a00}
         .btn-scan{background:#0066ff;color:white}
         .btn-scan:hover{background:#0052cc}
+        .btn-primary{background:#ff6b00;color:white;font-size:1.5em;padding:24px}
+        .btn-primary:hover{background:#e55a00}
         .btn-gallery{background:#2c3e50;color:white;margin-top:16px;padding:16px;border:2px solid #34495e}
         .btn-gallery:hover{background:#34495e;border-color:#ff6b00}
         .footer{text-align:center;margin-top:40px;font-size:0.95em;opacity:0.8;line-height:1.6}
-
-        #permissionOverlay,#scannerOverlay,#errorPopup,#loadingOverlay{
-            position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);
-            display:none;align-items:center;justify-content:center;flex-direction:column;
-            z-index:99999;padding:20px;text-align:center
-        }
+        #permissionOverlay,#scannerOverlay,#errorPopup,#loadingOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:99999;padding:20px;text-align:center}
         .active{display:flex !important}
         #reader{width:96%;max-width:420px;height:580px;border-radius:30px;overflow:hidden;border:9px solid #ff6b00;box-shadow:0 0 90px rgba(255,107,0,0.9)}
         .closeScanner{position:absolute;top:16px;right:16px;background:rgba(255,0,68,0.9);color:white;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;z-index:1000}
         .closeScanner:hover{background:#ff0044;transform:scale(1.1)}
         .perm-icon{font-size:100px;color:#ff6b00;margin-bottom:24px;animation:glow 2s infinite}
         @keyframes glow{0%,100%{text-shadow:0 0 20px #ff6b00}50%{text-shadow:0 0 40px #ff6b00,0 0 60px #ff4500}}
-        .perm-title{font-size:2.3em;font-weight:bold;color:#ff6b00;margin:10px 0}
-        .perm-text{font-size:1.15em;line-height:1.7;max-width:90%;margin:20px 0}
-        .perm-btn{background:#ff6b00;color:white;padding:20px 70px;font-size:1.3em;border-radius:60px;border:none;font-weight:bold;box-shadow:0 12px 40px rgba(255,107,0,0.5)}
+        .perm-title{font-size:2.3em;font-weight:bold;color:#ff6b00}
+        .perm-text{font-size:1.15em;line-height:1.7;max-width:90%}
+        .perm-btn{background:#ff6b00;color:white;padding:20px 70px;font-size:1.3em;border-radius:60px;border:none;font-weight:bold}
         .perm-btn:hover{background:#e55a00;transform:scale(1.05)}
-
         @media(max-width:480px){
             h1{font-size:2.1em}
             .card{padding:30px 20px}
@@ -72,7 +66,7 @@
             <p class="subtitle">Desa Sukamaju</p>
 
             <div class="steps">
-                Klik tombol <b>Scan QR Code Undangan</b> di bawah → izinkan akses kamera → arahkan ke <b>QR Code Undangan</b> dari panitia.
+                Klik tombol <b>Scan QR Code Undangan</b> → arahkan ke QR di undangan resmi dari panitia.
             </div>
 
             <div class="seed seed-locked">
@@ -83,7 +77,7 @@
             </div>
 
             <button class="btn btn-scan" id="scanBtn">
-                <i class="fas fa-camera"></i> Scan QR Code Undangan
+                Scan QR Code Undangan
             </button>
 
             <div class="footer">
@@ -95,7 +89,7 @@
 
     <!-- IZIN KAMERA -->
     <div id="permissionOverlay">
-        <div class="perm-icon"><i class="fas fa-camera"></i></div>
+        <div class="perm-icon">Kamera</div>
         <div class="perm-title">Izinkan Kamera</div>
         <div class="perm-text">
             Aplikasi akan memindai QR Code undangan resmi.<br>
@@ -107,12 +101,12 @@
 
     <!-- SCANNER -->
     <div id="scannerOverlay">
-        <div class="closeScanner" id="closeScanner"><i class="fas fa-times"></i></div>
+        <div class="closeScanner" id="closeScanner">X</div>
         <div id="reader"></div>
         <button class="btn btn-gallery" id="galleryBtn">
-            <i class="fas fa-images"></i> Pilih dari Galeri
+            Pilih dari Galeri
         </button>
-        <p style="margin-top:20px;color:#ff6b00;font-size:1.1em;font-weight:bold;">
+        <p style="margin-top:20px;color:#ff6b00;font-weight:bold;">
             Arahkan kamera ke QR Code di undangan
         </p>
     </div>
@@ -121,21 +115,19 @@
 
     <!-- LOADING -->
     <div id="loadingOverlay">
-        <div style="font-size:80px;color:#ff6b00"><i class="fas fa-spinner fa-spin"></i></div>
+        <div style="font-size:80px;color:#ff6b00">Spinner</div>
         <p style="font-size:1.5em;margin-top:20px">Memverifikasi undangan resmi...</p>
     </div>
 
     <!-- ERROR -->
     <div id="errorPopup">
-        <div style="font-size:90px;color:#ff4444;margin-bottom:20px;"><i class="fas fa-times-circle"></i></div>
-        <div style="font-size:2.3em;color:#ff6b00;margin:15px 0;font-weight:bold;">QR Code Tidak Valid</div>
+        <div style="font-size:90px;color:#ff4444;margin-bottom:20px;">X</div>
+        <div style="font-size:2.3em;color:#ff6b00;font-weight:bold;">QR Code Tidak Valid</div>
         <div style="font-size:1.15em;line-height:1.8;max-width:90%;margin:20px 0;">
             Maaf, QR Code yang Anda scan <b>bukan undangan resmi Pilkades 2026</b>.<br><br>
-            Pastikan Anda memindai <b>QR Code dari undangan kertas</b> yang diberikan panitia desa.
+            Pastikan Anda memindai <b>QR Code dari undangan kertas</b> yang diberikan panitia.
         </div>
-        <button id="retryBtn" class="btn btn-scan">
-            <i class="fas fa-camera"></i> Coba Scan Lagi
-        </button>
+        <button id="retryBtn" class="btn btn-scan">Coba Scan Lagi</button>
     </div>
 
     <!-- SUKSES -->
@@ -144,23 +136,23 @@
             <h1>Pilkades 2026</h1>
             <p class="subtitle">Undangan Resmi Terverifikasi!</p>
 
-            <div style="text-align:center;margin:20px 0;">
-                <i class="fas fa-check-circle success-check"></i>
+            <div style="text-align:center;margin:30px 0;">
+                <i class="fas fa-check-circle success-icon"></i>
             </div>
 
             <div class="steps" style="text-align:center">
-                <div style="font-size:1.5em;color:#ff9f43;font-weight:bold" id="voterNumber">Pemilih #---</div>
-                <div style="margin:20px 0;color:#0f0;font-weight:bold">
-                    <i class="fas fa-shield-alt"></i> Identitas Anda telah diverifikasi sebagai pemilih sah
+                <div style="font-size:1.6em;color:#ff9f43;font-weight:bold" id="voterId">Pemilih #---</div>
+                <div style="margin:25px 0;padding:20px;background:#001100;border-radius:12px;border:1px solid #0f0">
+                    <i class="fas fa-shield-alt" style="color:#0f0"></i>
+                    <b>Identitas Anda telah diverifikasi sebagai pemilih sah</b>
                 </div>
-                <div style="background:#001100;padding:16px;border-radius:12px;border:1px solid #0f0;margin:25px 0">
-                    <i class="fas fa-vote-yea" style="color:#0f0"></i>
-                    <b>Sekarang Anda dapat melakukan voting secara rahasia & aman</b>
+                <div style="color:#ff6b00;font-size:0.95em">
+                    Satu undangan hanya dapat digunakan <b>SEKALI</b> untuk voting
                 </div>
             </div>
 
-            <button class="btn btn-primary" style="font-size:1.5em;padding:24px" id="startVotingBtn">
-                <i class="fas fa-paper-plane"></i> MULAI VOTING SEKARANG
+            <button class="btn btn-primary" id="startVotingBtn">
+                MULAI VOTING SEKARANG
             </button>
 
             <div class="footer">
@@ -172,62 +164,50 @@
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script>
-        // === KONFIGURASI (SESUAI generate.js) ===
         const RAHASIA_PANITIA = "SuperRahasia2026Pilkades";
         const PANITIA_ADDRESS = "0x1E61ED90b34EFfa858307071F1C11a5A5523F09f".toLowerCase();
-
         let scanner = null;
-        window.voterData = null;
+        let voterData = null;
 
         async function processQR(rawText) {
             try {
                 document.getElementById('loadingOverlay').classList.add('active');
 
-                let url = rawText.trim();
-                if (!url.includes('data=')) throw "Bukan QR resmi";
-
-                const encrypted = new URL(url).searchParams.get('data');
-                if (!encrypted) throw "Data tidak ditemukan";
+                const url = new URL(rawText.trim());
+                const encrypted = url.searchParams.get('data');
+                if (!encrypted) throw "Bukan QR resmi";
 
                 const decrypted = CryptoJS.AES.decrypt(encrypted, RAHASIA_PANITIA).toString(CryptoJS.enc.Utf8);
-                if (!decrypted) throw "Gagal dekripsi";
-
                 const payload = JSON.parse(decrypted);
 
                 if (!payload.address || !payload.privateKey || !payload.voterId || !payload.signature) {
                     throw "Data tidak lengkap";
                 }
 
-                // Verifikasi signature panitia
                 const messageHash = ethers.solidityPackedKeccak256(
                     ["address", "uint256", "string", "string"],
                     [payload.address, payload.voterId, payload.desa || "SUKAMAJU", payload.tahun || "2026"]
                 );
-                const recovered = ethers.verifyMessage(ethers.getBytes(messageHash), payload.signature).toLowerCase();
+                const signer = ethers.verifyMessage(ethers.getBytes(messageHash), payload.signature).toLowerCase();
 
-                if (recovered !== PANITIA_ADDRESS) throw "Tanda tangan panitia tidak valid";
+                if (signer !== PANITIA_ADDRESS) throw "Tanda tangan panitia tidak valid";
 
-                // SUKSES
-                window.voterData = payload;
+                voterData = payload;
 
                 document.getElementById('loadingOverlay').classList.remove('active');
                 document.getElementById('mainView').style.display = 'none';
                 document.getElementById('successView').style.display = 'block';
-                document.getElementById('voterNumber').textContent = `Pemilih #${payload.voterId}`;
+                document.getElementById('voterId').textContent = `Pemilih #${payload.voterId}`;
 
             } catch (err) {
-                console.error("QR Error:", err);
+                console.error(err);
                 document.getElementById('loadingOverlay').classList.remove('active');
                 document.getElementById('errorPopup').classList.add('active');
             }
         }
 
-        // Jika buka langsung dari link QR
-        if (location.search.includes('data=')) {
-            processQR(location.href);
-        }
+        if (location.search.includes('data=')) processQR(location.href);
 
-        // === TOMBOL & SCANNER ===
         document.getElementById('scanBtn').onclick = () => 
             document.getElementById('permissionOverlay').classList.add('active');
 
@@ -248,31 +228,26 @@
             startScanner();
         };
 
-        // GALERI — DIPERBAIKI TOTAL!
-        document.getElementById('galleryBtn').onclick = () => {
+        document.getElementById('galleryBtn').onclick = () => 
             document.getElementById('qrInput').click();
-        };
 
         document.getElementById('qrInput').onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            // Reset tombol
             const btn = document.getElementById('galleryBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+            btn.innerHTML = 'Memproses...';
             btn.disabled = true;
 
             try {
-                const result = await Html5Qrcode.scanFileV2(file, true); // V2 lebih stabil
-                await processQR(result.text || result);
+                const result = await Html5Qrcode.scanFileV2(file, true);
+                await processQR(result.text);
             } catch (err) {
-                alert("Gagal membaca QR dari gambar. Coba lagi atau gunakan kamera.");
-                console.error(err);
+                alert("QR Code tidak terbaca. Pastikan gambar jelas dan gunakan QR resmi.");
             } finally {
-                // Pastikan tombol kembali normal
-                btn.innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
+                btn.innerHTML = 'Pilih dari Galeri';
                 btn.disabled = false;
-                e.target.value = ''; // reset input file
+                e.target.value = '';
             }
         };
 
@@ -283,32 +258,29 @@
             scanner.start(
                 { facingMode: "environment" },
                 { fps: 10, qrbox: { width: 280, height: 280 } },
-                async (decodedText) => {
+                (text) => {
                     stopScanner();
                     document.getElementById('scannerOverlay').classList.remove('active');
-                    await processQR(decodedText);
+                    processQR(text);
                 },
                 () => {}
-            ).catch(err => {
-                alert("Gagal akses kamera: " + err.message);
+            ).catch(() => {
+                alert("Gagal akses kamera");
                 document.getElementById('scannerOverlay').classList.remove('active');
             });
         }
 
         function stopScanner() {
-            if (scanner) {
-                scanner.stop().then(() => {}).catch(() => {});
-                scanner = null;
-            }
+            if (scanner) scanner.stop().catch(() => {});
+            scanner = null;
         }
 
-        // Mulai Voting
         document.getElementById('startVotingBtn').onclick = () => {
-            if (!window.voterData) return alert("Data hilang!");
+            if (!voterData) return alert("Data hilang!");
             const params = new URLSearchParams({
-                voterId: window.voterData.voterId,
-                address: window.voterData.address,
-                privateKey: window.voterData.privateKey
+                voterId: voterData.voterId,
+                address: voterData.address,
+                privateKey: voterData.privateKey
             });
             location.href = `vote.html?${params}`;
         };
