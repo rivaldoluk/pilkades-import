@@ -1,50 +1,51 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pilkades 2026 - Verifikasi Undangan</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.1/dist/ethers.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-  <style>
-    /* SEMUA STYLE KAMU SAYA PERTAHANKAN 99% - CUMA DIRAPIKAN SEDIKIT */
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Segoe UI',sans-serif;background:#000;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
-    .card{background:#111;width:100%;max-width:440px;border-radius:28px;padding:36px 28px;box-shadow:0 20px 60px rgba(255,107,0,0.25);border:1px solid rgba(255,107,0,0.15);position:relative;overflow:hidden}
-    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#ff6b00,#ff9f43)}
-    h1{font-size:2.4em;text-align:center;margin-bottom:8px;color:#ff6b00;text-shadow:0 0 20px rgba(255,107,0,0.4)}
-    .subtitle{text-align:center;font-size:1.15em;opacity:0.9;margin-bottom:24px}
-    .steps{background:rgba(255,107,0,0.08);border:1px solid rgba(255,107,0,0.2);padding:20px;border-radius:18px;line-height:1.85;margin:24px 0}
-    .btn{width:100%;padding:19px;font-size:1.2em;font-weight:bold;border:none;border-radius:60px;margin:12px 0;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,0.4)}
-    .btn:hover{transform:translateY(-4px);box-shadow:0 15px 40px rgba(0,0,0,0.5)}
-    .btn-primary{background:#ff6b00;color:white}
-    .btn-primary:hover{background:#e55a00}
-    .btn-scan{background:#0066ff;color:white}
-    .btn-scan:hover{background:#0052cc}
-    .footer{text-align:center;margin-top:40px;font-size:0.95em;opacity:0.8;line-height:1.6}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pilkades 2026 - Verifikasi Undangan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.1/dist/ethers.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',sans-serif;background:#000;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+        .card{background:#111;width:100%;max-width:440px;border-radius:28px;padding:36px 28px;box-shadow:0 20px 60px rgba(255,107,0,0.25);border:1px solid rgba(255,107,0,0.15);position:relative;overflow:hidden}
+        .card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#ff6b00,#ff9f43)}
+        h1{font-size:2.4em;text-align:center;margin-bottom:8px;color:#ff6b00;text-shadow:0 0 20px rgba(255,107,0,0.4)}
+        .subtitle{text-align:center;font-size:1.15em;opacity:0.9;margin-bottom:24px}
+        .steps{background:rgba(255,107,0,0.08);border:1px solid rgba(255,107,0,0.2);padding:20px;border-radius:18px;line-height:1.85;margin:24px 0}
+        .btn{width:100%;padding:19px;font-size:1.2em;font-weight:bold;border:none;border-radius:60px;margin:12px 0;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,0.4)}
+        .btn:hover{transform:translateY(-4px);box-shadow:0 15px 40px rgba(0,0,0,0.5)}
+        .btn-primary{background:#ff6b00;color:white}
+        .btn-primary:hover{background:#e55a00}
+        .btn-scan{background:#0066ff;color:white}
+        .btn-scan:hover{background:#0052cc}
+        .footer{text-align:center;margin-top:40px;font-size:0.95em;opacity:0.8;line-height:1.6}
 
-    .seed-locked{background:linear-gradient(135deg,#1a0000,#330000);border:3px dashed #ff4444;padding:28px 20px;border-radius:20px;color:#ff8888;font-size:1.15em;text-align:center;position:relative;overflow:hidden;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;animation:pulse 3s infinite}
-    .seed-locked::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(255,68,68,0.03) 20px,rgba(255,68,68,0.03) 40px);animation:scanline 8s linear infinite}
-    @keyframes pulse{0%,100%{box-shadow:0 0 20px rgba(255,68,68,0.4)}50%{box-shadow:0 0 40px rgba(255,68,68,0.8)}}
-    @keyframes scanline{0%{transform:translateX(-50%) translateY(-50%)}100%{transform:translateX(-50%) translateY(-50%) translateY(100%)}}
-    .qr-icon{font-size:52px;color:#ff6b00;animation:float 4s ease-in-out infinite}
-    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-    .blink{animation:blink 1.5s infinite}
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+        .seed-locked{background:linear-gradient(135deg,#1a0000,#330000);border:3px dashed #ff4444;padding:28px 20px;border-radius:20px;color:#ff8888;font-size:1.15em;text-align:center;position:relative;overflow:hidden;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;animation:pulse 3s infinite}
+        .seed-locked::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(255,68,68,0.03) 20px,rgba(255,68,68,0.03) 40px);animation:scanline 8s linear infinite}
+        @keyframes pulse{0%,100%{box-shadow:0 0 20px rgba(255,68,68,0.4)}50%{box-shadow:0 0 40px rgba(255,68,68,0.8)}}
+        @keyframes scanline{0%{transform:translateX(-50%) translateY(-50%)}100%{transform:translateX(-50%) translateY(-50%) translateY(100%)}}
+        .qr-icon{font-size:52px;color:#ff6b00;animation:float 4s ease-in-out infinite}
+        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+        .blink{animation:blink 1.5s infinite}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+        .success-check{font-size:80px;color:#0f0;animation:float 3s ease-in-out infinite}
 
-    #permissionOverlay,#scannerOverlay,#errorPopup,#loadingOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.98);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:99999;padding:20px;text-align:center}
-    .active{display:flex}
-    #reader{width:96%;max-width:420px;height:580px;border:9px solid #ff6b00;border-radius:30px;overflow:hidden;box-shadow:0 0 90px rgba(255,107,0,0.9)}
-    .closeScanner{position:absolute;top:16px;right:16px;background:rgba(255,0,68,0.9);color:white;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer}
-    .closeScanner:hover{background:#ff0044;transform:scale(1.1)}
-    .success-check{font-size:80px;color:#0f0;animation:float 3s ease-in-out infinite}
+        #permissionOverlay,#scannerOverlay,#errorPopup,#loadingOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;display:none;align-items:center;justify-content:center;flex-direction:column;z-index:99999;padding:20px;text-align:center}
+        .active{display:flex}
+        #reader{width:96%;max-width:420px;height:580px;border:9px solid #ff6b00;border-radius:30px;overflow:hidden;box-shadow:0 0 90px rgba(255,107,0,0.9)}
+        .closeScanner{position:absolute;top:16px;right:16px;background:rgba(255,0,68,0.9);color:white;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;z-index:1000}
+        .closeScanner:hover{background:#ff0044;transform:scale(1.1)}
 
-    @media(max-width:480px){
-      h1{font-size:2.1em}.card{padding:30px 20px}#reader{height:500px}
-    }
-  </style>
+        @media(max-width:480px){
+          h1{font-size:2.1em}.card{padding:30px 20px}#reader{height:500px}
+        }
+    </style>
 </head>
+
 <body>
 
   <!-- HALAMAN AWAL -->
@@ -74,7 +75,7 @@
     <div style="font-size:100px;color:#ff6b00"><i class="fas fa-camera"></i></div>
     <h2 style="color:#ff6b00;font-size:2.3em;margin:20px 0">Izinkan Kamera</h2>
     <p style="line-height:1.8;max-width:90%">Kamera hanya digunakan untuk memindai QR Code undangan resmi.<br><b>Tidak ada data yang direkam.</b></p>
-    <button class="perm-btn btn-primary" id="allowBtn">Izinkan Akses Kamera</button>
+    <button class="btn btn-primary" id="allowBtn">Izinkan Akses Kamera</button>
   </div>
 
   <!-- SCANNER -->
@@ -103,7 +104,7 @@
     </button>
   </div>
 
-  <!-- HALAMAN SUKSES + MULAI VOTING -->
+  <!-- HALAMAN SUKSES -->
   <div id="successView" style="display:none">
     <div class="card">
       <h1>Pilkades 2026</h1>
@@ -140,14 +141,12 @@
 
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
-    // === KONFIGURASI (SESUAI generate.js kamu) ===
+    // === KONFIGURASI (SESUAI generate.js) ===
     const RAHASIA_PANITIA = "SuperRahasia2026Pilkades";
-    const PANITIA_PRIVATE_KEY = "0xce136693696197f531df8766ac2f2cd4e3587fb8db3091e19ce04f3920edc22a";
-    const panitiaWallet = new ethers.Wallet(PANITIA_PRIVATE_KEY);
-    const PANITIA_ADDRESS = panitiaWallet.address.toLowerCase();
+    const PANITIA_ADDRESS = "0x1E61ED90b34EFfa858307071F1C11a5A5523F09f".toLowerCase(); // Dari generate.js
 
     let scanner = null;
-    window.currentVoter = null;
+    window.voterData = null;
 
     // Cek sudah vote belum
     function hasVoted() {
@@ -157,67 +156,70 @@
     // Proses QR Code
     async function processQR(url) {
       try {
-        $('#loadingOverlay').classList.add('active');
+        document.getElementById('loadingOverlay').classList.add('active');
 
         const encrypted = new URL(url).searchParams.get('data');
-        if (!encrypted) throw "Tidak ada data terenkripsi";
+        if (!encrypted) throw "Tidak ada data";
 
         const decrypted = CryptoJS.AES.decrypt(encrypted, RAHASIA_PANITIA).toString(CryptoJS.enc.Utf8);
         const payload = JSON.parse(decrypted);
 
         // Validasi payload
-        if (!payload.address || !payload.voterId || !payload.signature || payload.desa !== "SUKAMAJU" || payload.tahun !== "2026") {
-          throw "Data undangan tidak lengkap";
+        if (!payload.address || !payload.privateKey || !payload.voterId || !payload.signature) {
+          throw "Data tidak lengkap";
         }
 
         // Verifikasi signature panitia
-        const message = `${payload.address}${payload.voterId}${payload.desa}${payload.tahun}`;
-        const recovered = ethers.verifyMessage(ethers.toUtf8Bytes(message), payload.signature).toLowerCase();
-
-        if (recovered !== PANITIA_ADDRESS) throw "Tanda tangan panitia tidak valid";
+        const message = `${payload.address}${payload.voterId}${payload.desa || 'SUKAMAJU'}${payload.tahun || '2026'}`;
+        const recovered = ethers.verifyMessage(message, payload.signature).toLowerCase();
+        if (recovered !== PANITIA_ADDRESS) throw "Tanda tangan tidak valid";
 
         // Cek double voting
         if (hasVoted()) {
           alert("Undangan ini sudah pernah digunakan untuk voting!");
-          $('#loadingOverlay').classList.remove('active');
+          document.getElementById('loadingOverlay').classList.remove('active');
           return;
         }
 
-        // SUKSES TOTAL!
-        window.currentVoter = payload;
+        // SUKSES!
+        window.voterData = payload;
         localStorage.setItem('pilkades2026_voted', 'true');
 
-        $('#loadingOverlay').classList.remove('active');
-        $('#mainView').style.display = 'none';
-        $('#successView').style.display = 'block';
-        $('#voterNumber').textContent = `Pemilih #${payload.voterId}`;
+        document.getElementById('loadingOverlay').classList.remove('active');
+        document.getElementById('mainView').style.display = 'none';
+        document.getElementById('successView').style.display = 'block';
+        document.getElementById('voterNumber').textContent = `Pemilih #${payload.voterId}`;
 
       } catch (err) {
         console.error(err);
-        $('#loadingOverlay').classList.remove('active');
-        $('#errorPopup').classList.add('active');
+        document.getElementById('loadingOverlay').classList.remove('active');
+        document.getElementById('errorPopup').classList.add('active');
       }
     }
 
-    // Shortcut: kalau langsung buka link dari QR
+    // Kalau langsung buka dari QR
     if (location.search.includes('data=')) {
       processQR(location.href);
     }
 
-    // Scanner logic
-    $('#scanBtn').onclick = () => $('#permissionOverlay').classList.add('active');
-    $('#allowBtn').onclick = () => {
-      $('#permissionOverlay').classList.remove('active');
-      $('#scannerOverlay').classList.add('active');
+    // Scanner
+    document.getElementById('scanBtn').onclick = () => 
+      document.getElementById('permissionOverlay').classList.add('active');
+
+    document.getElementById('allowBtn').onclick = () => {
+      document.getElementById('permissionOverlay').classList.remove('active');
+      document.getElementById('scannerOverlay').classList.add('active');
       startScanner();
     };
-    $('#closeScanner').onclick = () => {
-      $('#scannerOverlay').classList.remove('active');
+
+    document.getElementById('closeScanner').onclick = () => {
+      document.getElementById('scannerOverlay').classList.remove('active');
       stopScanner();
     };
-    $('#retryBtn').onclick = () => {
-      $('#errorPopup').classList.remove('active');
-      $('#scannerOverlay').classList.add('active');
+
+    document.getElementById('retryBtn').onclick = () => {
+      document.getElementById('errorPopup').classList.remove('active');
+      document.getElementById('scannerOverlay').classList.add('active');
       startScanner();
     };
 
@@ -229,7 +231,7 @@
         { fps: 10, qrbox: { width: 280, height: 280 } },
         (text) => {
           stopScanner();
-          $('#scannerOverlay').classList.remove('active');
+          document.getElementById('scannerOverlay').classList.remove('active');
           processQR(text);
         },
         () => {}
@@ -241,15 +243,14 @@
       scanner = null;
     }
 
-    // Tombol mulai voting
-    $('#startVotingBtn').onclick = () => {
-      if (!window.currentVoter) return alert("Data pemilih hilang!");
+    // Tombol Mulai Voting
+    document.getElementById('startVotingBtn').onclick = () => {
+      if (!window.voterData) return alert("Data hilang!");
 
-      // LANGSUNG KE HALAMAN VOTING + BAWA PRIVATE KEY
       const params = new URLSearchParams({
-        voterId: window.currentVoter.voterId,
-        address: window.currentVoter.address,
-        privateKey: window.currentVoter.privateKey
+        voterId: window.voterData.voterId,
+        address: window.voterData.address,
+        privateKey: window.voterData.privateKey
       });
       location.href = `vote.html?${params}`;
     };
