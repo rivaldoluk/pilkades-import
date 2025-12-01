@@ -75,7 +75,7 @@
                 Klik tombol <b>Scan QR Code Undangan</b> di bawah → izinkan akses kamera → arahkan ke <b>QR Code Undangan</b> dari panitia.
             </div>
 
-            <div class="seed seed-locked" id="seedBox">
+            <div class="seed seed-locked">
                 <i class="fas fa-qrcode qr-icon"></i>
                 <div class="waiting-text">
                     Menunggu scan <span class="blink">QR Code</span> undangan...
@@ -138,7 +138,7 @@
         </button>
     </div>
 
-    <!-- HALAMAN SUKSES -->
+    <!-- SUKSES -->
     <div id="successView" style="display:none;">
         <div class="card">
             <h1>Pilkades 2026</h1>
@@ -172,25 +172,26 @@
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script>
-        // === KONFIGURASI ===
+        // === KONFIGURASI (SESUAI generate.js) ===
         const RAHASIA_PANITIA = "SuperRahasia2026Pilkades";
         const PANITIA_ADDRESS = "0x1E61ED90b34EFfa858307071F1C11a5A5523F09f".toLowerCase();
 
         let scanner = null;
         window.voterData = null;
 
-        // PERBAIKAN: JANGAN SET 'voted' di sini! Hanya simpan data aja
         async function processQR(rawText) {
             try {
                 document.getElementById('loadingOverlay').classList.add('active');
 
                 let url = rawText.trim();
-                if (!url.includes('data=')) throw "Bukan QR undangan resmi";
+                if (!url.includes('data=')) throw "Bukan QR resmi";
 
                 const encrypted = new URL(url).searchParams.get('data');
                 if (!encrypted) throw "Data tidak ditemukan";
 
                 const decrypted = CryptoJS.AES.decrypt(encrypted, RAHASIA_PANITIA).toString(CryptoJS.enc.Utf8);
+                if (!decrypted) throw "Gagal dekripsi";
+
                 const payload = JSON.parse(decrypted);
 
                 if (!payload.address || !payload.privateKey || !payload.voterId || !payload.signature) {
@@ -204,9 +205,9 @@
                 );
                 const recovered = ethers.verifyMessage(ethers.getBytes(messageHash), payload.signature).toLowerCase();
 
-                if (recovered !== PANITIA_ADDRESS) throw "Tanda tangan tidak valid";
+                if (recovered !== PANITIA_ADDRESS) throw "Tanda tangan panitia tidak valid";
 
-                // SUKSES! Tapi belum tandai voted
+                // SUKSES
                 window.voterData = payload;
 
                 document.getElementById('loadingOverlay').classList.remove('active');
@@ -215,16 +216,18 @@
                 document.getElementById('voterNumber').textContent = `Pemilih #${payload.voterId}`;
 
             } catch (err) {
-                console.error(err);
+                console.error("QR Error:", err);
                 document.getElementById('loadingOverlay').classList.remove('active');
                 document.getElementById('errorPopup').classList.add('active');
             }
         }
 
-        // Kalau buka langsung dari QR
-        if (location.search.includes('data=')) processQR(location.href);
+        // Jika buka langsung dari link QR
+        if (location.search.includes('data=')) {
+            processQR(location.href);
+        }
 
-        // === TOMBOL & SCANNER (100% DARI CODE KAMU) ===
+        // === TOMBOL & SCANNER ===
         document.getElementById('scanBtn').onclick = () => 
             document.getElementById('permissionOverlay').classList.add('active');
 
@@ -245,23 +248,32 @@
             startScanner();
         };
 
-        document.getElementById('galleryBtn').onclick = () => document.getElementById('qrInput').click();
+        // GALERI — DIPERBAIKI TOTAL!
+        document.getElementById('galleryBtn').onclick = () => {
+            document.getElementById('qrInput').click();
+        };
 
-        document.getElementById('qrInput').onchange = e => {
+        document.getElementById('qrInput').onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            stopScanner();
-            document.getElementById('galleryBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-            document.getElementById('galleryBtn').disabled = true;
 
-            const temp = new Html5Qrcode("reader");
-            temp.scanFile(file, true)
-                .then(text => processQR(text))
-                .catch(() => {
-                    document.getElementById('errorPopup').classList.add('active');
-                    document.getElementById('galleryBtn').innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
-                    document.getElementById('galleryBtn').disabled = false;
-                });
+            // Reset tombol
+            const btn = document.getElementById('galleryBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+            btn.disabled = true;
+
+            try {
+                const result = await Html5Qrcode.scanFileV2(file, true); // V2 lebih stabil
+                await processQR(result.text || result);
+            } catch (err) {
+                alert("Gagal membaca QR dari gambar. Coba lagi atau gunakan kamera.");
+                console.error(err);
+            } finally {
+                // Pastikan tombol kembali normal
+                btn.innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
+                btn.disabled = false;
+                e.target.value = ''; // reset input file
+            }
         };
 
         function startScanner() {
@@ -271,24 +283,26 @@
             scanner.start(
                 { facingMode: "environment" },
                 { fps: 10, qrbox: { width: 280, height: 280 } },
-                text => {
+                async (decodedText) => {
                     stopScanner();
                     document.getElementById('scannerOverlay').classList.remove('active');
-                    processQR(text);
+                    await processQR(decodedText);
                 },
                 () => {}
             ).catch(err => {
-                alert("Gagal akses kamera: " + err);
+                alert("Gagal akses kamera: " + err.message);
                 document.getElementById('scannerOverlay').classList.remove('active');
             });
         }
 
         function stopScanner() {
-            if (scanner) scanner.stop().catch(() => {});
-            scanner = null;
+            if (scanner) {
+                scanner.stop().then(() => {}).catch(() => {});
+                scanner = null;
+            }
         }
 
-        // Tombol Mulai Voting → BARU DI SINI set voted (di vote.html)
+        // Mulai Voting
         document.getElementById('startVotingBtn').onclick = () => {
             if (!window.voterData) return alert("Data hilang!");
             const params = new URLSearchParams({
