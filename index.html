@@ -808,48 +808,58 @@ async function decryptAndValidate(rahasia) {
         document.getElementById('rahasiaInput').focus();
         return;
     }
-    const expectedEntropy = ethers.keccak256(
-  ethers.toUtf8Bytes(`pilkades2026_${rahasia}_SUKAMAJU_${decrypted.voterId}`)
-);
-const expectedWallet = new ethers.Wallet(expectedEntropy);
 
-if (expectedWallet.address.toLowerCase() !== decrypted.address.toLowerCase()) {
-  alert("QR Code RUSAK atau dari generasi lama! Gunakan QR yang baru dicetak.");
-  cancelPassword();
-  return;
-}
-
-    // Verifikasi signature panitia (anti QR palsu)
+    // 1. VALIDASI ENTROPY — HARUS URUTAN INI: rahasia dulu, baru SUKAMAJU
     try {
-  const messageHash = ethers.solidityPackedKeccak256(
-    ["address", "uint256", "string", "string"],
-    [decrypted.address, decrypted.voterId, "SUKAMAJU", "2026"]
-  );
+        const correctSeed = `pilkades2026_${rahasia}_SUKAMAJU_${decrypted.voterId}`;
+        const expectedEntropy = ethers.keccak256(ethers.toUtf8Bytes(correctSeed));
+        const expectedWallet = new ethers.Wallet(expectedEntropy);
 
-  const recovered = ethers.verifyMessage(
-    ethers.getBytes(messageHash),
-    decrypted.signature
-  );
+        if (expectedWallet.address.toLowerCase() !== decrypted.address.toLowerCase()) {
+            alert("QR Code RUSAK atau dari generasi lama!\n\nGunakan QR undangan yang baru dicetak.");
+            cancelPassword();
+            return;
+        }
+    } catch (err) {
+        alert("Error validasi wallet pemilih!");
+        cancelPassword();
+        return;
+    }
 
-  if (recovered.toLowerCase() !== "0x1E61ED90b34EFfa858307071F1C11a5A5523F09f".toLowerCase()) {
-    alert("QR Code PALSU! Tanda tangan panitia tidak cocok.");
-    cancelPassword();
-    return;
-  }
-} catch (err) {
-  console.error("Error verifikasi signature:", err);
-  alert("Signature tidak valid!");
-  cancelPassword();
-  return;
-}
+    // 2. VERIFIKASI SIGNATURE PANITIA — PAKAI verifyMessage (bukan recoverAddress)
+    try {
+        const messageHash = ethers.solidityPackedKeccak256(
+            ["address", "uint256", "string", "string"],
+            [decrypted.address, decrypted.voterId, "SUKAMAJU", "2026"]
+        );
 
-    // SUKSES! Simpan data & lanjut ke halaman success
+        const recovered = ethers.verifyMessage(
+            ethers.getBytes(messageHash),
+            decrypted.signature
+        );
+
+        // Alamat panitia dari generate.js kamu (hasil terakhir)
+        const PANITIA_ADDRESS = "0x1E61ED90b34EFfa858307071F1C11a5A5523F09f";
+
+        if (recovered.toLowerCase() !== PANITIA_ADDRESS.toLowerCase()) {
+            alert("QR Code PALSU! Tanda tangan panitia tidak cocok.");
+            cancelPassword();
+            return;
+        }
+    } catch (err) {
+        console.error("Signature error:", err);
+        alert("Signature tidak valid!");
+        cancelPassword();
+        return;
+    }
+
+    // SEMUA LOLOS → LANJUT KE SUCCESS
     localStorage.setItem("voterPrivateKey", decrypted.privateKey);
     localStorage.setItem("voterAddress", decrypted.address);
     localStorage.setItem("voterId", decrypted.voterId);
     localStorage.setItem("voterDesa", decrypted.desa);
 
-    cancelPassword(); // tutup modal
+    cancelPassword();
     showSuccessPage(decrypted);
 }
 
@@ -911,6 +921,7 @@ if (expectedWallet.address.toLowerCase() !== decrypted.address.toLowerCase()) {
 </body>
 
 </html>
+
 
 
 
