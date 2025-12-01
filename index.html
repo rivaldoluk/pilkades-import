@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pilkades 2026 - Verifikasi Undangan</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- Ethers v6 + CryptoJS -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.1/dist/ethers.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
     <style>
@@ -37,8 +36,13 @@
         .btn-gallery{background:#2c3e50;color:white;margin-top:16px;padding:16px;border:2px solid #34495e}
         .btn-gallery:hover{background:#34495e;border-color:#ff6b00}
         .footer{text-align:center;margin-top:40px;font-size:0.95em;opacity:0.8;line-height:1.6}
-        #permissionOverlay,#scannerOverlay,#errorPopup,#loadingOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:99999;padding:20px;text-align:center}
-        .active{display:flex}
+
+        #permissionOverlay,#scannerOverlay,#errorPopup,#loadingOverlay{
+            position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);
+            display:none;align-items:center;justify-content:center;flex-direction:column;
+            z-index:99999;padding:20px;text-align:center
+        }
+        .active{display:flex !important}
         #reader{width:96%;max-width:420px;height:580px;border-radius:30px;overflow:hidden;border:9px solid #ff6b00;box-shadow:0 0 90px rgba(255,107,0,0.9)}
         .closeScanner{position:absolute;top:16px;right:16px;background:rgba(255,0,68,0.9);color:white;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;z-index:1000}
         .closeScanner:hover{background:#ff0044;transform:scale(1.1)}
@@ -48,6 +52,7 @@
         .perm-text{font-size:1.15em;line-height:1.7;max-width:90%;margin:20px 0}
         .perm-btn{background:#ff6b00;color:white;padding:20px 70px;font-size:1.3em;border-radius:60px;border:none;font-weight:bold;box-shadow:0 12px 40px rgba(255,107,0,0.5)}
         .perm-btn:hover{background:#e55a00;transform:scale(1.05)}
+
         @media(max-width:480px){
             h1{font-size:2.1em}
             .card{padding:30px 20px}
@@ -152,9 +157,6 @@
                     <i class="fas fa-vote-yea" style="color:#0f0"></i>
                     <b>Sekarang Anda dapat melakukan voting secara rahasia & aman</b>
                 </div>
-                <div style="color:#ff6b00;font-size:0.9em;margin-top:15px">
-                    Satu undangan hanya dapat digunakan <b>SEKALI</b> untuk voting
-                </div>
             </div>
 
             <button class="btn btn-primary" style="font-size:1.5em;padding:24px" id="startVotingBtn">
@@ -170,19 +172,14 @@
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script>
-        // === KONFIGURASI (HARUS SAMA DENGAN generate.js) ===
+        // === KONFIGURASI ===
         const RAHASIA_PANITIA = "SuperRahasia2026Pilkades";
-        const PANITIA_ADDRESS = "0x1E61ED90b34EFfa858307071F1C11a5A5523F09f".toLowerCase(); // dari private key kamu
+        const PANITIA_ADDRESS = "0x1E61ED90b34EFfa858307071F1C11a5A5523F09f".toLowerCase();
 
         let scanner = null;
         window.voterData = null;
 
-        // Cek apakah sudah pernah vote
-        function hasVoted() {
-            return localStorage.getItem('pilkades2026_voted') === 'true';
-        }
-
-        // Proses QR Code dari generate.js
+        // PERBAIKAN: JANGAN SET 'voted' di sini! Hanya simpan data aja
         async function processQR(rawText) {
             try {
                 document.getElementById('loadingOverlay').classList.add('active');
@@ -191,36 +188,27 @@
                 if (!url.includes('data=')) throw "Bukan QR undangan resmi";
 
                 const encrypted = new URL(url).searchParams.get('data');
-                if (!encrypted) throw "Data enkripsi tidak ditemukan";
+                if (!encrypted) throw "Data tidak ditemukan";
 
-                // Dekripsi
                 const decrypted = CryptoJS.AES.decrypt(encrypted, RAHASIA_PANITIA).toString(CryptoJS.enc.Utf8);
                 const payload = JSON.parse(decrypted);
 
-                // Validasi payload
                 if (!payload.address || !payload.privateKey || !payload.voterId || !payload.signature) {
-                    throw "Data QR tidak lengkap";
+                    throw "Data tidak lengkap";
                 }
 
-                // Verifikasi signature panitia (PAKAI KECCAK256 seperti generate.js terbaru)
+                // Verifikasi signature panitia
                 const messageHash = ethers.solidityPackedKeccak256(
                     ["address", "uint256", "string", "string"],
                     [payload.address, payload.voterId, payload.desa || "SUKAMAJU", payload.tahun || "2026"]
                 );
                 const recovered = ethers.verifyMessage(ethers.getBytes(messageHash), payload.signature).toLowerCase();
 
-                if (recovered !== PANITIA_ADDRESS) throw "Tanda tangan panitia tidak valid";
+                if (recovered !== PANITIA_ADDRESS) throw "Tanda tangan tidak valid";
 
-                if (hasVoted()) {
-                    alert("Undangan ini sudah pernah digunakan untuk voting!");
-                    throw "Sudah vote";
-                }
-
-                // SUKSES TOTAL
+                // SUKSES! Tapi belum tandai voted
                 window.voterData = payload;
-                localStorage.setItem('pilkades2026_voted', 'true');
 
-                // Tampilkan halaman sukses
                 document.getElementById('loadingOverlay').classList.remove('active');
                 document.getElementById('mainView').style.display = 'none';
                 document.getElementById('successView').style.display = 'block';
@@ -233,13 +221,11 @@
             }
         }
 
-        // Kalau langsung buka dari link QR
-        if (location.search.includes('data=')) {
-            processQR(location.href);
-        }
+        // Kalau buka langsung dari QR
+        if (location.search.includes('data=')) processQR(location.href);
 
-        // === SEMUA FUNGSI SCANNER & TOMBOL (100% DARI CODE KAMU YANG SUDAH PROVEN) ===
-        document.getElementById('scanBtn').onclick = () =>
+        // === TOMBOL & SCANNER (100% DARI CODE KAMU) ===
+        document.getElementById('scanBtn').onclick = () => 
             document.getElementById('permissionOverlay').classList.add('active');
 
         document.getElementById('allowBtn').onclick = () => {
@@ -302,9 +288,9 @@
             scanner = null;
         }
 
-        // Tombol Mulai Voting
+        // Tombol Mulai Voting → BARU DI SINI set voted (di vote.html)
         document.getElementById('startVotingBtn').onclick = () => {
-            if (!window.voterData) return alert("Data pemilih hilang!");
+            if (!window.voterData) return alert("Data hilang!");
             const params = new URLSearchParams({
                 voterId: window.voterData.voterId,
                 address: window.voterData.address,
