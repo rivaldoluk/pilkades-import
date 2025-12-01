@@ -18,16 +18,6 @@
         .subtitle{text-align:center;font-size:1.15em;opacity:0.9;margin-bottom:24px}
         .steps{background:rgba(255,107,0,0.08);border:1px solid rgba(255,107,0,0.2);padding:20px;border-radius:18px;font-size:1.02em;line-height:1.85;margin:24px 0}
         .steps b{color:#ff9f43}
-        .btn{width:100%;padding:19px;font-size:1.2em;font-weight:bold;border:none;border-radius:60px;margin:12px 0;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,0.4)}
-        .btn:hover{transform:translateY(-4px);box-shadow:0 15px 40px rgba(0,0,0,0.5)}
-        .btn-primary{background:#ff6b00;color:white}
-        .btn-primary:hover{background:#e55a00}
-        .btn-scan{background:#0066ff;color:white}
-        .btn-scan:hover{background:#0052cc}
-        .btn-gallery{background:#2c3e50;color:white;margin-top:16px;padding:16px;border:2px solid #34495e}
-        .btn-gallery:hover{background:#34495e;border-color:#ff6b00}
-        .footer{text-align:center;margin-top:40px;font-size:0.95em;opacity:0.8;line-height:1.6}
-
         .seed-locked{background:linear-gradient(135deg,#1a0000,#330000);border:3px dashed #ff4444;padding:28px 20px;border-radius:20px;color:#ff8888;font-size:1.15em;text-align:center;position:relative;overflow:hidden;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;animation:pulse 3s infinite}
         .seed-locked::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(255,68,68,0.03) 20px,rgba(255,68,68,0.03) 40px);animation:scanline 8s linear infinite}
         @keyframes pulse{0%,100%{box-shadow:0 0 20px rgba(255,68,68,0.4)}50%{box-shadow:0 0 40px rgba(255,68,68,0.8)}}
@@ -38,9 +28,17 @@
         .blink{animation:blink 1.5s infinite}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
         .success-check{font-size:80px;color:#0f0;animation:float 3s ease-in-out infinite}
-
+        .btn{width:100%;padding:19px;font-size:1.2em;font-weight:bold;border:none;border-radius:60px;margin:12px 0;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,0.4)}
+        .btn:hover{transform:translateY(-4px);box-shadow:0 15px 40px rgba(0,0,0,0.5)}
+        .btn-primary{background:#ff6b00;color:white}
+        .btn-primary:hover{background:#e55a00}
+        .btn-scan{background:#0066ff;color:white}
+        .btn-scan:hover{background:#0052cc}
+        .btn-gallery{background:#2c3e50;color:white;margin-top:16px;padding:16px;border:2px solid #34495e}
+        .btn-gallery:hover{background:#34495e;border-color:#ff6b00}
+        .footer{text-align:center;margin-top:40px;font-size:0.95em;opacity:0.8;line-height:1.6}
         #permissionOverlay,#scannerOverlay,#errorPopup,#loadingOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:99999;padding:20px;text-align:center}
-        #permissionOverlay.active,#scannerOverlay.active,#errorPopup.active,#loadingOverlay.active{display:flex}
+        .active{display:flex}
         #reader{width:96%;max-width:420px;height:580px;border-radius:30px;overflow:hidden;border:9px solid #ff6b00;box-shadow:0 0 90px rgba(255,107,0,0.9)}
         .closeScanner{position:absolute;top:16px;right:16px;background:rgba(255,0,68,0.9);color:white;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;z-index:1000}
         .closeScanner:hover{background:#ff0044;transform:scale(1.1)}
@@ -50,7 +48,6 @@
         .perm-text{font-size:1.15em;line-height:1.7;max-width:90%;margin:20px 0}
         .perm-btn{background:#ff6b00;color:white;padding:20px 70px;font-size:1.3em;border-radius:60px;border:none;font-weight:bold;box-shadow:0 12px 40px rgba(255,107,0,0.5)}
         .perm-btn:hover{background:#e55a00;transform:scale(1.05)}
-
         @media(max-width:480px){
             h1{font-size:2.1em}
             .card{padding:30px 20px}
@@ -155,7 +152,7 @@
                     <i class="fas fa-vote-yea" style="color:#0f0"></i>
                     <b>Sekarang Anda dapat melakukan voting secara rahasia & aman</b>
                 </div>
-                <div style="color:#ff6b00;font-size:0.9em">
+                <div style="color:#ff6b00;font-size:0.9em;margin-top:15px">
                     Satu undangan hanya dapat digunakan <b>SEKALI</b> untuk voting
                 </div>
             </div>
@@ -173,51 +170,57 @@
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script>
-        // === KONFIGURASI (SESUAI generate.js) ===
+        // === KONFIGURASI (HARUS SAMA DENGAN generate.js) ===
         const RAHASIA_PANITIA = "SuperRahasia2026Pilkades";
-        const PANITIA_ADDRESS = "0x1E61ED90b34EFfa858307071F1C11a5A5523F09f".toLowerCase();
+        const PANITIA_ADDRESS = "0x1E61ED90b34EFfa858307071F1C11a5A5523F09f".toLowerCase(); // dari private key kamu
 
         let scanner = null;
         window.voterData = null;
 
-        // Cek sudah vote belum
+        // Cek apakah sudah pernah vote
         function hasVoted() {
             return localStorage.getItem('pilkades2026_voted') === 'true';
         }
 
-        // Proses QR Code
-        async function processResult(text) {
+        // Proses QR Code dari generate.js
+        async function processQR(rawText) {
             try {
                 document.getElementById('loadingOverlay').classList.add('active');
 
-                let url = text.trim();
+                let url = rawText.trim();
                 if (!url.includes('data=')) throw "Bukan QR undangan resmi";
 
                 const encrypted = new URL(url).searchParams.get('data');
-                if (!encrypted) throw "Data tidak ditemukan";
+                if (!encrypted) throw "Data enkripsi tidak ditemukan";
 
+                // Dekripsi
                 const decrypted = CryptoJS.AES.decrypt(encrypted, RAHASIA_PANITIA).toString(CryptoJS.enc.Utf8);
                 const payload = JSON.parse(decrypted);
 
+                // Validasi payload
                 if (!payload.address || !payload.privateKey || !payload.voterId || !payload.signature) {
-                    throw "Data tidak lengkap";
+                    throw "Data QR tidak lengkap";
                 }
 
-                const message = `${payload.address}${payload.voterId}${payload.desa || 'SUKAMAJU'}${payload.tahun || '2026'}`;
-                const recovered = ethers.verifyMessage(message, payload.signature).toLowerCase();
+                // Verifikasi signature panitia (PAKAI KECCAK256 seperti generate.js terbaru)
+                const messageHash = ethers.solidityPackedKeccak256(
+                    ["address", "uint256", "string", "string"],
+                    [payload.address, payload.voterId, payload.desa || "SUKAMAJU", payload.tahun || "2026"]
+                );
+                const recovered = ethers.verifyMessage(ethers.getBytes(messageHash), payload.signature).toLowerCase();
 
                 if (recovered !== PANITIA_ADDRESS) throw "Tanda tangan panitia tidak valid";
 
                 if (hasVoted()) {
                     alert("Undangan ini sudah pernah digunakan untuk voting!");
-                    document.getElementById('loadingOverlay').classList.remove('active');
-                    return;
+                    throw "Sudah vote";
                 }
 
-                // SUKSES!
+                // SUKSES TOTAL
                 window.voterData = payload;
                 localStorage.setItem('pilkades2026_voted', 'true');
 
+                // Tampilkan halaman sukses
                 document.getElementById('loadingOverlay').classList.remove('active');
                 document.getElementById('mainView').style.display = 'none';
                 document.getElementById('successView').style.display = 'block';
@@ -230,12 +233,12 @@
             }
         }
 
-        // Kalau langsung buka dari QR
+        // Kalau langsung buka dari link QR
         if (location.search.includes('data=')) {
-            processResult(location.href);
+            processQR(location.href);
         }
 
-        // === SEMUA TOMBOL & SCANNER (PAKAI LOGIC KAMU YANG 100% SUDAH JALAN) ===
+        // === SEMUA FUNGSI SCANNER & TOMBOL (100% DARI CODE KAMU YANG SUDAH PROVEN) ===
         document.getElementById('scanBtn').onclick = () =>
             document.getElementById('permissionOverlay').classList.add('active');
 
@@ -267,7 +270,7 @@
 
             const temp = new Html5Qrcode("reader");
             temp.scanFile(file, true)
-                .then(text => processResult(text))
+                .then(text => processQR(text))
                 .catch(() => {
                     document.getElementById('errorPopup').classList.add('active');
                     document.getElementById('galleryBtn').innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
@@ -285,7 +288,7 @@
                 text => {
                     stopScanner();
                     document.getElementById('scannerOverlay').classList.remove('active');
-                    processResult(text);
+                    processQR(text);
                 },
                 () => {}
             ).catch(err => {
@@ -301,7 +304,7 @@
 
         // Tombol Mulai Voting
         document.getElementById('startVotingBtn').onclick = () => {
-            if (!window.voterData) return alert("Data hilang!");
+            if (!window.voterData) return alert("Data pemilih hilang!");
             const params = new URLSearchParams({
                 voterId: window.voterData.voterId,
                 address: window.voterData.address,
