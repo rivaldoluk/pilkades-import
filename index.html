@@ -597,7 +597,25 @@
             </div>
         </div>
     </div>
-
+    
+    <div id="passwordModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.98);z-index:99999;align-items:center;justify-content:center;flex-direction:column;padding:20px;">
+        <div style="background:#111;padding:30px;border-radius:20px;max-width:90%;border:2px solid #ff6b00;">
+            <h2 style="color:#ff6b00;text-align:center;margin-bottom:20px;">
+                <i class="fas fa-key"></i> Masukkan Kode Rahasia
+            </h2>
+            <p style="text-align:center;margin-bottom:20px;line-height:1.7;">
+                Kode rahasia diumumkan oleh panitia di lokasi TPS.<br>
+                <b>Hanya warga yang hadir yang tahu kode ini.</b>
+            </p>
+            <input type="text" id="rahasiaInput" placeholder="Contoh: SuperRahasia2026Pilkades" 
+                   style="width:100%;padding:16px;font-size:1.2em;border-radius:12px;border:1px solid #ff6b00;background:#000;color:white;text-align:center;margin-bottom:15px;">
+            <div style="display:flex;gap:15px;">
+                <button onclick="cancelPassword()" style="flex:1;padding:16px;background:#333;color:white;border:none;border-radius:12px;font-size:1.1em;">Batal</button>
+                <button onclick="submitPassword()" style="flex:2;padding:16px;background:#ff6b00;color:white;border:none;border-radius:12px;font-size:1.1em;font-weight:bold;">Lanjut</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- POPUP ERROR CANTIK -->
     <div id="errorPopup">
         <div style="font-size:90px;color:#ff4444;margin-bottom:20px;"><i class="fas fa-times-circle"></i></div>
@@ -726,72 +744,97 @@
             }
             reader.innerHTML = '';
         }
+        
+    const PANITIA_ADDRESS = "0x1B7f8eC1bF7d2A2C6eF6f8eF8eC1bF7d2A2C6eF6"; // <-- UBAH INI !!!
 
-        async function processResult(text) {
+let pendingEncryptedData = null;
+
+async function processResult(text) {
     let encryptedData = null;
 
-    // 1. Ambil parameter ?data= dari URL yang ada di QR
+    // Ambil parameter ?data= dari QR
     try {
-        const url = new URL(text);
+        const url = new URL(text.trim());
         encryptedData = url.searchParams.get('data');
     } catch (e) {
-        // Kalau bukan URL lengkap, mungkin hanya parameter saja (jarang)
+        // Kalau QR cuma berisi parameter saja
         const params = new URLSearchParams(text.split('?')[1] || '');
         encryptedData = params.get('data');
     }
 
     if (!encryptedData) {
-        showError("QR tidak berisi data undangan resmi.");
+        showError("QR Code bukan undangan resmi Pilkades.");
         return;
     }
 
-    // 2. Minta RAHASIA_PANITIA dari warga (password)
-    const rahasia = prompt(
-        "MASUKKAN KODE RAHASIA dari panitia desa\n\n" +
-        "Kode ini diumumkan oleh panitia saat pemungutan suara.\n" +
-        "Contoh: SuperRahasia2026Pilkades\n\n" +
-        "Masukkan kode rahasia:",
-        ""
-    );
+    // Simpan sementara, tunggu user masukin kode rahasia
+    pendingEncryptedData = encryptedData;
+    document.getElementById('passwordModal').style.display = 'flex';
+    document.getElementById('rahasiaInput').focus();
+}
 
-    if (!rahasia || rahasia.trim() === "") {
+function cancelPassword() {
+    document.getElementById('passwordModal').style.display = 'none';
+    pendingEncryptedData = null;
+    document.getElementById('rahasiaInput').value = '';
+}
+
+async function submitPassword() {
+    const rahasia = document.getElementById('rahasiaInput').value.trim();
+    if (!rahasia) {
         alert("Kode rahasia wajib diisi!");
         return;
     }
 
+    if (!pendingEncryptedData) {
+        alert("Data QR hilang. Scan ulang.");
+        cancelPassword();
+        return;
+    }
+
+    await decryptAndValidate(rahasia);
+}
+
+async function decryptAndValidate(rahasia) {
     let decrypted;
     try {
-        const bytes = CryptoJS.AES.decrypt(encryptedData, rahasia.trim());
+        const bytes = CryptoJS.AES.decrypt(pendingEncryptedData, rahasia);
         const jsonStr = bytes.toString(CryptoJS.enc.Utf8);
-        if (!jsonStr) throw "salah";
+        if (!jsonStr) throw new Error("Dekripsi gagal");
         decrypted = JSON.parse(jsonStr);
-    } catch (e) {
-        alert("Kode rahasia SALAH atau QR Code tidak valid!");
+    } catch (err) {
+        alert("Kode rahasia SALAH atau QR tidak valid!");
+        document.getElementById('rahasiaInput').value = '';
+        document.getElementById('rahasiaInput').focus();
         return;
     }
 
-    // 3. Validasi signature panitia (anti QR palsu)
-    const messageHash = ethers.solidityPackedKeccak256(
-        ["address", "uint256", "string", "string"],
-        [decrypted.address, decrypted.voterId, decrypted.desa, decrypted.tahun]
-    );
+    // Verifikasi signature panitia (anti QR palsu)
+    try {
+        const messageHash = ethers.solidityPackedKeccak256(
+            ["address", "uint256", "string", "string"],
+            [decrypted.address, decrypted.voterId, decrypted.desa, decrypted.tahun]
+        );
+        const recovered = ethers.recoverAddress(messageHash, decrypted.signature);
 
-    const recoveredAddress = ethers.recoverAddress(messageHash, decrypted.signature);
-
-    // GANTI DENGAN ALAMAT PANITIA YANG BENAR (dari generate.js)
-    const PANITIA_ADDRESS = "0x1E61ED90b34EFfa858307071F1C11a5A5523F09f"; // ← ISI DENGAN panitiaSigner.address yang muncul saat generate
-
-    if (recoveredAddress.toLowerCase() !== PANITIA_ADDRESS.toLowerCase()) {
-        alert("QR Code PALSU! Signature panitia tidak cocok.");
+        if (recovered.toLowerCase() !== PANITIA_ADDRESS.toLowerCase()) {
+            alert("QR Code PALSU! Tanda tangan panitia tidak cocok.");
+            cancelPassword();
+            return;
+        }
+    } catch (err) {
+        alert("Signature tidak valid!");
+        cancelPassword();
         return;
     }
 
-    // 4. Semua valid → simpan private key ke localStorage supaya halaman voting bisa pakai
+    // SUKSES! Simpan data & lanjut ke halaman success
     localStorage.setItem("voterPrivateKey", decrypted.privateKey);
     localStorage.setItem("voterAddress", decrypted.address);
     localStorage.setItem("voterId", decrypted.voterId);
+    localStorage.setItem("voterDesa", decrypted.desa);
 
-    // 5. Tampilkan halaman sukses (bisa tanpa seed phrase)
+    cancelPassword(); // tutup modal
     showSuccessPage(decrypted);
 }
 
@@ -813,37 +856,44 @@
     document.getElementById('mainView').style.display = 'none';
     document.getElementById('successView').style.display = 'block';
 
-    // Ubah teks jadi lebih sesuai
+    // Update tampilan success
     document.querySelector('#successView h1').textContent = 'Aktivasi Berhasil!';
     document.querySelector('#successView .subtitle').innerHTML = 
-        `<strong>Warga ke-${data.voterId} • Desa ${data.desa}</strong>`;
+        `<strong>Warga ke-${data.voterId} • Desa ${data.desa} • Tahun ${data.tahun}</strong>`;
 
-    const infoBox = document.getElementById('finalSeed');
-    infoBox.innerHTML = `
-        <div style="text-align:center;">
-            <i class="fas fa-check-circle" style="font-size:70px;color:#0f0;"></i>
-            <p style="margin:15px 0;font-size:1.3em;">Wallet voting Anda sudah aktif!</p>
-            <p>Address:<br><code style="font-size:0.9em;background:#222;padding:8px 12px;border-radius:8px;">
+    document.getElementById('finalSeed').innerHTML = `
+        <div style="text-align:center;padding:20px;">
+            <i class="fas fa-check-circle" style="font-size:80px;color:#0f0;margin-bottom:20px;"></i>
+            <p style="font-size:1.4em;margin:16px 0;font-weight:bold;">Wallet voting Anda sudah aktif!</p>
+            <p style="margin:10px 0;">Address Wallet:</p>
+            <code style="background:#222;padding:12px 16px;border-radius:12px;font-size:0.95em;word-break:break-all;display:block;margin:12px 0;">
                 ${data.address}
-            </code></p>
+            </code>
             <p>ID Pemilih: <b>${data.voterId}</b></p>
         </div>
     `;
 
-    // Tombol langsung ke halaman voting (bukan MetaMask lagi)
-    const btn = document.getElementById('openMetaMaskBtn');
-    btn.innerHTML = '<i class="fas fa-vote-yea"></i> Lanjut ke Pemungutan Suara';
-    btn.onclick = () => {
-        window.location.href = "voting.html"; // atau halaman voting kamu
-    };
-
-    // Optional: tombol copy address
+    // Tombol copy address
     document.getElementById('finalCopyBtn').onclick = async () => {
         await navigator.clipboard.writeText(data.address);
-        alert("Address wallet berhasil disalin!");
+        const span = document.querySelector('#finalCopyBtn span');
+        document.getElementById('finalCopyBtn').classList.add('copied');
+        span.textContent = 'Address Tersalin!';
+        setTimeout(() => {
+            document.getElementById('finalCopyBtn').classList.remove('copied');
+            span.textContent = 'Copy Address Wallet';
+        }, 3000);
+    };
+    document.querySelector('#finalCopyBtn span').textContent = 'Copy Address Wallet';
+
+    // Tombol lanjut ke voting
+    document.getElementById('openMetaMaskBtn').innerHTML = '<i class="fas fa-vote-yea"></i> Lanjut ke Pemungutan Suara';
+    document.getElementById('openMetaMaskBtn').onclick = () => {
+        window.location.href = "voting.html"; // ganti dengan nama file voting kamu
     };
 }
     </script>
 </body>
 
 </html>
+
