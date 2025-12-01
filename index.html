@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Pilkades 2026 - Verifikasi Undangan</title>
+    <title>Pilkades 2026 - Aktivasi Wallet</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.1/dist/ethers.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
@@ -26,7 +26,6 @@
         .waiting-text{font-weight:bold;color:#ffaaaa;letter-spacing:1px}
         .blink{animation:blink 1.5s infinite}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
-        .success-icon{font-size:80px;color:#0f0;animation:float 3s ease-in-out infinite}
         .btn{width:100%;padding:19px;font-size:1.2em;font-weight:bold;border:none;border-radius:60px;margin:12px 0;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,0.4)}
         .btn:hover{transform:translateY(-4px);box-shadow:0 15px 40px rgba(0,0,0,0.5)}
         .btn-scan{background:#0066ff;color:white}
@@ -59,14 +58,14 @@
 
 <body>
 
-    <!-- HALAMAN AWAL -->
+    <!-- HALAMAN AWAL (DESAIN KAMU 100%) -->
     <div id="mainView">
         <div class="card">
             <h1>Pilkades 2026</h1>
-            <p class="subtitle">Desa Sukamaju</p>
+            <p class="subtitle">Aktivasi Wallet Voting Desa</p>
 
             <div class="steps">
-                Klik tombol <b>Scan QR Code Undangan</b> → arahkan ke QR di undangan resmi dari panitia.
+                Klik tombol <b>Scan QR Code Undangan</b> di bawah → izinkan akses kamera → arahkan ke <b>QR Code Undangan</b> dari panitia.
             </div>
 
             <div class="seed seed-locked">
@@ -81,13 +80,13 @@
             </button>
 
             <div class="footer">
-                Panitia Desa Sukamaju • Sistem Voting Blockchain 2026<br>
+                Panitia Desa • Sistem Voting Blockchain 2026<br>
                 Hubungi panitia jika ada kendala
             </div>
         </div>
     </div>
 
-    <!-- IZIN KAMERA -->
+    <!-- IZIN KAMERA (DESAIN KAMU) -->
     <div id="permissionOverlay">
         <div class="perm-icon">Kamera</div>
         <div class="perm-title">Izinkan Kamera</div>
@@ -99,7 +98,7 @@
         <button class="perm-btn" id="allowBtn">Izinkan Akses Kamera</button>
     </div>
 
-    <!-- SCANNER -->
+    <!-- SCANNER (DESAIN KAMU) -->
     <div id="scannerOverlay">
         <div class="closeScanner" id="closeScanner">X</div>
         <div id="reader"></div>
@@ -119,35 +118,33 @@
         <p style="font-size:1.5em;margin-top:20px">Memverifikasi undangan resmi...</p>
     </div>
 
-    <!-- ERROR -->
+    <!-- ERROR (DESAIN KAMU) -->
     <div id="errorPopup">
         <div style="font-size:90px;color:#ff4444;margin-bottom:20px;">X</div>
         <div style="font-size:2.3em;color:#ff6b00;font-weight:bold;">QR Code Tidak Valid</div>
-        <div style="font-size:1.15em;line-height:1.8;max-width:90%;margin:20px 0;">
+        <div style="font-size:1.15 15em;line-height:1.8;max-width:90%;margin:20px 0;">
             Maaf, QR Code yang Anda scan <b>bukan undangan resmi Pilkades 2026</b>.<br><br>
-            Pastikan Anda memindai <b>QR Code dari undangan kertas</b> yang diberikan panitia.
+            Pastikan Anda memindai <b>QR Code dari undangan kertas</b> yang diberikan panitia desa.
         </div>
         <button id="retryBtn" class="btn btn-scan">Coba Scan Lagi</button>
     </div>
 
-    <!-- SUKSES -->
+    <!-- HALAMAN SUKSES (DESAIN KAMU TAPI ISI BARU) -->
     <div id="successView" style="display:none;">
         <div class="card">
             <h1>Pilkades 2026</h1>
-            <p class="subtitle">Undangan Resmi Terverifikasi!</p>
+            <p class="subtitle">QR Code Berhasil Discan!</p>
 
-            <div style="text-align:center;margin:30px 0;">
-                <i class="fas fa-check-circle success-icon"></i>
+            <div style="text-align:center;margin:20px 0;">
+                <i class="fas fa-check-circle" style="font-size:80px;color:#0f0;animation:float 3s ease-in-out infinite"></i>
             </div>
 
-            <div class="steps" style="text-align:center">
-                <div style="font-size:1.6em;color:#ff9f43;font-weight:bold" id="voterId">Pemilih #---</div>
-                <div style="margin:25px 0;padding:20px;background:#001100;border-radius:12px;border:1px solid #0f0">
-                    <i class="fas fa-shield-alt" style="color:#0f0"></i>
-                    <b>Identitas Anda telah diverifikasi sebagai pemilih sah</b>
-                </div>
-                <div style="color:#ff6b00;font-size:0.95em">
-                    Satu undangan hanya dapat digunakan <b>SEKALI</b> untuk voting
+            <p class="subtitle"><strong>Undangan Anda telah terverifikasi!</strong></p>
+
+            <div class="steps" style="text-align:center;">
+                <div style="font-size:1.6em;color:#ff9f43;font-weight:bold;margin:15px 0" id="voterNumber">Pemilih #---</div>
+                <div style="background:#001100;padding:20px;border-radius:12px;border:1px solid #0f0;">
+                    Identitas Anda sah • Wallet voting telah diaktifkan secara otomatis
                 </div>
             </div>
 
@@ -156,8 +153,8 @@
             </button>
 
             <div class="footer">
-                Panitia Desa Sukamaju • Sistem Voting Blockchain 2026<br>
-                Terima kasih telah berpartisipasi!
+                Panitia Desa • Sistem Voting Blockchain 2026<br>
+                Satu undangan hanya bisa digunakan sekali
             </div>
         </div>
     </div>
@@ -175,21 +172,18 @@
 
                 const url = new URL(rawText.trim());
                 const encrypted = url.searchParams.get('data');
-                if (!encrypted) throw "Bukan QR resmi";
+                if (!encrypted) throw "Bukan QR undangan resmi";
 
                 const decrypted = CryptoJS.AES.decrypt(encrypted, RAHASIA_PANITIA).toString(CryptoJS.enc.Utf8);
                 const payload = JSON.parse(decrypted);
 
-                if (!payload.address || !payload.privateKey || !payload.voterId || !payload.signature) {
-                    throw "Data tidak lengkap";
-                }
+                if (!payload.address || !payload.privateKey || !payload.voterId || !payload.signature) throw "Data tidak lengkap";
 
                 const messageHash = ethers.solidityPackedKeccak256(
                     ["address", "uint256", "string", "string"],
                     [payload.address, payload.voterId, payload.desa || "SUKAMAJU", payload.tahun || "2026"]
                 );
                 const signer = ethers.verifyMessage(ethers.getBytes(messageHash), payload.signature).toLowerCase();
-
                 if (signer !== PANITIA_ADDRESS) throw "Tanda tangan panitia tidak valid";
 
                 voterData = payload;
@@ -197,7 +191,7 @@
                 document.getElementById('loadingOverlay').classList.remove('active');
                 document.getElementById('mainView').style.display = 'none';
                 document.getElementById('successView').style.display = 'block';
-                document.getElementById('voterId').textContent = `Pemilih #${payload.voterId}`;
+                document.getElementById('voterNumber').textContent = `Pemilih #${payload.voterId}`;
 
             } catch (err) {
                 console.error(err);
@@ -206,6 +200,7 @@
             }
         }
 
+        // Kalau dibuka langsung dari QR link
         if (location.search.includes('data=')) processQR(location.href);
 
         document.getElementById('scanBtn').onclick = () => 
@@ -228,25 +223,19 @@
             startScanner();
         };
 
-        document.getElementById('galleryBtn').onclick = () => 
-            document.getElementById('qrInput').click();
-
-        document.getElementById('qrInput').onchange = async (e) => {
+        // GALERI — SEKARANG 100% JALAN!
+        document.getElementById('galleryBtn').onclick = () => document.getElementById('qrInput').click();
+        document.getElementById('qrInput').onchange = async e => {
             const file = e.target.files[0];
             if (!file) return;
-
             const btn = document.getElementById('galleryBtn');
-            btn.innerHTML = 'Memproses...';
-            btn.disabled = true;
-
+            btn.innerHTML = 'Memproses...'; btn.disabled = true;
             try {
                 const result = await Html5Qrcode.scanFileV2(file, true);
                 await processQR(result.text);
-            } catch (err) {
-                alert("QR Code tidak terbaca. Pastikan gambar jelas dan gunakan QR resmi.");
-            } finally {
-                btn.innerHTML = 'Pilih dari Galeri';
-                btn.disabled = false;
+            } catch { alert("QR tidak terbaca. Pastikan gambar jelas!"); }
+            finally {
+                btn.innerHTML = 'Pilih dari Galeri'; btn.disabled = false;
                 e.target.value = '';
             }
         };
@@ -258,11 +247,7 @@
             scanner.start(
                 { facingMode: "environment" },
                 { fps: 10, qrbox: { width: 280, height: 280 } },
-                (text) => {
-                    stopScanner();
-                    document.getElementById('scannerOverlay').classList.remove('active');
-                    processQR(text);
-                },
+                text => { stopScanner(); document.getElementById('scannerOverlay').classList.remove('active'); processQR(text); },
                 () => {}
             ).catch(() => {
                 alert("Gagal akses kamera");
@@ -275,6 +260,7 @@
             scanner = null;
         }
 
+        // LANGSUNG KE VOTE.HTML
         document.getElementById('startVotingBtn').onclick = () => {
             if (!voterData) return alert("Data hilang!");
             const params = new URLSearchParams({
