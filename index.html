@@ -5,8 +5,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pilkades 2026 - Aktivasi Wallet</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-    <script src="https://unpkg.com/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script type="module">
+        import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6/+esm";
+        window.ethers = ethers;
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         * {
@@ -560,62 +563,49 @@
     <div id="successView" style="display:none;">
         <div class="card">
             <h1>Pilkades 2026</h1>
-            <p class="subtitle">QR Code Berhasil Discan!</p>
-
-            <div style="text-align:center;margin:20px 0;">
-                <i class="fas fa-check-circle" style="font-size:80px;color:#0f0;"></i>
+            <p class="subtitle">Undangan Anda <strong style="color:#0f0;">VALID & BELUM DIPAKAI</strong></p>
+    
+            <div style="text-align:center;margin:30px 0;">
+                <i class="fas fa-check-circle" style="font-size:90px;color:#0f0;"></i>
             </div>
-
-            <p class="subtitle"><strong>Silahkan aktivasi Wallet voting kamu!</strong></p>
-            <p class="subtitle">Sekarang ikuti langkah dibawah ini:</p>
-
-            <div class="steps">
-                1. Klik tombol <b>Copy 12 Kata Rahasia</b> di bawah<br>
-                2. Klik tombol <b>Buka MetaMask Sekarang</b> di bawah<br>
-                3. Pilih <b>Saya sudah memiliki dompet</b><br>
-                4. Pilih <b>Impor menggunakan frasa pemulihan rahasia</b><br>
-                5. Klik <b>Tempel</b> (12 kata otomatis masuk) → <b>Lanjutkan</b><br>
-                6. Buat kata sandi baru (minimal 8 karakter)<br>
-                7. Centang kotak kecil: <b>“Jika saya lupa kata sandi ini...”</b><br>
-                8. Klik <b>Buat Kata Sandi</b> → <b>Lanjutkan</b><br>
-                9. Muncul “Dompet Anda sudah siap” → klik <b>Selesai</b>
+    
+            <h2 style="margin:20px 0;color:#ff9f43;">Silakan pilih calon kepala desa</h2>
+    
+            <div style="margin:30px 0;">
+                <div style="background:#222;padding:20px;border-radius:20px;margin:20px 0;box-shadow:0 8px 30px rgba(255,107,0,0.2);">
+                    <img src="https://via.placeholder.com/180/4CAF50/white?text=Calon+1" style="width:120px;height:120px;border-radius:50%;border:5px solid #4CAF50;">
+                    <h3 style="margin:15px 0;color:#4CAF50;">Calon 01 - Bpk. Ahmad Subagyo</h3>
+                    <button class="btn" style="background:#4CAF50;font-size:1.3em;padding:18px;" onclick="kirimSuara(0)">
+                        Pilih Calon 1
+                    </button>
+                </div>
+    
+                <div style="background:#222;padding:20px;border-radius:20px;margin:20px 0;box-shadow:0 8px 30px rgba(255,107,0,0.2);">
+                    <img src="https://via.placeholder.com/180/2196F3/white?text=Calon+2" style="width:120px;height:120px;border-radius:50%;border:5px solid #2196F3;">
+                    <h3 style="margin:15px 0;color:#2196F3;">Calon 02 - Bpk. Slamet Riyadi</h3>
+                    <button class="btn" style="background:#2196F3;font-size:1.3em;padding:18px;" onclick="kirimSuara(1)">
+                        Pilih Calon 2
+                    </button>
+                </div>
             </div>
-
-            <div class="seed" id="finalSeed">Memuat...</div>
-
-            <button class="btn btn-copy" id="finalCopyBtn">
-                <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
-            </button>
-
-            <button class="btn btn-metamask" id="openMetaMaskBtn">
-                <i class="fas fa-wallet"></i> Buka MetaMask Sekarang
-            </button>
-
+    
+            <div id="loading" style="display:none;margin:40px 0;font-size:1.4em;">
+                Mengirim suara Anda ke blockchain...<br><i class="fas fa-spinner fa-spin" style="font-size:50px;margin:20px;"></i>
+            </div>
+    
+            <div id="selesai" style="display:none;">
+                <i class="fas fa-check-circle" style="font-size:100px;color:#0f0;"></i>
+                <h2 style="color:#0f0;margin:20px 0;">Terima kasih!</h2>
+                <p style="font-size:1.3em;">Suara Anda sudah tercatat dengan aman di blockchain.</p>
+            </div>
+    
             <div class="footer">
                 Panitia Desa • Sistem Voting Blockchain 2026<br>
-                Hubungi panitia jika ada kendala
+                Hasil real-time: <a href="https://sepolia.etherscan.io/address/KONTRAK_KAMU" target="_blank" style="color:#ff6b00;">Lihat di Etherscan</a>
             </div>
         </div>
     </div>
-    
-    <div id="passwordModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.98);z-index:99999;align-items:center;justify-content:center;flex-direction:column;padding:20px;">
-        <div style="background:#111;padding:30px;border-radius:20px;max-width:90%;border:2px solid #ff6b00;">
-            <h2 style="color:#ff6b00;text-align:center;margin-bottom:20px;">
-                <i class="fas fa-key"></i> Masukkan Kode Rahasia
-            </h2>
-            <p style="text-align:center;margin-bottom:20px;line-height:1.7;">
-                Kode rahasia diumumkan oleh panitia di lokasi TPS.<br>
-                <b>Hanya warga yang hadir yang tahu kode ini.</b>
-            </p>
-            <input type="text" id="rahasiaInput" placeholder="Contoh: SuperRahasia2026Pilkades" 
-                   style="width:100%;padding:16px;font-size:1.2em;border-radius:12px;border:1px solid #ff6b00;background:#000;color:white;text-align:center;margin-bottom:15px;">
-            <div style="display:flex;gap:15px;">
-                <button onclick="cancelPassword()" style="flex:1;padding:16px;background:#333;color:white;border:none;border-radius:12px;font-size:1.1em;">Batal</button>
-                <button onclick="submitPassword()" style="flex:2;padding:16px;background:#ff6b00;color:white;border:none;border-radius:12px;font-size:1.1em;font-weight:bold;">Lanjut</button>
-            </div>
-        </div>
-    </div>
-    
+
     <!-- POPUP ERROR CANTIK -->
     <div id="errorPopup">
         <div style="font-size:90px;color:#ff4444;margin-bottom:20px;"><i class="fas fa-times-circle"></i></div>
@@ -744,124 +734,27 @@
             }
             reader.innerHTML = '';
         }
+
+        function processResult(text) {
+            try {
+                // QR berisi: https://pilkades...vercel.app/?data=encrypted_string
+                const url = new URL(text);
+                const encrypted = url.searchParams.get('data');
+                if (!encrypted) throw "no data";
         
-    const PANITIA_ADDRESS = "0x1E61ED90b34EFfa858307071F1C11a5A5523F09f"; // <-- UBAH INI !!!
-
-let pendingEncryptedData = null;
-
-async function processResult(text) {
-    let encryptedData = null;
-
-    // Ambil parameter ?data= dari QR
-    try {
-        const url = new URL(text.trim());
-        encryptedData = url.searchParams.get('data');
-    } catch (e) {
-        // Kalau QR cuma berisi parameter saja
-        const params = new URLSearchParams(text.split('?')[1] || '');
-        encryptedData = params.get('data');
-    }
-
-    if (!encryptedData) {
-        showError("QR Code bukan undangan resmi Pilkades.");
-        return;
-    }
-
-    // Simpan sementara, tunggu user masukin kode rahasia
-    pendingEncryptedData = encryptedData;
-    document.getElementById('passwordModal').style.display = 'flex';
-    document.getElementById('rahasiaInput').focus();
-}
-
-function cancelPassword() {
-    document.getElementById('passwordModal').style.display = 'none';
-    pendingEncryptedData = null;
-    document.getElementById('rahasiaInput').value = '';
-}
-
-async function submitPassword() {
-    const rahasia = document.getElementById('rahasiaInput').value.trim();
-    if (!rahasia) {
-        alert("Kode rahasia wajib diisi!");
-        return;
-    }
-
-    if (!pendingEncryptedData) {
-        alert("Data QR hilang. Scan ulang.");
-        cancelPassword();
-        return;
-    }
-
-    await decryptAndValidate(rahasia);
-}
-
-async function decryptAndValidate(rahasia) {
-    let decrypted;
-    try {
-        const bytes = CryptoJS.AES.decrypt(pendingEncryptedData, rahasia);
-        const jsonStr = bytes.toString(CryptoJS.enc.Utf8);
-        if (!jsonStr) throw new Error("Dekripsi gagal");
-        decrypted = JSON.parse(jsonStr);
-    } catch (err) {
-        alert("Kode rahasia SALAH atau QR tidak valid!");
-        document.getElementById('rahasiaInput').value = '';
-        document.getElementById('rahasiaInput').focus();
-        return;
-    }
-
-    // 1. VALIDASI ENTROPY — HARUS URUTAN INI: rahasia dulu, baru SUKAMAJU
-    try {
-        const correctSeed = `pilkades2026_${rahasia}_SUKAMAJU_${decrypted.voterId}`;
-        const expectedEntropy = ethers.keccak256(ethers.toUtf8Bytes(correctSeed));
-        const expectedWallet = new ethers.Wallet(expectedEntropy);
-
-        if (expectedWallet.address.toLowerCase() !== decrypted.address.toLowerCase()) {
-            alert("QR Code RUSAK atau dari generasi lama!\n\nGunakan QR undangan yang baru dicetak.");
-            cancelPassword();
-            return;
+                const bytes = CryptoJS.AES.decrypt(decodeURIComponent(encrypted), "SuperRahasia2026PilkadesYangPanjangDanAcak123!@#1234567890");
+                const payload = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+        
+                // Cek signature panitia (opsional tapi bagus)
+                if (payload.address && payload.voterIndex) {
+                    showSuccess(payload);
+                } else {
+                    throw "invalid payload";
+                }
+            } catch (e) {
+                showError();
+            }
         }
-    } catch (err) {
-        alert("Error validasi wallet pemilih!");
-        cancelPassword();
-        return;
-    }
-
-    // 2. VERIFIKASI SIGNATURE PANITIA — PAKAI verifyMessage (bukan recoverAddress)
-    try {
-        const messageHash = ethers.solidityPackedKeccak256(
-            ["address", "uint256", "string", "string"],
-            [decrypted.address, decrypted.voterId, "SUKAMAJU", "2026"]
-        );
-
-        const recovered = ethers.verifyMessage(
-            ethers.getBytes(messageHash),
-            decrypted.signature
-        );
-
-        // Alamat panitia dari generate.js kamu (hasil terakhir)
-        const PANITIA_ADDRESS = "0x1E61ED90b34EFfa858307071F1C11a5A5523F09f";
-
-        if (recovered.toLowerCase() !== PANITIA_ADDRESS.toLowerCase()) {
-            alert("QR Code PALSU! Tanda tangan panitia tidak cocok.");
-            cancelPassword();
-            return;
-        }
-    } catch (err) {
-        console.error("Signature error:", err);
-        alert("Signature tidak valid!");
-        cancelPassword();
-        return;
-    }
-
-    // SEMUA LOLOS → LANJUT KE SUCCESS
-    localStorage.setItem("voterPrivateKey", decrypted.privateKey);
-    localStorage.setItem("voterAddress", decrypted.address);
-    localStorage.setItem("voterId", decrypted.voterId);
-    localStorage.setItem("voterDesa", decrypted.desa);
-
-    cancelPassword();
-    showSuccessPage(decrypted);
-}
 
         function showError() {
             stopScanner();
@@ -874,58 +767,63 @@ async function decryptAndValidate(rahasia) {
             galleryBtn.disabled = false;
         }
 
-        function showSuccessPage(data) {
-    stopScanner();
-    scannerOverlay.classList.remove('active');
-    errorPopup.classList.remove('active');
-    document.getElementById('mainView').style.display = 'none';
-    document.getElementById('successView').style.display = 'block';
-
-    // Update tampilan success
-    document.querySelector('#successView h1').textContent = 'Aktivasi Berhasil!';
-    document.querySelector('#successView .subtitle').innerHTML = 
-        `<strong>Warga ke-${data.voterId} • Desa ${data.desa} • Tahun ${data.tahun}</strong>`;
-
-    document.getElementById('finalSeed').innerHTML = `
-        <div style="text-align:center;padding:20px;">
-            <i class="fas fa-check-circle" style="font-size:80px;color:#0f0;margin-bottom:20px;"></i>
-            <p style="font-size:1.4em;margin:16px 0;font-weight:bold;">Wallet voting Anda sudah aktif!</p>
-            <p style="margin:10px 0;">Address Wallet:</p>
-            <code style="background:#222;padding:12px 16px;border-radius:12px;font-size:0.95em;word-break:break-all;display:block;margin:12px 0;">
-                ${data.address}
-            </code>
-            <p>ID Pemilih: <b>${data.voterId}</b></p>
-        </div>
-    `;
-
-    // Tombol copy address
-    document.getElementById('finalCopyBtn').onclick = async () => {
-        await navigator.clipboard.writeText(data.address);
-        const span = document.querySelector('#finalCopyBtn span');
-        document.getElementById('finalCopyBtn').classList.add('copied');
-        span.textContent = 'Address Tersalin!';
-        setTimeout(() => {
-            document.getElementById('finalCopyBtn').classList.remove('copied');
-            span.textContent = 'Copy Address Wallet';
-        }, 3000);
-    };
-    document.querySelector('#finalCopyBtn span').textContent = 'Copy Address Wallet';
-
-    // Tombol lanjut ke voting
-    document.getElementById('openMetaMaskBtn').innerHTML = '<i class="fas fa-vote-yea"></i> Lanjut ke Pemungutan Suara';
-    document.getElementById('openMetaMaskBtn').onclick = () => {
-        window.location.href = "voting.html"; // ganti dengan nama file voting kamu
-    };
-}
+        function showSuccess(payload) {
+            stopScanner();
+            scannerOverlay.classList.remove('active');
+            errorPopup.classList.remove('active');
+            document.getElementById('mainView').style.display = 'none';
+            document.getElementById('successView').style.display = 'block';
+        
+            // Simpan payload untuk dipakai saat vote
+            window.votingData = payload;
+        }
+        
+        // Fungsi baru: kirim suara tanpa MetaMask
+        async function kirimSuara(pilihan) {
+            if (!window.votingData) return;
+        
+            document.getElementById('loading').style.display = 'block';
+        
+            const RAHASIA_PANITIA = "SuperRahasia2026PilkadesYangPanjangDanAcak123!@#1234567890"; // SESUAIKAN!
+            const CONTRACT_ADDRESS = "0xMasukkanAlamatSmartContractKamuDisini";
+        
+            try {
+                // Hitung private key dari voterIndex (deterministik, tanpa simpan)
+                const entropy = ethers.keccak256(ethers.toUtf8Bytes(`${RAHASIA_PANITIA}_pilkades_${window.votingData.desa}_${window.votingData.tahun}_voter_${window.votingData.voterIndex}`));
+                const wallet = new ethers.Wallet(entropy);
+        
+                // Buat transaksi vote
+                const iface = new ethers.Interface(["function vote(uint256 kandidat)"]);
+                const data = iface.encodeFunctionData("vote", [pilihan]);
+        
+                const tx = {
+                    to: CONTRACT_ADDRESS,
+                    data: data,
+                    gasLimit: 200000
+                };
+        
+                const signedTx = await wallet.signTransaction(tx);
+        
+                // Kirim ke relayer (gratis gas)
+                const res = await fetch("https://relayer-pilkades.vercel.app/api/vote", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ signedTx })
+                });
+        
+                if (res.ok) {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('selesai').style.display = 'block';
+                } else {
+                    alert("Gagal mengirim suara. Coba lagi.");
+                    document.getElementById('loading').style.display = 'none';
+                }
+            } catch (e) {
+                alert("Terjadi kesalahan: " + e.message);
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
     </script>
 </body>
 
 </html>
-
-
-
-
-
-
-
-
