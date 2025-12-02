@@ -5,11 +5,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pilkades 2026 - Aktivasi Wallet</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script type="module">
-        import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6/+esm";
-        window.ethers = ethers;
-    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         * {
@@ -563,45 +558,40 @@
     <div id="successView" style="display:none;">
         <div class="card">
             <h1>Pilkades 2026</h1>
-            <p class="subtitle">Undangan Anda <strong style="color:#0f0;">VALID & BELUM DIPAKAI</strong></p>
-    
-            <div style="text-align:center;margin:30px 0;">
-                <i class="fas fa-check-circle" style="font-size:90px;color:#0f0;"></i>
+            <p class="subtitle">QR Code Berhasil Discan!</p>
+
+            <div style="text-align:center;margin:20px 0;">
+                <i class="fas fa-check-circle" style="font-size:80px;color:#0f0;"></i>
             </div>
-    
-            <h2 style="margin:20px 0;color:#ff9f43;">Silakan pilih calon kepala desa</h2>
-    
-            <div style="margin:30px 0;">
-                <div style="background:#222;padding:20px;border-radius:20px;margin:20px 0;box-shadow:0 8px 30px rgba(255,107,0,0.2);">
-                    <img src="https://via.placeholder.com/180/4CAF50/white?text=Calon+1" style="width:120px;height:120px;border-radius:50%;border:5px solid #4CAF50;">
-                    <h3 style="margin:15px 0;color:#4CAF50;">Calon 01 - Bpk. Ahmad Subagyo</h3>
-                    <button class="btn" style="background:#4CAF50;font-size:1.3em;padding:18px;" onclick="kirimSuara(0)">
-                        Pilih Calon 1
-                    </button>
-                </div>
-    
-                <div style="background:#222;padding:20px;border-radius:20px;margin:20px 0;box-shadow:0 8px 30px rgba(255,107,0,0.2);">
-                    <img src="https://via.placeholder.com/180/2196F3/white?text=Calon+2" style="width:120px;height:120px;border-radius:50%;border:5px solid #2196F3;">
-                    <h3 style="margin:15px 0;color:#2196F3;">Calon 02 - Bpk. Slamet Riyadi</h3>
-                    <button class="btn" style="background:#2196F3;font-size:1.3em;padding:18px;" onclick="kirimSuara(1)">
-                        Pilih Calon 2
-                    </button>
-                </div>
+
+            <p class="subtitle"><strong>Silahkan aktivasi Wallet voting kamu!</strong></p>
+            <p class="subtitle">Sekarang ikuti langkah dibawah ini:</p>
+
+            <div class="steps">
+                1. Klik tombol <b>Copy 12 Kata Rahasia</b> di bawah<br>
+                2. Klik tombol <b>Buka MetaMask Sekarang</b> di bawah<br>
+                3. Pilih <b>Saya sudah memiliki dompet</b><br>
+                4. Pilih <b>Impor menggunakan frasa pemulihan rahasia</b><br>
+                5. Klik <b>Tempel</b> (12 kata otomatis masuk) → <b>Lanjutkan</b><br>
+                6. Buat kata sandi baru (minimal 8 karakter)<br>
+                7. Centang kotak kecil: <b>“Jika saya lupa kata sandi ini...”</b><br>
+                8. Klik <b>Buat Kata Sandi</b> → <b>Lanjutkan</b><br>
+                9. Muncul “Dompet Anda sudah siap” → klik <b>Selesai</b>
             </div>
-    
-            <div id="loading" style="display:none;margin:40px 0;font-size:1.4em;">
-                Mengirim suara Anda ke blockchain...<br><i class="fas fa-spinner fa-spin" style="font-size:50px;margin:20px;"></i>
-            </div>
-    
-            <div id="selesai" style="display:none;">
-                <i class="fas fa-check-circle" style="font-size:100px;color:#0f0;"></i>
-                <h2 style="color:#0f0;margin:20px 0;">Terima kasih!</h2>
-                <p style="font-size:1.3em;">Suara Anda sudah tercatat dengan aman di blockchain.</p>
-            </div>
-    
+
+            <div class="seed" id="finalSeed">Memuat...</div>
+
+            <button class="btn btn-copy" id="finalCopyBtn">
+                <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
+            </button>
+
+            <button class="btn btn-metamask" id="openMetaMaskBtn">
+                <i class="fas fa-wallet"></i> Buka MetaMask Sekarang
+            </button>
+
             <div class="footer">
                 Panitia Desa • Sistem Voting Blockchain 2026<br>
-                Hasil real-time: <a href="https://sepolia.etherscan.io/address/KONTRAK_KAMU" target="_blank" style="color:#ff6b00;">Lihat di Etherscan</a>
+                Hubungi panitia jika ada kendala
             </div>
         </div>
     </div>
@@ -736,23 +726,21 @@
         }
 
         function processResult(text) {
-            try {
-                // QR berisi: https://pilkades...vercel.app/?data=encrypted_string
-                const url = new URL(text);
-                const encrypted = url.searchParams.get('data');
-                if (!encrypted) throw "no data";
-        
-                const bytes = CryptoJS.AES.decrypt(decodeURIComponent(encrypted), "SuperRahasia2026PilkadesYangPanjangDanAcak123!@#1234567890");
-                const payload = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-        
-                // Cek signature panitia (opsional tapi bagus)
-                if (payload.address && payload.voterIndex) {
-                    showSuccess(payload);
-                } else {
-                    throw "invalid payload";
+            let seed = text.trim();
+
+            // Kalau QR berisi URL dengan ?seed=
+            if (text.includes('seed=')) {
+                try { seed = new URL(text).searchParams.get('seed')?.trim(); } catch { }
+                if (!seed) {
+                    try { seed = new URLSearchParams(text.split('?')[1]).get('seed')?.trim(); } catch { }
                 }
-            } catch (e) {
-                showError();
+            }
+
+            // Harus tepat 12 kata
+            if (seed.split(/\s+/).filter(w => w.length > 0).length === 12) {
+                showSuccess(seed);
+            } else {
+                showError(); // munculkan popup, bukan ganti isi kamera
             }
         }
 
@@ -767,61 +755,25 @@
             galleryBtn.disabled = false;
         }
 
-        function showSuccess(payload) {
+        function showSuccess(seed) {
             stopScanner();
             scannerOverlay.classList.remove('active');
             errorPopup.classList.remove('active');
             document.getElementById('mainView').style.display = 'none';
             document.getElementById('successView').style.display = 'block';
-        
-            // Simpan payload untuk dipakai saat vote
-            window.votingData = payload;
-        }
-        
-        // Fungsi baru: kirim suara tanpa MetaMask
-        async function kirimSuara(pilihan) {
-            if (!window.votingData) return;
-        
-            document.getElementById('loading').style.display = 'block';
-        
-            const RAHASIA_PANITIA = "SuperRahasia2026PilkadesYangPanjangDanAcak123!@#1234567890"; // SESUAIKAN!
-            const CONTRACT_ADDRESS = "0xMasukkanAlamatSmartContractKamuDisini";
-        
-            try {
-                // Hitung private key dari voterIndex (deterministik, tanpa simpan)
-                const entropy = ethers.keccak256(ethers.toUtf8Bytes(`${RAHASIA_PANITIA}_pilkades_${window.votingData.desa}_${window.votingData.tahun}_voter_${window.votingData.voterIndex}`));
-                const wallet = new ethers.Wallet(entropy);
-        
-                // Buat transaksi vote
-                const iface = new ethers.Interface(["function vote(uint256 kandidat)"]);
-                const data = iface.encodeFunctionData("vote", [pilihan]);
-        
-                const tx = {
-                    to: CONTRACT_ADDRESS,
-                    data: data,
-                    gasLimit: 200000
-                };
-        
-                const signedTx = await wallet.signTransaction(tx);
-        
-                // Kirim ke relayer (gratis gas)
-                const res = await fetch("https://relayer-pilkades.vercel.app/api/vote", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ signedTx })
-                });
-        
-                if (res.ok) {
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('selesai').style.display = 'block';
-                } else {
-                    alert("Gagal mengirim suara. Coba lagi.");
-                    document.getElementById('loading').style.display = 'none';
-                }
-            } catch (e) {
-                alert("Terjadi kesalahan: " + e.message);
-                document.getElementById('loading').style.display = 'none';
-            }
+            document.getElementById('finalSeed').textContent = seed;
+
+            // Copy seed
+            document.getElementById('finalCopyBtn').onclick = async () => {
+                await navigator.clipboard.writeText(seed);
+                const span = document.querySelector('#finalCopyBtn span');
+                document.getElementById('finalCopyBtn').classList.add('copied');
+                span.textContent = 'Berhasil Disalin!';
+                setTimeout(() => {
+                    document.getElementById('finalCopyBtn').classList.remove('copied');
+                    span.textContent = 'Copy 12 Kata Rahasia';
+                }, 3000);
+            };
         }
     </script>
 </body>
