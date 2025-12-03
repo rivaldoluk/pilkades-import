@@ -634,47 +634,44 @@
         };
     
         // === GALERI — VERSI FINAL YANG BENAR-BENAR JALAN DI SEMUA HP ===
-        document.getElementById('galleryBtn').onclick = () => document.getElementById('qrInput').click();
-    
-        document.getElementById('qrInput').onchange = function(e) {
+        document.getElementById('galleryBtn').onclick = () => {
+            document.getElementById('qrInput').click();
+        };
+        
+        document.getElementById('qrInput').onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
-    
+        
             stopScanner();
             const btn = document.getElementById('galleryBtn');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memindai Gambar...';
             btn.disabled = true;
-    
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-    
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const code = jsQR(imageData.data, imageData.width, imageData.height);
-    
+        
+            // Buat div sementara di luar layar untuk render gambar
+            const tempReader = document.createElement('div');
+            tempReader.id = 'temp-reader';
+            tempReader.style.position = 'absolute';
+            tempReader.style.left = '-9999px';
+            tempReader.style.width = '400px';
+            tempReader.style.height = '400px';
+            document.body.appendChild(tempReader);
+        
+            try {
+                const scanner = new Html5Qrcode("temp-reader");
+                const result = await scanner.scanFile(file, true); // true = render gambar (PENTING!)
+        
+                document.body.removeChild(tempReader);
+                processQR(result); // langsung proses hasilnya
+        
+            } catch (err) {
+                document.body.removeChild(tempReader);
+                alert("QR Code tidak terdeteksi di gambar.\n\nTips:\n• Pastikan QR terlihat utuh dan jelas\n• Foto harus terang & fokus\n• Coba scan langsung dengan kamera");
+                showError();
+            } finally {
                 btn.innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
                 btn.disabled = false;
                 document.getElementById('qrInput').value = '';
-    
-                if (code && code.data) {
-                    processQR(code.data);
-                } else {
-                    alert("QR Code tidak terdeteksi di gambar.\n\nTips:\n• Pastikan QR terlihat utuh & jelas\n• Foto harus terang dan tidak buram");
-                    showError();
-                }
-            };
-    
-            img.onerror = function() {
-                btn.innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
-                btn.disabled = false;
-                alert("Gagal membaca gambar.");
-            };
-    
-            img.src = URL.createObjectURL(file);
+            }
         };
     
         // Scanner kamera
@@ -743,6 +740,7 @@
 </body>
 
 </html>
+
 
 
 
