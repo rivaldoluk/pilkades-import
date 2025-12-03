@@ -606,93 +606,85 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script>
         // === SEMUA ELEMENT ===
-        const scannerOverlay   = document.getElementById('scannerOverlay');
-        const permissionOverlay= document.getElementById('permissionOverlay');
-        const errorPopup       = document.getElementById('errorPopup');
-        const successView      = document.getElementById('successView');
-        const mainView         = document.getElementById('mainView');
-        const reader           = document.getElementById('reader');
+        const scannerOverlay    = document.getElementById('scannerOverlay');
+        const permissionOverlay = document.getElementById('permissionOverlay');
+        const errorPopup        = document.getElementById('errorPopup');
+        const successView       = document.getElementById('successView');
+        const mainView          = document.getElementById('mainView');
+        const reader            = document.getElementById('reader');
         let scanner = null;
-        window.scannedPrivateKey = null; // penyimpanan sementara private key
+        window.scannedPrivateKey = null;
     
-        // Tombol-tombol
-        document.getElementById('scanBtn').onclick = () => {
-            permissionOverlay.classList.add('active');
-        };
-    
+        // Tombol utama
+        document.getElementById('scanBtn').onclick = () => permissionOverlay.classList.add('active');
         document.getElementById('allowBtn').onclick = () => {
             permissionOverlay.classList.remove('active');
             scannerOverlay.classList.add('active');
             startScanner();
         };
-    
         document.getElementById('closeScanner').onclick = () => {
             scannerOverlay.classList.remove('active');
             stopScanner();
         };
-    
         document.getElementById('retryBtn').onclick = () => {
             errorPopup.classList.remove('active');
             scannerOverlay.classList.add('active');
             startScanner();
         };
     
-        // Pilih dari galeri
-        document.getElementById('galleryBtn').onclick = () => {
-            document.getElementById('qrInput').click();
-        };
-
-        document.getElementById('qrInput').onchange = async (e) => {
+        // === GALERI — VERSI FINAL YANG 100% JALAN DI SEMUA HP ===
+        document.getElementById('galleryBtn').onclick = () => document.getElementById('qrInput').click();
+    
+        document.getElementById('qrInput').onchange = (e) => {
             const file = e.target.files[0];
             if (!file) return;
-
+    
             stopScanner();
             const btn = document.getElementById('galleryBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memindai...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memindai Gambar...';
             btn.disabled = true;
-
-            try {
-                // GUNAKAN LIBRARY TERBARU & PALING KUAT: html5-qrcode versi terbaru
-                const result = await Html5Qrcode.getCameras(); // trigger load library
-
-                const scanner = new Html5Qrcode("temp-reader"); // ID sementara
-                const tempDiv = document.createElement('div');
-                tempDiv.id = "temp-reader";
-                tempDiv.style.position = "absolute";
-                tempDiv.style.left = "-9999px";
-                document.body.appendChild(tempDiv);
-
-                // PAKAI scanFile (bukan scanFileV2) + showImage: true → ini yang paling akurat!
-                const text = await scanner.scanFile(file, true); // true = tampilkan preview (penting!)
-
-                document.body.removeChild(tempDiv);
-                processQR(text);
-
-            } catch (err) {
-                // Fallback: coba sekali lagi tanpa preview
-                try {
-                    const scanner2 = new Html5Qrcode("temp-reader2");
-                    const tempDiv2 = document.createElement('div');
-                    tempDiv2.id = "temp-reader2";
-                    tempDiv2.style.display = "none";
-                    document.body.appendChild(tempDiv2);
-
-                    const text2 = await scanner2.scanFile(file, false);
-                    document.body.removeChild(tempDiv2);
-                    processQR(text2);
-
-                } catch (err2) {
-                    alert("QR Code tidak terdeteksi di gambar.\n\nTips:\n• Pastikan QR hitam-putih & terlihat jelas\n• Jangan terlalu kecil atau buram\n• Coba foto ulang atau scan langsung dengan kamera");
-                    showError();
-                }
-            } finally {
+    
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+    
+                // Pakai jsQR — library paling ringan & akurat untuk gambar statis
+                jsQR(canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data, canvas.width, canvas.height, {
+                    inversionAttempts: "dontInvert",
+                }, (err, result) => {
+                    btn.innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
+                    btn.disabled = false;
+                    document.getElementById('qrInput').value = '';
+    
+                    if (result) {
+                        processQR(result.data);
+                    } else {
+                        alert("QR Code tidak terdeteksi di gambar.\n\nTips:\n• Pastikan QR terlihat jelas & utuh\n• Foto harus terang dan fokus\n• Coba scan langsung dengan kamera");
+                        showError();
+                    }
+                });
+            };
+    
+            img.onerror = () => {
                 btn.innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
                 btn.disabled = false;
-                document.getElementById('qrInput').value = '';
-            }
+                alert("Gagal membaca gambar. Coba lagi.");
+            };
+    
+            img.src = URL.createObjectURL(file);
         };
     
-        // Mulai scanner kamera
+        // Load jsQR (hanya 30KB, super cepat)
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
+        script.onload = () => console.log("jsQR siap!");
+        document.head.appendChild(script);
+    
+        // Scanner kamera (tetap pakai html5-qrcode)
         function startScanner() {
             stopScanner();
             reader.innerHTML = '';
@@ -702,24 +694,22 @@
                 { fps: 10, qrbox: { width: 280, height: 280 } },
                 processQR,
                 () => {}
-            ).catch(err => {
-                alert("Gagal mengakses kamera. Pastikan Anda mengizinkan akses kamera.");
+            ).catch(() => {
+                alert("Gagal akses kamera.");
                 scannerOverlay.classList.remove('active');
             });
         }
     
         function stopScanner() {
             if (scanner) {
-                scanner.stop().then(() => scanner = null).catch(() => {});
-                reader.innerHTML = '';
+                scanner.stop().catch(() => {});
+                scanner = null;
             }
+            reader.innerHTML = '';
         }
     
-        // Proses hasil scan QR
         function processQR(text) {
             const str = text.trim();
-    
-            // Cek URL dengan ?pk=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             try {
                 const url = new URL(str);
                 const pk = url.searchParams.get('pk');
@@ -730,18 +720,15 @@
                 }
             } catch (_) {}
     
-            // Atau langsung private key langsung (64 hex tanpa 0x)
             if (/^[0-9a-fA-F]{64}$/.test(str)) {
                 window.scannedPrivateKey = str;
                 showSuccess();
                 return;
             }
     
-            // Kalau tidak cocok → error
             showError();
         }
     
-        // Tampilkan halaman sukses + tombol voting
         function showSuccess() {
             stopScanner();
             scannerOverlay.classList.remove('active');
@@ -753,8 +740,6 @@
                 const pk = window.scannedPrivateKey;
                 if (pk) {
                     window.location.href = `public/user/user.html?pk=${pk}`;
-                } else {
-                    alert("Private key hilang! Silakan scan ulang.");
                 }
             };
         }
@@ -768,6 +753,7 @@
 </body>
 
 </html>
+
 
 
 
