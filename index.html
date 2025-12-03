@@ -564,29 +564,16 @@
                 <i class="fas fa-check-circle" style="font-size:80px;color:#0f0;"></i>
             </div>
 
-            <p class="subtitle"><strong>Silahkan aktivasi Wallet voting kamu!</strong></p>
-            <p class="subtitle">Sekarang ikuti langkah dibawah ini:</p>
-
+            <p class="subtitle"><strong>QR Code Berhasil Discan!</strong></p>
+            <p class="subtitle">Anda sudah terdaftar sebagai pemilih resmi.</p>
+            
             <div class="steps">
-                1. Klik tombol <b>Copy 12 Kata Rahasia</b> di bawah<br>
-                2. Klik tombol <b>Buka MetaMask Sekarang</b> di bawah<br>
-                3. Pilih <b>Saya sudah memiliki dompet</b><br>
-                4. Pilih <b>Impor menggunakan frasa pemulihan rahasia</b><br>
-                5. Klik <b>Tempel</b> (12 kata otomatis masuk) → <b>Lanjutkan</b><br>
-                6. Buat kata sandi baru (minimal 8 karakter)<br>
-                7. Centang kotak kecil: <b>“Jika saya lupa kata sandi ini...”</b><br>
-                8. Klik <b>Buat Kata Sandi</b> → <b>Lanjutkan</b><br>
-                9. Muncul “Dompet Anda sudah siap” → klik <b>Selesai</b>
+                Tekan tombol <b>Mulai Voting Sekarang</b> di bawah ini untuk memilih calon kepala desa pilihan Anda.<br><br>
+                <b>Tanpa install aplikasi. Tanpa buat wallet. Cukup sekali klik.</b>
             </div>
 
-            <div class="seed" id="finalSeed">Memuat...</div>
-
-            <button class="btn btn-copy" id="finalCopyBtn">
-                <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
-            </button>
-
-            <button class="btn btn-metamask" id="openMetaMaskBtn">
-                <i class="fas fa-wallet"></i> Buka MetaMask Sekarang
+            <button class="btn btn-metamask" id="startVotingBtn" style="background:#00c853;">
+                <i class="fas fa-vote-yea"></i> Mulai Voting Sekarang
             </button>
 
             <div class="footer">
@@ -726,22 +713,32 @@
         }
 
         function processResult(text) {
-            let seed = text.trim();
-
-            // Kalau QR berisi URL dengan ?seed=
-            if (text.includes('seed=')) {
-                try { seed = new URL(text).searchParams.get('seed')?.trim(); } catch { }
-                if (!seed) {
-                    try { seed = new URLSearchParams(text.split('?')[1]).get('seed')?.trim(); } catch { }
+            let url = text.trim();
+        
+            try {
+                const parsed = new URL(url);
+                const pk = parsed.searchParams.get('pk');
+        
+                // QR VALID: ada parameter ?pk= dan panjangnya 64 hex (tanpa 0x)
+                if (pk && pk.length === 64 && /^[0-9a-fA-F]{64}$/.test(pk)) {
+                    // Simpan pk sementara dan langsung ke halaman sukses
+                    window.scannedPrivateKey = pk;
+                    showSuccess();
+                    return;
                 }
+            } catch (e) {
+                // bukan URL valid
             }
-
-            // Harus tepat 12 kata
-            if (seed.split(/\s+/).filter(w => w.length > 0).length === 12) {
-                showSuccess(seed);
-            } else {
-                showError(); // munculkan popup, bukan ganti isi kamera
+        
+            // Alternatif: QR isinya langsung private key 64 hex (tanpa 0x)
+            if (/^[0-9a-fA-F]{64}$/.test(url)) {
+                window.scannedPrivateKey = url;
+                showSuccess();
+                return;
             }
+        
+            // Kalau sampai sini → QR salah
+            showError();
         }
 
         function showError() {
@@ -755,24 +752,22 @@
             galleryBtn.disabled = false;
         }
 
-        function showSuccess(seed) {
+        function showSuccess() {
             stopScanner();
             scannerOverlay.classList.remove('active');
             errorPopup.classList.remove('active');
             document.getElementById('mainView').style.display = 'none';
             document.getElementById('successView').style.display = 'block';
-            document.getElementById('finalSeed').textContent = seed;
-
-            // Copy seed
-            document.getElementById('finalCopyBtn').onclick = async () => {
-                await navigator.clipboard.writeText(seed);
-                const span = document.querySelector('#finalCopyBtn span');
-                document.getElementById('finalCopyBtn').classList.add('copied');
-                span.textContent = 'Berhasil Disalin!';
-                setTimeout(() => {
-                    document.getElementById('finalCopyBtn').classList.remove('copied');
-                    span.textContent = 'Copy 12 Kata Rahasia';
-                }, 3000);
+        
+            // Tombol Mulai Voting
+            document.getElementById('startVotingBtn').onclick = () => {
+                const pk = window.scannedPrivateKey;
+                if (!pk) {
+                    alert("PrivateKeyHilang();
+                    return;
+                }
+                // Ganti sesuai struktur folder kamu
+                window.location.href = `public/user/user.html?pk=${pk}`;
             };
         }
     </script>
