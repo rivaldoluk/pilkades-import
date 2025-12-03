@@ -1,5 +1,5 @@
 // public/user/user.js
-import config from '../config.js';
+import config from './config.js';
 const { CONTRACT_ADDRESS, RELAYER_URL, RPC_URL = "https://rpc.sepolia.org" } = config;
 
 const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
@@ -189,4 +189,5 @@ function startTimer() {
 // START
 
 init();
+
 
