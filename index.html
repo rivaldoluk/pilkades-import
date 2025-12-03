@@ -604,8 +604,9 @@
     </div>
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    
     <script>
-        // === SEMUA ELEMENT ===
         const scannerOverlay    = document.getElementById('scannerOverlay');
         const permissionOverlay = document.getElementById('permissionOverlay');
         const errorPopup        = document.getElementById('errorPopup');
@@ -615,7 +616,7 @@
         let scanner = null;
         window.scannedPrivateKey = null;
     
-        // Tombol utama
+        // Tombol-tombol
         document.getElementById('scanBtn').onclick = () => permissionOverlay.classList.add('active');
         document.getElementById('allowBtn').onclick = () => {
             permissionOverlay.classList.remove('active');
@@ -632,10 +633,10 @@
             startScanner();
         };
     
-        // === GALERI — VERSI FINAL YANG 100% JALAN DI SEMUA HP ===
+        // === GALERI — VERSI FINAL YANG BENAR-BENAR JALAN DI SEMUA HP ===
         document.getElementById('galleryBtn').onclick = () => document.getElementById('qrInput').click();
     
-        document.getElementById('qrInput').onchange = (e) => {
+        document.getElementById('qrInput').onchange = function(e) {
             const file = e.target.files[0];
             if (!file) return;
     
@@ -645,46 +646,38 @@
             btn.disabled = true;
     
             const img = new Image();
-            img.onload = () => {
+            img.onload = function() {
                 const canvas = document.createElement('canvas');
                 canvas.width = img.width;
                 canvas.height = img.height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0);
     
-                // Pakai jsQR — library paling ringan & akurat untuk gambar statis
-                jsQR(canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data, canvas.width, canvas.height, {
-                    inversionAttempts: "dontInvert",
-                }, (err, result) => {
-                    btn.innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
-                    btn.disabled = false;
-                    document.getElementById('qrInput').value = '';
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
     
-                    if (result) {
-                        processQR(result.data);
-                    } else {
-                        alert("QR Code tidak terdeteksi di gambar.\n\nTips:\n• Pastikan QR terlihat jelas & utuh\n• Foto harus terang dan fokus\n• Coba scan langsung dengan kamera");
-                        showError();
-                    }
-                });
-            };
-    
-            img.onerror = () => {
                 btn.innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
                 btn.disabled = false;
-                alert("Gagal membaca gambar. Coba lagi.");
+                document.getElementById('qrInput').value = '';
+    
+                if (code && code.data) {
+                    processQR(code.data);
+                } else {
+                    alert("QR Code tidak terdeteksi di gambar.\n\nTips:\n• Pastikan QR terlihat utuh & jelas\n• Foto harus terang dan tidak buram");
+                    showError();
+                }
+            };
+    
+            img.onerror = function() {
+                btn.innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
+                btn.disabled = false;
+                alert("Gagal membaca gambar.");
             };
     
             img.src = URL.createObjectURL(file);
         };
     
-        // Load jsQR (hanya 30KB, super cepat)
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
-        script.onload = () => console.log("jsQR siap!");
-        document.head.appendChild(script);
-    
-        // Scanner kamera (tetap pakai html5-qrcode)
+        // Scanner kamera
         function startScanner() {
             stopScanner();
             reader.innerHTML = '';
@@ -694,7 +687,7 @@
                 { fps: 10, qrbox: { width: 280, height: 280 } },
                 processQR,
                 () => {}
-            ).catch(() => {
+            ).catch(err => {
                 alert("Gagal akses kamera.");
                 scannerOverlay.classList.remove('active');
             });
@@ -725,7 +718,6 @@
                 showSuccess();
                 return;
             }
-    
             showError();
         }
     
@@ -738,9 +730,7 @@
     
             document.getElementById('startVotingBtn').onclick = () => {
                 const pk = window.scannedPrivateKey;
-                if (pk) {
-                    window.location.href = `public/user/user.html?pk=${pk}`;
-                }
+                if (pk) window.location.href = `public/user/user.html?pk=${pk}`;
             };
         }
     
@@ -753,6 +743,7 @@
 </body>
 
 </html>
+
 
 
 
