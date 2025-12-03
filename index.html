@@ -642,32 +642,36 @@
             document.getElementById('qrInput').click();
         };
         
-        document.getElementById('qrInput').onchange = e => {
+        document.getElementById('qrInput').onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
         
-            // Matikan kamera dulu supaya tidak bentrok
+            // Matikan kamera dulu
             stopScanner();
-            scannerOverlay.querySelector('.btn-gallery').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+            const galleryBtn = document.querySelector('#galleryBtn');
+            galleryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses Gambar...';
+            galleryBtn.disabled = true;
         
-            // Buat instance sementara khusus untuk scan file
-            const fileScanner = new Html5Qrcode("reader");
+            try {
+                // CARA PALING AMAN: pakai Html5QrcodeScanner (bukan scanFile)
+                const html5QrcodeScanner = new Html5Qrcode("reader");
         
-            fileScanner.scanFile(file, true)
-                .then(decodedText => {
-                    processQR(decodedText); // langsung proses hasilnya
-                })
-                .catch(err => {
-                    alert("Gagal membaca QR dari gambar. Pastikan gambar jelas dan QR terlihat utuh.");
-                    showError();
-                })
-                .finally(() => {
-                    // Bersihkan instance sementara
-                    fileScanner.clear().catch(() => {});
-                    scannerOverlay.querySelector('.btn-gallery').innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
-                    // Reset input biar bisa dipakai lagi
-                    document.getElementById('qrInput').value = '';
-                });
+                // Langsung scan dari file → ini yang paling stabil
+                const result = await html5QrcodeScanner.scanFileV2(file, false); // false = tidak tampilkan preview
+        
+                // Kalau berhasil
+                processQR(result.text); // langsung proses hasilnya
+        
+            } catch (err) {
+                // Kalau gagal → kasih pesan yang lebih jelas
+                alert("QR Code tidak terdeteksi di gambar.\n\nTips:\n• Pastikan QR terlihat utuh & tidak terpotong\n• Gunakan foto yang terang & fokus\n• Coba scan langsung dengan kamera");
+                showError();
+            } finally {
+                // Bersihkan & reset tombol
+                galleryBtn.innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
+                galleryBtn.disabled = false;
+                document.getElementById('qrInput').value = ''; // reset input
+            }
         };
     
         // Mulai scanner kamera
@@ -746,5 +750,6 @@
 </body>
 
 </html>
+
 
 
