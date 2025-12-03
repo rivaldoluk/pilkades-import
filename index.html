@@ -641,36 +641,70 @@
         document.getElementById('galleryBtn').onclick = () => {
             document.getElementById('qrInput').click();
         };
-        
+
         document.getElementById('qrInput').onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
-        
-            // Matikan kamera dulu
+
             stopScanner();
-            const galleryBtn = document.querySelector('#galleryBtn');
-            galleryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses Gambar...';
-            galleryBtn.disabled = true;
-        
+            const btn = document.getElementById('galleryBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memindai Gambar...';
+            btn.disabled = true;
+
             try {
-                // CARA PALING AMAN: pakai Html5QrcodeScanner (bukan scanFile)
-                const html5QrcodeScanner = new Html5Qrcode("reader");
-        
-                // Langsung scan dari file → ini yang paling stabil
-                const result = await html5QrcodeScanner.scanFileV2(file, false); // false = tidak tampilkan preview
-        
-                // Kalau berhasil
-                processQR(result.text); // langsung proses hasilnya
-        
+                // Buat canvas sementara untuk baca QR (cara paling akurat!)
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+
+                await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = () => reject("Gagal load gambar");
+                });
+
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+
+                // Pakai ZXing (lebih kuat dari html5-qrcode untuk gambar statis)
+                const result = await new Promise((resolve) => {
+                    // Load ZXing dari CDN (ringan & super akurat)
+                    if (!window.ZXing) {
+                        const script = document.createElement('script');
+                        script.src = 'https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js';
+                        script.onload = () => resolve(scanWithZXing(canvas));
+                        script.onerror = () => resolve(null);
+                        document.head.appendChild(script);
+                    } else {
+                        resolve(scanWithZXing(canvas));
+                    }
+                });
+
+                async function scanWithZXing(canvas) {
+                    const codeReader = new ZXing.BrowserMultiFormatReader();
+                    try {
+                        const result = await codeReader.decodeFromCanvas(canvas);
+                        return result.getText();
+                    } catch {
+                        return null;
+                    }
+                }
+
+                if (result) {
+                    processQR(result);
+                    return;
+                } else {
+                    throw new Error("Tidak ditemukan");
+                }
+
             } catch (err) {
-                // Kalau gagal → kasih pesan yang lebih jelas
-                alert("QR Code tidak terdeteksi di gambar.\n\nTips:\n• Pastikan QR terlihat utuh & tidak terpotong\n• Gunakan foto yang terang & fokus\n• Coba scan langsung dengan kamera");
+                alert("QR tidak terdeteksi di gambar.\n\nTips:\n• Pastikan QR utuh & tidak terpotong\n• Foto harus terang & fokus\n• Coba scan langsung pakai kamera");
                 showError();
             } finally {
-                // Bersihkan & reset tombol
-                galleryBtn.innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
-                galleryBtn.disabled = false;
-                document.getElementById('qrInput').value = ''; // reset input
+                btn.innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
+                btn.disabled = false;
+                document.getElementById('qrInput').value = '';
             }
         };
     
@@ -750,6 +784,7 @@
 </body>
 
 </html>
+
 
 
 
