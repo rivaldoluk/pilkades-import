@@ -276,6 +276,11 @@
             border: 2px solid #34495e;
         }
 
+        .btn-gallery.processing {
+            background: #444 !important;
+            cursor: not-allowed;
+        }
+
         .btn-gallery:hover {
             background: #34495e;
             border-color: #ff6b00;
@@ -633,13 +638,36 @@
         };
     
         // Pilih dari galeri
-        document.getElementById('galleryBtn').onclick = () => document.getElementById('qrInput').click();
+        document.getElementById('galleryBtn').onclick = () => {
+            document.getElementById('qrInput').click();
+        };
+        
         document.getElementById('qrInput').onchange = e => {
             const file = e.target.files[0];
             if (!file) return;
-            Html5Qrcode.scanFile(file, true)
-                .then(text => processQR(text))
-                .catch(() => showError());
+        
+            // Matikan kamera dulu supaya tidak bentrok
+            stopScanner();
+            scannerOverlay.querySelector('.btn-gallery').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+        
+            // Buat instance sementara khusus untuk scan file
+            const fileScanner = new Html5Qrcode("reader");
+        
+            fileScanner.scanFile(file, true)
+                .then(decodedText => {
+                    processQR(decodedText); // langsung proses hasilnya
+                })
+                .catch(err => {
+                    alert("Gagal membaca QR dari gambar. Pastikan gambar jelas dan QR terlihat utuh.");
+                    showError();
+                })
+                .finally(() => {
+                    // Bersihkan instance sementara
+                    fileScanner.clear().catch(() => {});
+                    scannerOverlay.querySelector('.btn-gallery').innerHTML = '<i class="fas fa-images"></i> Pilih dari Galeri';
+                    // Reset input biar bisa dipakai lagi
+                    document.getElementById('qrInput').value = '';
+                });
         };
     
         // Mulai scanner kamera
@@ -718,4 +746,5 @@
 </body>
 
 </html>
+
 
