@@ -730,24 +730,43 @@
         }
 
         function processResult(text) {
-            let seed = text.trim();
-
-            // Kalau QR berisi URL dengan ?seed=
-            if (text.includes('seed=')) {
-                try { seed = new URL(text).searchParams.get('seed')?.trim(); } catch { }
-                if (!seed) {
-                    try { seed = new URLSearchParams(text.split('?')[1]).get('seed')?.trim(); } catch { }
-                }
+            let token = null;
+        
+            // Ambil token dari ?t=xxx (bisa dari URL langsung atau dari QR)
+            try {
+                const url = new URL(text);
+                token = url.searchParams.get('t');
+            } catch {
+                const params = new URLSearchParams(text.split('?')[1]);
+                token = params.get('t');
             }
-
-            // Harus tepat 12 kata
-            if (seed.split(/\s+/).filter(w => w.length > 0).length === 12) {
-                showSuccess(seed);
+        
+            if (token && token.length >= 32) {
+                localStorage.setItem('votingToken', token);
+                showNikForm();  // ← fungsi baru
             } else {
-                showError(); // munculkan popup, bukan ganti isi kamera
+                showError();
             }
         }
-
+        
+        function showNikForm() {
+            stopScanner();
+            scannerOverlay.classList.remove('active');
+            document.getElementById('mainView').style.display = 'none';
+            document.getElementById('successView').style.display = 'block';
+        
+            document.getElementById('lanjutVoteBtn').onclick = () => {
+                const nik = document.getElementById('nikInput').value.trim();
+                if (nik.length === 18 && /^\d+$/.test(nik)) {
+                    // Kirim ke backend validasi token + NIK
+                    window.location.href = `/vote-candidates?nik=${nik}`;
+                    // atau langsung load halaman voting + kirim data via POST
+                } else {
+                    alert('NIK harus 18 digit angka!');
+                }
+            };
+        }
+        
         function showError() {
             stopScanner();
             errorPopup.classList.add('active'); // popup muncul
@@ -783,4 +802,5 @@
 </body>
 
 </html>
+
 
