@@ -759,7 +759,7 @@
                 const nik = document.getElementById('nikInput').value.trim();
                 if (nik.length === 16 && /^\d+$/.test(nik)) {
                     // Kirim ke backend validasi token + NIK
-                    window.location.href = `/vote-candidates?nik=${nik}`;
+                    window.location.href = `/user?nik=${nik}`;
                     // atau langsung load halaman voting + kirim data via POST
                 } else {
                     alert('NIK harus 18 digit angka!');
