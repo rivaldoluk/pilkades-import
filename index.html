@@ -579,15 +579,19 @@
                 9. Muncul “Dompet Anda sudah siap” → klik <b>Selesai</b>
             </div>
 
-            <div class="seed" id="finalSeed">Memuat...</div>
-
-            <button class="btn btn-copy" id="finalCopyBtn">
-                <i class="fas fa-copy"></i> <span>Copy 12 Kata Rahasia</span>
-            </button>
-
-            <button class="btn btn-metamask" id="openMetaMaskBtn">
-                <i class="fas fa-wallet"></i> Buka MetaMask Sekarang
-            </button>
+            <div id="nikForm">
+                <h1>Tiket Valid</h1>
+                <p class="subtitle">Silakan masukkan <strong>NIK</strong> Anda untuk memastikan identitas</p>
+            
+                <div style="margin:30px 0;">
+                    <input type="text" id="nikInput" maxlength="18" placeholder="Masukkan 18 digit NIK" 
+                           style="width:100%;padding:20px;font-size:1.3em;border-radius:16px;border:2px solid #ff6b00;background:#000;color:white;text-align:center;letter-spacing:2px;">
+                </div>
+            
+                <button class="btn btn-metamask" id="lanjutVoteBtn">
+                    <i class="fas fa-vote-yea"></i> Lanjut ke Voting
+                </button>
+            </div>
 
             <div class="footer">
                 Panitia Desa • Sistem Voting Blockchain 2026<br>
@@ -779,3 +783,4 @@
 </body>
 
 </html>
+
