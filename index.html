@@ -757,7 +757,7 @@
         
             document.getElementById('lanjutVoteBtn').onclick = () => {
                 const nik = document.getElementById('nikInput').value.trim();
-                if (nik.length === 18 && /^\d+$/.test(nik)) {
+                if (nik.length === 16 && /^\d+$/.test(nik)) {
                     // Kirim ke backend validasi token + NIK
                     window.location.href = `/vote-candidates?nik=${nik}`;
                     // atau langsung load halaman voting + kirim data via POST
@@ -802,5 +802,6 @@
 </body>
 
 </html>
+
 
 
